@@ -968,8 +968,8 @@
       "networkCompilerLabel": "Network compiler",
       "backendUrlPlaceholder": "Enter backend url",
       "backendUrlLabel": "Backend URL",
-      "showMore": "Show More",
-      "showLess": "Show Less",
+      "showTippingConfig": "Show Tipping Configuration",
+      "hideTippingConfig": "Hide Tipping Configuration",
       "save": "Connect"
     },
     "donate-error": {

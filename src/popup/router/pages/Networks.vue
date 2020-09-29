@@ -61,7 +61,9 @@
       />
       <div class="text-left expand" @click="expanded = !expanded">
         <img :class="expanded ? 'open' : ''" src="../../../icons/carret-down.svg" />
-        <span>{{ expanded ? $t('pages.network.showLess') : $t('pages.network.showMore') }}</span>
+        <span>{{
+          expanded ? $t('pages.network.hideTippingConfig') : $t('pages.network.showTippingConfig')
+        }}</span>
       </div>
       <Input
         v-show="expanded"

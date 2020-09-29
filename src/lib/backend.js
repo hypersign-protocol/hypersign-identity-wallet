@@ -1,5 +1,3 @@
-// copied from https://github.com/aeternity/superhero-ui/blob/178bc2d63cb362ddc3b2163fed58deb2e253ec00/src/utils/backend.js
-
 const wrapTry = async promise => {
   try {
     return Promise.race([
