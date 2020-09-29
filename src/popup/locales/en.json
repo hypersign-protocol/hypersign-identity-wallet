@@ -966,6 +966,10 @@
       "networkMiddlewareLabel": "Network middleware",
       "networkCompilerPlaceholder": "Enter network compiler url",
       "networkCompilerLabel": "Network compiler",
+      "backendUrlPlaceholder": "Enter backend url",
+      "backendUrlLabel": "Backend URL",
+      "showMore": "Show More",
+      "showLess": "Show Less",
       "save": "Connect"
     },
     "donate-error": {

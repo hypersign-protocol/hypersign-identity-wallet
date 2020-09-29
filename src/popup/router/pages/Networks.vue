@@ -59,6 +59,16 @@
         v-model="network.compilerUrl"
         data-cy="compiler"
       />
+      <div class="text-left expand" @click="expanded = !expanded">
+        <img :class="expanded ? 'open' : ''" src="../../../icons/carret-down.svg" />
+        <span>{{ expanded ? $t('pages.network.showLess') : $t('pages.network.showMore') }}</span>
+      </div>
+      <Input
+        v-show="expanded"
+        :placeholder="$t('pages.network.backendUrlPlaceholder')"
+        :label="$t('pages.network.backendUrlLabel')"
+        v-model="network.backendUrl"
+      />
       <Button half @click="cancel" data-cy="cancel">{{ $t('pages.network.cancel') }}</Button>
       <Button
         class="danger"
@@ -69,6 +79,7 @@
             !network.url ||
             !network.middlewareUrl ||
             !network.compilerUrl ||
+            !network.backendUrl ||
             !!network.error
         "
         data-cy="connect"
@@ -94,6 +105,7 @@ const networkProps = {
   url: null,
   middlewareUrl: null,
   compilerUrl: null,
+  backendUrl: 'https://raendom-backend.z52da5wt.xyz',
   error: false,
 };
 
@@ -108,16 +120,18 @@ export default {
     return {
       mode: 'list',
       network: networkProps,
+      expanded: false,
     };
   },
   computed: mapGetters(['networks', 'activeNetwork', 'allowTipping']),
   mounted() {
     this.$watch(
-      ({ network: { name, url, middlewareUrl, compilerUrl } }) => [
+      ({ network: { name, url, middlewareUrl, compilerUrl, backendUrl } }) => [
         name,
         url,
         middlewareUrl,
         compilerUrl,
+        backendUrl,
       ],
       () => {
         this.network.error = false;
@@ -153,7 +167,8 @@ export default {
         const url = new URL(this.network.url);
         const middleware = new URL(this.network.middlewareUrl);
         const compiler = new URL(this.network.compilerUrl);
-        if (!url.hostname || !middleware.hostname || !compiler.hostname)
+        const backendUrl = new URL(this.network.backendUrl);
+        if (!url.hostname || !middleware.hostname || !compiler.hostname || !backendUrl.hostname)
           throw new Error('Invalid hostname');
 
         const networkWithSameName = this.networks[this.network.name];
@@ -170,6 +185,7 @@ export default {
           middlewareUrl: this.network.middlewareUrl,
           compilerUrl: this.network.compilerUrl,
           name: this.network.name,
+          backendUrl: this.network.backendUrl,
         });
         await this.selectNetwork(this.network.name);
         this.mode = 'list';
@@ -200,5 +216,31 @@ export default {
 .edit-btn {
   margin-left: 5px;
   margin-right: 0;
+}
+
+.expand {
+  font-size: 14px;
+  cursor: pointer;
+
+  span {
+    display: inline-block;
+  }
+
+  img {
+    transform: rotate(-90deg);
+    vertical-align: middle;
+
+    & ~ span {
+      margin-bottom: 20px;
+    }
+
+    &.open {
+      transform: none;
+    }
+
+    &.open ~ span {
+      margin-bottom: 10px;
+    }
+  }
 }
 </style>
