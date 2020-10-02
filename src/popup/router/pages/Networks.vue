@@ -101,13 +101,14 @@ import CheckBox from '../components/CheckBox';
 import ListItem from '../components/ListItem';
 import { defaultNetwork } from '../../utils/constants';
 import wallet from '../../../lib/wallet';
+import {DEFAULT_BACKEND_URL} from '../../utils/constants'
 
 const networkProps = {
   name: null,
   url: null,
   middlewareUrl: null,
   compilerUrl: null,
-  backendUrl: 'https://raendom-backend.z52da5wt.xyz',
+  backendUrl: DEFAULT_BACKEND_URL,
   error: false,
 };
 

@@ -1,3 +1,5 @@
+import { DEFAULT_BACKEND_URL } from '../popup/utils/constants'
+
 const wrapTry = async promise => {
   try {
     return Promise.race([
@@ -22,7 +24,7 @@ const wrapTry = async promise => {
 };
 
 export default class Backend {
-  backendUrl = 'https://raendom-backend.z52da5wt.xyz';
+  backendUrl = DEFAULT_BACKEND_URL;
 
   constructor(url) {
     this.backendUrl = url || this.backendUrl;
