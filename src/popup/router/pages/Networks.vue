@@ -34,7 +34,7 @@
         $t('pages.network.addNetwork')
       }}</Button>
     </div>
-    <div v-if="mode === 'add' || mode === 'edit'" class="mt-10">
+    <div v-if="mode === 'add' || mode === 'edit'" class="mt-10 network">
       <Input
         :placeholder="$t('pages.network.networkNamePlaceholder')"
         :label="$t('pages.network.networkNameLabel')"
@@ -59,14 +59,14 @@
         v-model="network.compilerUrl"
         data-cy="compiler"
       />
-      <div class="text-left expand" @click="expanded = !expanded">
-        <img :class="expanded ? 'open' : ''" src="../../../icons/carret-down.svg" />
+      <button class="text-left expand" @click="backendUrlInputExpanded = !backendUrlInputExpanded">
+        <img :class="{ 'expanded' : backendUrlInputExpanded }" src="../../../icons/carret-down.svg" />
         <span>{{
-          expanded ? $t('pages.network.hideTippingConfig') : $t('pages.network.showTippingConfig')
+          backendUrlInputExpanded ? $t('pages.network.hideTippingConfig') : $t('pages.network.showTippingConfig')
         }}</span>
-      </div>
+      </button>
       <Input
-        v-show="expanded"
+        v-show="backendUrlInputExpanded"
         :placeholder="$t('pages.network.backendUrlPlaceholder')"
         :label="$t('pages.network.backendUrlLabel')"
         v-model="network.backendUrl"
@@ -122,7 +122,7 @@ export default {
     return {
       mode: 'list',
       network: networkProps,
-      expanded: false,
+      backendUrlInputExpanded: false,
     };
   },
   computed: mapGetters(['networks', 'activeNetwork', 'allowTipping']),
@@ -199,6 +199,8 @@ export default {
 };
 </script>
 <style lang="scss">
+@import '../../../common/variables';
+
 .network-row li {
   display: flex;
   justify-content: space-between;
@@ -215,34 +217,37 @@ export default {
   }
 }
 
-.edit-btn {
-  margin-left: 5px;
-  margin-right: 0;
-}
+.network {
 
-.expand {
-  font-size: 14px;
-  cursor: pointer;
-
-  span {
-    display: inline-block;
+  .edit-btn {
+    margin-left: 5px;
+    margin-right: 0;
   }
 
-  img {
-    transform: rotate(-90deg);
-    vertical-align: middle;
+  .expand {
+    font-size: 14px;
+    cursor: pointer;
+    color: $white-1;
+    width: 100%;
+    padding: 0;
 
-    & ~ span {
-      margin-bottom: 20px;
-    }
-
-    &.open {
-      transform: none;
-    }
-
-    &.open ~ span {
+    span {
+      display: inline-block;
       margin-bottom: 10px;
     }
+
+    img {
+      transform: rotate(-90deg);
+      vertical-align: middle;
+
+      &.expanded {
+        transform: none;
+      }
+    }
+  }
+
+  .primary-button {
+    margin-top: 20px;
   }
 }
 </style>
