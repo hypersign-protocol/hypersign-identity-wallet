@@ -99,9 +99,8 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import CheckBox from '../components/CheckBox';
 import ListItem from '../components/ListItem';
-import { defaultNetwork } from '../../utils/constants';
+import { defaultNetwork, DEFAULT_BACKEND_URL } from '../../utils/constants';
 import wallet from '../../../lib/wallet';
-import {DEFAULT_BACKEND_URL} from '../../utils/constants'
 
 const networkProps = {
   name: null,

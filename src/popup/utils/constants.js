@@ -65,7 +65,7 @@ export const calculateFee = (type, params) => {
   };
 };
 
-export const DEFAULT_BACKEND_URL =  'https://raendom-backend.z52da5wt.xyz'
+export const DEFAULT_BACKEND_URL = 'https://raendom-backend.z52da5wt.xyz';
 
 export const defaultNetworks = [
   {

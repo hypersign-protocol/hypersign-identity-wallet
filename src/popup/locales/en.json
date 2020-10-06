@@ -108,7 +108,7 @@
     },
     "tip-mainnet-warning": {
       "title": "Warning",
-      "msg": "Tip/Claim functionality works only on Mainnet."
+      "msg": "Tip/Claim functionality works on the predefined networks."
     },
     "confirm-transaction-sign": {
       "unknown": "Unknown",

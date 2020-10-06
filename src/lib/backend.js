@@ -1,4 +1,4 @@
-import { DEFAULT_BACKEND_URL } from '../popup/utils/constants'
+import { DEFAULT_BACKEND_URL } from '../popup/utils/constants';
 
 const wrapTry = async promise => {
   try {
