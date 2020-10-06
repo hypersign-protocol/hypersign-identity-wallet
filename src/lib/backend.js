@@ -1,4 +1,4 @@
-import { DEFAULT_BACKEND_URL } from '../popup/utils/constants';
+import { defaultNetwork } from '../popup/utils/constants';
 
 const wrapTry = async promise => {
   try {
@@ -24,7 +24,7 @@ const wrapTry = async promise => {
 };
 
 export default class Backend {
-  backendUrl = DEFAULT_BACKEND_URL;
+  backendUrl = defaultNetwork.backendUrl;
 
   constructor(url) {
     this.backendUrl = url || this.backendUrl;

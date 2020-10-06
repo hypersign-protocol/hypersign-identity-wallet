@@ -65,8 +65,6 @@ export const calculateFee = (type, params) => {
   };
 };
 
-export const DEFAULT_BACKEND_URL = 'https://raendom-backend.z52da5wt.xyz';
-
 export const defaultNetworks = [
   {
     url: 'https://testnet.aeternity.io',
@@ -88,7 +86,7 @@ export const defaultNetworks = [
     middlewareUrl: 'https://mainnet.aeternity.io',
     explorerUrl: 'https://mainnet.aeternal.io',
     compilerUrl: 'https://compiler.aepps.com',
-    backendUrl: DEFAULT_BACKEND_URL,
+    backendUrl: 'https://raendom-backend.z52da5wt.xyz',
     tokenRegistry: 'ct_UAzV9RcXEMsFcUCmrPN4iphbZroM7EHk3wvdidDYgZGGBo3hV',
     tokenRegistryLima: 'ct_UAzV9RcXEMsFcUCmrPN4iphbZroM7EHk3wvdidDYgZGGBo3hV',
     tipContract: 'superhero.chain',
