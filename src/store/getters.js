@@ -35,7 +35,7 @@ export default {
   activeAccountName({ account }, getters) {
     return getters['names/getDefault'](get(account, 'publicKey')) || 'Main account';
   },
-  allowTipping(state, { activeNetwork }) {
+  tippingSupported(state, { activeNetwork }) {
     return (
       activeNetwork.networkId === 'ae_mainnet' ||
       activeNetwork.networkId === 'ae_uat' ||

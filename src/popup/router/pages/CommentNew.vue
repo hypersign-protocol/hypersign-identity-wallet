@@ -4,7 +4,7 @@
       {{ text }}
     </div>
 
-    <Button @click="sendComment" :disabled="!allowTipping">
+    <Button @click="sendComment" :disabled="!tippingSupported">
       {{ $t('pages.tipPage.confirm') }}
     </Button>
     <Button @click="openCallbackOrGoHome(false)">
@@ -24,7 +24,7 @@ export default {
   data: () => ({ id: 0, parentId: undefined, text: '', loading: false }),
   computed: {
     ...mapState(['sdk']),
-    ...mapGetters(['allowTipping', 'backendInstance']),
+    ...mapGetters(['tippingSupported', 'backendInstance']),
   },
   async created() {
     this.loading = true;

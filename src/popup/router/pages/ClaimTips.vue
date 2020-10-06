@@ -5,7 +5,7 @@
     </p>
     <Input size="m-0 sm" v-model="url" :error="!normalizedUrl" />
 
-    <Button @click="claimTips" :disabled="!normalizedUrl || !allowTipping">
+    <Button @click="claimTips" :disabled="!normalizedUrl || !tippingSupported">
       {{ $t('pages.tipPage.confirm') }}
     </Button>
     <Button :to="{ name: 'account' }">
@@ -29,7 +29,7 @@ export default {
   }),
   computed: {
     ...mapState(['sdk', 'tipping']),
-    ...mapGetters(['account', 'allowTipping', 'backendInstance']),
+    ...mapGetters(['account', 'tippingSupported', 'backendInstance']),
     normalizedUrl() {
       if (!validateTipUrl(this.url)) return '';
       return toURL(this.url).toString();

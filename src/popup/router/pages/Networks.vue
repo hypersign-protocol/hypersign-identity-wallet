@@ -125,7 +125,7 @@ export default {
       backendUrlInputExpanded: false,
     };
   },
-  computed: mapGetters(['networks', 'activeNetwork', 'allowTipping']),
+  computed: mapGetters(['networks', 'activeNetwork', 'tippingSupported']),
   mounted() {
     this.$watch(
       ({ network: { name, url, middlewareUrl, compilerUrl, backendUrl } }) => [
@@ -144,7 +144,7 @@ export default {
     async selectNetwork(network) {
       await this.$store.dispatch('switchNetwork', network);
       await wallet.initSdk();
-      if (this.allowTipping) return;
+      if (this.tippingSupported) return;
       await this.$store.dispatch('modals/open', {
         name: 'default',
         ...this.$t('modals.tip-mainnet-warning'),
