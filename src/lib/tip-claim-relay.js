@@ -1,3 +1,4 @@
+import fetchJson from 'fetch-json';
 import { uniq } from 'lodash-es';
 import { defaultNetwork, TIPPING_CONTRACT } from '../popup/utils/constants';
 import {
@@ -7,7 +8,6 @@ import {
   getTippingContractAddress,
 } from './background-utils';
 import Logger from './logger';
-import getters from '../store/getters';
 
 export default {
   checkAddressMatch(account, addresses) {
@@ -47,7 +47,9 @@ export default {
 
         if (this.checkAddressMatch(account.publicKey, uniq(addresses))) {
           await this.abortIfZeroClaim(url);
-          await getters.backendInstance.claimTips({ url, address: account.publicKey });
+          // This check is only used on mainnet
+          const { backendUrl } = defaultNetwork;
+          await fetchJson.post(`${backendUrl}/claim/submit`, { url, address: account.publicKey });
         }
       }
     } catch (e) {

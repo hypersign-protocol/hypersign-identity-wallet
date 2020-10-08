@@ -60,9 +60,11 @@
         data-cy="compiler"
       />
       <button class="text-left expand" @click="backendUrlInputExpanded = !backendUrlInputExpanded">
-        <img :class="{ 'expanded' : backendUrlInputExpanded }" src="../../../icons/carret-down.svg" />
+        <img :class="{ expanded: backendUrlInputExpanded }" src="../../../icons/carret-down.svg" />
         <span>{{
-          backendUrlInputExpanded ? $t('pages.network.hideTippingConfig') : $t('pages.network.showTippingConfig')
+          backendUrlInputExpanded
+            ? $t('pages.network.hideTippingConfig')
+            : $t('pages.network.showTippingConfig')
         }}</span>
       </button>
       <Input
@@ -218,7 +220,6 @@ export default {
 }
 
 .network {
-
   .edit-btn {
     margin-left: 5px;
     margin-right: 0;

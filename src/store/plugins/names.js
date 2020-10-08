@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import fetchJson from 'fetch-json';
 import BigNumber from 'bignumber.js';
 import { aettosToAe } from '../../popup/utils/helper';
 import { i18n } from '../../popup/utils/i18nHelper';
@@ -124,12 +125,13 @@ export default store =>
         }
       },
       async setDefault(
-        { rootState: { sdk }, commit, dispatch, getters: { backendInstance } },
+        { rootState: { sdk }, commit, dispatch, rootGetters: { activeNetwork } },
         { name, address, modal = true },
       ) {
         commit('setDefault', { name, address, networkId: sdk.getNetworkId() });
+
         try {
-          const response = await backendInstance.sendProfileData({
+          const response = await fetchJson.post(`${activeNetwork.backendUrl}/profile`, {
             author: address,
             preferredChainName: name.name,
           });
@@ -140,7 +142,7 @@ export default store =>
             challenge: response.challenge,
             signature: signedChallenge,
           };
-          await backendInstance.sendProfileData(respondChallenge);
+          await fetchJson.post(`${activeNetwork.backendUrl}/profile`, respondChallenge);
         } catch (e) {
           if (modal) {
             if (e.type === 'backend')

@@ -1,3 +1,4 @@
+import fetchJson from 'fetch-json';
 import { getTwitterAccountUrl } from '../../popup/utils/helper';
 
 export default store =>
@@ -34,12 +35,12 @@ export default store =>
       },
     },
     actions: {
-      async ensureFetched({ state: { verifiedUrls, blacklistedUrls }, commit }) {
+      async ensureFetched({ state: { verifiedUrls, blacklistedUrls }, commit, rootGetters }) {
         if (verifiedUrls.length && blacklistedUrls.length) return;
 
         const [verified, graylist] = await Promise.all([
-          store.getters.backendInstance.getVerifiedUrls(),
-          store.getters.backendInstance.getGraylistedUrls(),
+          fetchJson.get(`${rootGetters.activeNetwork.backendUrl}/verified`),
+          fetchJson.get(`${rootGetters.activeNetwork.backendUrl}/static/wallet/graylist`),
         ]);
 
         commit('setVerified', verified);

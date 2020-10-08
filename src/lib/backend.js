@@ -117,8 +117,6 @@ export default class Backend {
     return this.backendFetch(`profile/image/${address}`, request);
   };
 
-  getProfileImageUrl = address => `${this.backendUrl}/profile/image/${address}`;
-
   getStats = async () => this.backendFetch('static/stats/');
 
   getCacheTipById = async id => this.backendFetch(`cache/tip?id=${id}`);

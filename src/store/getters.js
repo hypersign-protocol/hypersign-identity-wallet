@@ -1,6 +1,5 @@
 import { isEmpty, get } from 'lodash-es';
 import { defaultNetworks } from '../popup/utils/constants';
-import Backend from '../lib/backend';
 
 export default {
   account(state, { activeAccountName }) {
@@ -29,9 +28,8 @@ export default {
   activeNetwork({ current: { network } }, { networks }) {
     return networks[network];
   },
-  backendInstance(state, { activeNetwork }) {
-    return new Backend(activeNetwork.backendUrl);
-  },
+  getProfileImage: (_, { activeNetwork }) => address =>
+    `${activeNetwork.backendUrl}/profile/image/${address}`,
   activeAccountName({ account }, getters) {
     return getters['names/getDefault'](get(account, 'publicKey')) || 'Main account';
   },

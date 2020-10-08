@@ -1,5 +1,5 @@
 import { flatten, uniq, orderBy } from 'lodash-es';
-import axios from 'axios';
+import fetchJson from 'fetch-json';
 import {
   convertToAE,
   stringifyForStorage,
@@ -30,8 +30,14 @@ export default {
     let txs = await Promise.all([
       state.middleware.getTxByAccount(publicKey, { limit, page }),
       (async () => {
-        const transactionsFromEvents = await getters.backendInstance
-          .getTxEvents(publicKey, recent, limit)
+        const transactionsFromEvents = await fetchJson
+          .get(
+            `${
+              getters.activeNetwork.backendUrl
+            }/cache/events/?address=${publicKey}&event=TipWithdrawn${
+              recent ? `&limit=${limit}` : ``
+            }`,
+          )
           .catch(() => []);
         return transactionsFromEvents.map(({ address, amount, ...t }) => ({
           tx: { address, amount },
@@ -80,11 +86,9 @@ export default {
   async getCurrencies({ state: { nextCurrenciesFetch }, commit }) {
     if (!nextCurrenciesFetch || nextCurrenciesFetch <= new Date().getTime()) {
       try {
-        const { aeternity } = (
-          await axios.get(
-            'https://api.coingecko.com/api/v3/simple/price?ids=aeternity&vs_currencies=usd,eur,aud,ron,brl,cad,chf,cny,czk,dkk,gbp,hkd,hrk,huf,idr,ils,inr,isk,jpy,krw,mxn,myr,nok,nzd,php,pln,ron,rub,sek,sgd,thb,try,zar,xau',
-          )
-        ).data;
+        const { aeternity } = await fetchJson.get(
+          'https://api.coingecko.com/api/v3/simple/price?ids=aeternity&vs_currencies=usd,eur,aud,ron,brl,cad,chf,cny,czk,dkk,gbp,hkd,hrk,huf,idr,ils,inr,isk,jpy,krw,mxn,myr,nok,nzd,php,pln,ron,rub,sek,sgd,thb,try,zar,xau',
+        );
         commit('setCurrencies', aeternity);
         commit('setNextCurrencyFetch', new Date().getTime() + 3600000);
       } catch (e) {
@@ -132,5 +136,33 @@ export default {
   },
   async getHeight({ state: { sdk } }) {
     return (await sdk.topBlock()).height;
+  },
+  async claimTips({ getters: { activeNetwork } }, { url, address }) {
+    return fetchJson.post(`${activeNetwork.backendUrl}/claim/submit`, { url, address });
+  },
+  async cacheInvalidateOracle({ getters: { activeNetwork } }) {
+    return fetchJson.get(`${activeNetwork.backendUrl}/cache/invalidate/oracle`);
+  },
+  async cacheInvalidateTips({ getters: { activeNetwork } }) {
+    return fetchJson.get(`${activeNetwork.backendUrl}/cache/invalidate/tips`);
+  },
+  async donateError({ getters: { activeNetwork } }, { error, description }) {
+    return fetchJson.post(`${activeNetwork.backendUrl}/errorreport`, {
+      ...error,
+      description,
+    });
+  },
+  async sendTipComment({ getters: { activeNetwork } }, [tipId, text, author, signCb, parentId]) {
+    const sendComment = async postParam =>
+      fetchJson.post(`${activeNetwork.backendUrl}/comment/api/`, postParam);
+
+    const responseChallenge = await sendComment({ tipId, text, author });
+    const signedChallenge = await signCb(responseChallenge.challenge);
+    const respondChallenge = {
+      challenge: responseChallenge.challenge,
+      signature: signedChallenge,
+      parentId,
+    };
+    return sendComment(respondChallenge);
   },
 };
