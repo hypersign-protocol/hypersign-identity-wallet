@@ -1,7 +1,10 @@
 <template>
   <img
-    v-if="!error"
-    :src="typeof profileImage === 'string' && profileImage.length > 0 ? profileImage : avatar.src"
+    :src="
+      typeof profileImage === 'string' && profileImage.length > 0 && !error
+        ? profileImage
+        : avatar.src
+    "
     :class="[size, avatar.type === 'identicon' ? 'user-identicon' : 'user-avatar']"
     @error="error = true"
   />
