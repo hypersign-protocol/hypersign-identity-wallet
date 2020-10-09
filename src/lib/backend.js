@@ -1,4 +1,4 @@
-import { defaultNetwork } from '../popup/utils/constants';
+import { DEFAULT_BACKEND_URL } from '../popup/utils/constants';
 
 const wrapTry = async promise => {
   try {
@@ -24,7 +24,7 @@ const wrapTry = async promise => {
 };
 
 export default class Backend {
-  backendUrl = defaultNetwork.backendUrl;
+  backendUrl = DEFAULT_BACKEND_URL;
 
   constructor(url) {
     this.backendUrl = url || this.backendUrl;
@@ -116,6 +116,8 @@ export default class Backend {
     };
     return this.backendFetch(`profile/image/${address}`, request);
   };
+
+  getProfileImageUrl = address => `${this.backendUrl}/profile/image/${address}`;
 
   getStats = async () => this.backendFetch('static/stats/');
 

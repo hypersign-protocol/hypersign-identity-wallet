@@ -165,4 +165,20 @@ export default {
     };
     return sendComment(respondChallenge);
   },
+  async modifyNotification({ getters: { activeNetwork } }, [notifId, status, author, signCb]) {
+    const backendMethod = async postParam =>
+      fetchJson.post(`${activeNetwork.backendUrl}/notification/${notifId}`, postParam);
+
+    const responseChallenge = await backendMethod({ author, status });
+    const signedChallenge = await signCb(responseChallenge.challenge);
+    const respondChallenge = {
+      challenge: responseChallenge.challenge,
+      signature: signedChallenge,
+    };
+
+    return backendMethod(respondChallenge);
+  },
+  async getCacheChainNames({ getters: { activeNetwork } }) {
+    return fetchJson.get(`${activeNetwork.backendUrl}/cache/chainnames`);
+  },
 };

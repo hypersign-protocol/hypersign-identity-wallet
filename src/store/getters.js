@@ -35,8 +35,7 @@ export default {
   },
   tippingSupported(state, { activeNetwork }) {
     return (
-      activeNetwork.networkId === 'ae_mainnet' ||
-      activeNetwork.networkId === 'ae_uat' ||
+      ['ae_mainnet', 'ae_uat'].includes(activeNetwork.networkId) ||
       process.env.RUNNING_IN_TESTS
     );
   },

@@ -68,7 +68,7 @@
         }}</span>
       </button>
       <Input
-        v-show="backendUrlInputExpanded"
+        v-if="backendUrlInputExpanded"
         :placeholder="$t('pages.network.backendUrlPlaceholder')"
         :label="$t('pages.network.backendUrlLabel')"
         v-model="network.backendUrl"

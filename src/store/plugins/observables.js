@@ -1,7 +1,7 @@
 import { BehaviorSubject, timer } from 'rxjs';
 import { multicast, pluck, switchMap, map } from 'rxjs/operators';
 import { refCountDelay } from 'rxjs-etc/operators';
-import Backend from '../../lib/backend';
+import fetchJson from 'fetch-json';
 
 export default store => {
   const watchAsObservable = (getter, options) =>
@@ -33,10 +33,27 @@ export default store => {
         : `https://superhero.com/tip/${sourceId}/comment/${entityId}`,
   });
 
+  const getAllNotifications = async (address, signCb) => {
+    const responseChallenge = await fetchJson.get(
+      `${store.getters.activeNetwork.backendUrl}/notification/user/${address}`,
+    );
+    const signedChallenge = await signCb(responseChallenge.challenge);
+
+    const respondChallenge = {
+      challenge: responseChallenge.challenge,
+      signature: signedChallenge,
+    };
+    const url = new URL(`${store.getters.activeNetwork.backendUrl}/notification/user/${address}`);
+    Object.keys(respondChallenge).forEach(key =>
+      url.searchParams.append(key, respondChallenge[key]),
+    );
+    return fetchJson.get(url.toString());
+  };
+
   const notifications$ = createSdkObservable(
     async sdk =>
       (
-        await Backend.getAllNotifications(store.state.account.publicKey, async data =>
+        await getAllNotifications(store.state.account.publicKey, async data =>
           Buffer.from(await sdk.signMessage(data)).toString('hex'),
         )
       ).map(normalizeNotification),

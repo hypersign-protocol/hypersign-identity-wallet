@@ -41,15 +41,14 @@ export default {
   methods: {
     async sendComment() {
       this.loading = true;
-      const postData = [
-        this.id,
-        this.text,
-        await this.sdk.address(),
-        async data => Buffer.from(await this.sdk.signMessage(data)).toString('hex'),
-        this.parentId,
-      ];
       try {
-        this.$store.dispatch('sendTipComment', postData);
+        await this.$store.dispatch('sendTipComment', [
+          this.id,
+          this.text,
+          await this.sdk.address(),
+          async data => Buffer.from(await this.sdk.signMessage(data)).toString('hex'),
+          this.parentId,
+        ]);
         this.openCallbackOrGoHome(true);
       } catch (e) {
         this.$store.dispatch('modals/open', { name: 'default', type: 'transaction-failed' });
