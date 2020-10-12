@@ -1,5 +1,4 @@
-import fetchJson from 'fetch-json';
-import { getTwitterAccountUrl } from '../../popup/utils/helper';
+import { getTwitterAccountUrl, fetchJson } from '../../popup/utils/helper';
 
 export default store =>
   store.registerModule('tipUrl', {
@@ -39,8 +38,8 @@ export default store =>
         if (verifiedUrls.length && blacklistedUrls.length) return;
 
         const [verified, graylist] = await Promise.all([
-          fetchJson.get(`${rootGetters.activeNetwork.backendUrl}/verified`),
-          fetchJson.get(`${rootGetters.activeNetwork.backendUrl}/static/wallet/graylist`),
+          fetchJson(`${rootGetters.activeNetwork.backendUrl}/verified`),
+          fetchJson(`${rootGetters.activeNetwork.backendUrl}/static/wallet/graylist`),
         ]);
 
         commit('setVerified', verified);

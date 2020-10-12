@@ -89,7 +89,6 @@ export default {
           notification.id,
           status,
           this.$store.state.account.publicKey,
-          async data => Buffer.from(await this.$store.state.sdk.signMessage(data)).toString('hex'),
         ]);
         this.observableNotifications.find(n => n.id === notification.id).status = status;
       }

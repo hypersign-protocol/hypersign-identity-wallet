@@ -46,7 +46,6 @@ export default {
           this.id,
           this.text,
           await this.sdk.address(),
-          async data => Buffer.from(await this.sdk.signMessage(data)).toString('hex'),
           this.parentId,
         ]);
         this.openCallbackOrGoHome(true);

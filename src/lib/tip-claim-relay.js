@@ -1,5 +1,5 @@
-import fetchJson from 'fetch-json';
 import { uniq } from 'lodash-es';
+import { fetchJson } from '../popup/utils/helper';
 import { defaultNetwork, TIPPING_CONTRACT } from '../popup/utils/constants';
 import {
   contractCallStatic,
@@ -49,7 +49,11 @@ export default {
           await this.abortIfZeroClaim(url);
           // This check is only used on mainnet
           const { backendUrl } = defaultNetwork;
-          await fetchJson.post(`${backendUrl}/claim/submit`, { url, address: account.publicKey });
+          await fetchJson(`${backendUrl}/claim/submit`, {
+            method: 'post',
+            body: JSON.stringify({ url, address: account.publicKey }),
+            headers: { 'Content-Type': 'application/json' },
+          });
         }
       }
     } catch (e) {

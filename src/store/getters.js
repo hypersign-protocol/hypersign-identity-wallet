@@ -35,8 +35,7 @@ export default {
   },
   tippingSupported(state, { activeNetwork }) {
     return (
-      ['ae_mainnet', 'ae_uat'].includes(activeNetwork.networkId) ||
-      process.env.RUNNING_IN_TESTS
+      ['ae_mainnet', 'ae_uat'].includes(activeNetwork.networkId) || process.env.RUNNING_IN_TESTS
     );
   },
   tokenBalance(state) {

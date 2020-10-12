@@ -1,10 +1,10 @@
 import { flatten, uniq, orderBy } from 'lodash-es';
-import fetchJson from 'fetch-json';
 import {
   convertToAE,
   stringifyForStorage,
   parseFromStorage,
   getAddressByNameEntry,
+  fetchJson,
 } from '../popup/utils/helper';
 import { postMessage, postMessageToContent } from '../popup/utils/connection';
 import { AEX2_METHODS } from '../popup/utils/constants';
@@ -29,22 +29,19 @@ export default {
     const { publicKey } = state.account;
     let txs = await Promise.all([
       state.middleware.getTxByAccount(publicKey, { limit, page }),
-      (async () => {
-        const transactionsFromEvents = await fetchJson
-          .get(
-            `${
-              getters.activeNetwork.backendUrl
-            }/cache/events/?address=${publicKey}&event=TipWithdrawn${
-              recent ? `&limit=${limit}` : ``
-            }`,
-          )
-          .catch(() => []);
-        return transactionsFromEvents.map(({ address, amount, ...t }) => ({
-          tx: { address, amount },
-          ...t,
-          claim: true,
-        }));
-      })(),
+      fetchJson(
+        `${getters.activeNetwork.backendUrl}/cache/events/?address=${publicKey}&event=TipWithdrawn${
+          recent ? `&limit=${limit}` : ``
+        }`,
+      )
+        .then(response =>
+          response.map(({ address, amount, ...t }) => ({
+            tx: { address, amount },
+            ...t,
+            claim: true,
+          })),
+        )
+        .catch(() => []),
     ]);
     txs = orderBy(flatten(txs), ['time'], ['desc']);
     return recent ? txs.slice(0, limit) : txs;
@@ -86,7 +83,7 @@ export default {
   async getCurrencies({ state: { nextCurrenciesFetch }, commit }) {
     if (!nextCurrenciesFetch || nextCurrenciesFetch <= new Date().getTime()) {
       try {
-        const { aeternity } = await fetchJson.get(
+        const { aeternity } = await fetchJson(
           'https://api.coingecko.com/api/v3/simple/price?ids=aeternity&vs_currencies=usd,eur,aud,ron,brl,cad,chf,cny,czk,dkk,gbp,hkd,hrk,huf,idr,ils,inr,isk,jpy,krw,mxn,myr,nok,nzd,php,pln,ron,rub,sek,sgd,thb,try,zar,xau',
         );
         commit('setCurrencies', aeternity);
@@ -138,26 +135,40 @@ export default {
     return (await sdk.topBlock()).height;
   },
   async claimTips({ getters: { activeNetwork } }, { url, address }) {
-    return fetchJson.post(`${activeNetwork.backendUrl}/claim/submit`, { url, address });
-  },
-  async cacheInvalidateOracle({ getters: { activeNetwork } }) {
-    return fetchJson.get(`${activeNetwork.backendUrl}/cache/invalidate/oracle`);
-  },
-  async cacheInvalidateTips({ getters: { activeNetwork } }) {
-    return fetchJson.get(`${activeNetwork.backendUrl}/cache/invalidate/tips`);
-  },
-  async donateError({ getters: { activeNetwork } }, { error, description }) {
-    return fetchJson.post(`${activeNetwork.backendUrl}/errorreport`, {
-      ...error,
-      description,
+    return fetchJson(`${activeNetwork.backendUrl}/claim/submit`, {
+      method: 'post',
+      body: JSON.stringify({ url, address }),
+      headers: { 'Content-Type': 'application/json' },
     });
   },
-  async sendTipComment({ getters: { activeNetwork } }, [tipId, text, author, signCb, parentId]) {
+  async cacheInvalidateOracle({ getters: { activeNetwork } }) {
+    return fetchJson(`${activeNetwork.backendUrl}/cache/invalidate/oracle`);
+  },
+  async cacheInvalidateTips({ getters: { activeNetwork } }) {
+    return fetchJson(`${activeNetwork.backendUrl}/cache/invalidate/tips`);
+  },
+  async donateError({ getters: { activeNetwork } }, { error, description }) {
+    return fetchJson(`${activeNetwork.backendUrl}/errorreport`, {
+      method: 'post',
+      body: JSON.stringify({ ...error, description }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  },
+  async sendTipComment(
+    { state: { sdk }, getters: { activeNetwork } },
+    [tipId, text, author, parentId],
+  ) {
     const sendComment = async postParam =>
-      fetchJson.post(`${activeNetwork.backendUrl}/comment/api/`, postParam);
+      fetchJson(`${activeNetwork.backendUrl}/comment/api/`, {
+        method: 'post',
+        body: JSON.stringify(postParam),
+        headers: { 'Content-Type': 'application/json' },
+      });
 
     const responseChallenge = await sendComment({ tipId, text, author });
-    const signedChallenge = await signCb(responseChallenge.challenge);
+    const signedChallenge = Buffer.from(
+      await sdk.signMessage(responseChallenge.challenge),
+    ).toString('hex');
     const respondChallenge = {
       challenge: responseChallenge.challenge,
       signature: signedChallenge,
@@ -165,12 +176,21 @@ export default {
     };
     return sendComment(respondChallenge);
   },
-  async modifyNotification({ getters: { activeNetwork } }, [notifId, status, author, signCb]) {
+  async modifyNotification(
+    { state: { sdk }, getters: { activeNetwork } },
+    [notifId, status, author],
+  ) {
     const backendMethod = async postParam =>
-      fetchJson.post(`${activeNetwork.backendUrl}/notification/${notifId}`, postParam);
+      fetchJson(`${activeNetwork.backendUrl}/notification/${notifId}`, {
+        method: 'post',
+        body: JSON.stringify(postParam),
+        headers: { 'Content-Type': 'application/json' },
+      });
 
     const responseChallenge = await backendMethod({ author, status });
-    const signedChallenge = await signCb(responseChallenge.challenge);
+    const signedChallenge = Buffer.from(
+      await sdk.signMessage(responseChallenge.challenge),
+    ).toString('hex');
     const respondChallenge = {
       challenge: responseChallenge.challenge,
       signature: signedChallenge,
@@ -179,6 +199,24 @@ export default {
     return backendMethod(respondChallenge);
   },
   async getCacheChainNames({ getters: { activeNetwork } }) {
-    return fetchJson.get(`${activeNetwork.backendUrl}/cache/chainnames`);
+    return fetchJson(`${activeNetwork.backendUrl}/cache/chainnames`);
+  },
+  async getAllNotifications({ state: { sdk }, getters: { activeNetwork } }, address) {
+    const responseChallenge = await fetchJson(
+      `${activeNetwork.backendUrl}/notification/user/${address}`,
+    );
+    const signedChallenge = Buffer.from(
+      await sdk.signMessage(responseChallenge.challenge),
+    ).toString('hex');
+
+    const respondChallenge = {
+      challenge: responseChallenge.challenge,
+      signature: signedChallenge,
+    };
+    const url = new URL(`${activeNetwork.backendUrl}/notification/user/${address}`);
+    Object.keys(respondChallenge).forEach(key =>
+      url.searchParams.append(key, respondChallenge[key]),
+    );
+    return fetchJson(url.toString());
   },
 };

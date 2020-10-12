@@ -1,7 +1,6 @@
 import Vue from 'vue';
-import fetchJson from 'fetch-json';
 import BigNumber from 'bignumber.js';
-import { aettosToAe } from '../../popup/utils/helper';
+import { aettosToAe, fetchJson } from '../../popup/utils/helper';
 import { i18n } from '../../popup/utils/i18nHelper';
 import { AUTO_EXTEND_NAME_BLOCKS_INTERVAL } from '../../popup/utils/constants';
 
@@ -131,9 +130,13 @@ export default store =>
         commit('setDefault', { name, address, networkId: sdk.getNetworkId() });
 
         try {
-          const response = await fetchJson.post(`${activeNetwork.backendUrl}/profile`, {
-            author: address,
-            preferredChainName: name.name,
+          const response = await fetchJson(`${activeNetwork.backendUrl}/profile`, {
+            method: 'post',
+            body: JSON.stringify({
+              author: address,
+              preferredChainName: name.name,
+            }),
+            headers: { 'Content-Type': 'application/json' },
           });
           const signedChallenge = Buffer.from(await sdk.signMessage(response.challenge)).toString(
             'hex',
@@ -142,7 +145,11 @@ export default store =>
             challenge: response.challenge,
             signature: signedChallenge,
           };
-          await fetchJson.post(`${activeNetwork.backendUrl}/profile`, respondChallenge);
+          await fetchJson(`${activeNetwork.backendUrl}/profile`, {
+            method: 'post',
+            body: JSON.stringify(respondChallenge),
+            headers: { 'Content-Type': 'application/json' },
+          });
         } catch (e) {
           if (modal) {
             if (e.type === 'backend')
