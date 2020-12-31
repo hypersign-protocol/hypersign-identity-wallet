@@ -187,6 +187,7 @@ export default {
   align-items: center;
   width: 100%;
   border-top: 1px solid #100c0d !important;
+  color:#9c9c9c !important;
 
   p {
     margin: 0;

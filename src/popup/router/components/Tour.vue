@@ -55,10 +55,10 @@
           }}</Button>
         </div>
       </div>
-    </div>{{nodeStatus}}
+    </div>
     <div
       class="tour-start"
-      v-if="!$route.path === '/account' && isLoggedIn && !tourRunning && tourStartBar"
+      v-if="!nodeStatus && $route.path === '/account' && isLoggedIn && !tourRunning && tourStartBar"
       @click="toggleTour"
     >
       <div class="container">

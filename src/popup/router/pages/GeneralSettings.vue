@@ -133,7 +133,7 @@ small {
       width: 30%;
       text-align: center;
       margin: auto;
-      color: #fff;
+      color: #717c87;
       cursor: pointer;
 
       div {
@@ -157,6 +157,7 @@ small {
     .sub-dropdown {
       visibility: visible;
       max-height: 210px;
+      color:#717c87;
     }
 
     .ae-icon-left-more {

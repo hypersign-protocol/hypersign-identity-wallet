@@ -41,7 +41,7 @@ export default {
   }),
   computed: {
     profileImage() {
-      return `${BACKEND_URL}/profile/image/${this.address}`;
+      return `/profile/image/${this.address}`;
     },
     avatar() {
       if (this.name) {
