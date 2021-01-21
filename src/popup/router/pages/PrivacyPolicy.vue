@@ -3,27 +3,26 @@
   <div class="popup">
     <div class="privacypolicy--content">
       <h2>{{ $t('pages.privacyPolicy.heading') }}</h2>
-      <p><em>The present Privacy Policy is effective since on 9th April 2020.</em></p>
+      <p><em>The present Privacy Policy is effective since on 1 Jan 2021.</em></p>
       <ol>
         <li class="first">
           <h3><strong>Introduction</strong></h3>
           <p>
             <strong
-              >Hypersign.id Establishment (&ldquo;Hypersign&rdquo;, &ldquo;we&rdquo;,
+              >Hypermine (&ldquo;Hypersign&rdquo;, &ldquo;we&rdquo;,
               &ldquo;us&rdquo;, &ldquo;our&rdquo; </strong
             >or<strong> &ldquo;the company&rdquo;</strong>) is a company with seat and registered
-            address at: Dr. Grass Str. 12, 9490 Vaduz, Liechtenstein, with email address for
+            address at: Sobha City, Bangalore, India, with email address for
             communication related to the <strong>Hypersign Wallet</strong>:
-            connect@hypermine.in. <strong>Hypersign</strong> is the company, which created
+            connect@hypermine.in. <strong>Hypermine</strong> is the company, which created
             and developed <strong>Hypersign Wallet</strong>.
           </p>
-          <p>
-            <strong>Hypersign </strong>takes your privacy and the security of your information as a
-            <strong>USER</strong> very seriously.&nbsp;&nbsp;&nbsp;
-          </p>
+          <!-- <p>
+            <strong>Hypersign </strong>takes your privacy and security <strong>USER</strong> very seriously.&nbsp;&nbsp;&nbsp;
+          </p> -->
           <p>
             This <strong>Privacy Policy</strong> (&ldquo;<strong>Policy</strong>&rdquo;) is
-            applicable for the <strong>Hypersign </strong>developed software program
+            applicable for <strong>Hypersign</strong>developed software program
             <strong>Hypersign Wallet</strong><strong> (</strong>the
             <strong>&ldquo;Wallet&rdquo; </strong>or the
             <strong>&ldquo;application&rdquo;), </strong>designed for end users, which allows
@@ -68,12 +67,12 @@
             >
             and
           </p>
-          <p>
+          <!-- <p>
             from App Store:
             <a @click="openUrl('https://testflight.apple.com/join/3o5r4dQQ', true)"
               >https://testflight.apple.com/join/3o5r4dQQ</a
             >.
-          </p>
+          </p> -->
           <p>
             If you have any questions regarding this <strong>Policy</strong>, please contact us at
             connect@hypermine.in. If you do not agree to the terms of this
@@ -289,79 +288,79 @@
           <p>
             (iv)&nbsp;&nbsp; in connection with the sale, purchase, business transition under any
             form, merger, dissolution, reorganization, liquidation of
-            <strong>Hypersign</strong>; <strong>We</strong> may have to disclose the information
+            <strong>Hypermine</strong>; <strong>We</strong> may have to disclose the information
             <strong>YOU</strong> have given us to the successor, who is part of the transition,
           </p>
-          <p>
-            (v)&nbsp;&nbsp; when <strong>WE</strong> believe it is necessary to protect the rights,
-            property, or safety of <strong>Hypersign </strong>or other persons, or
-          </p>
+          (v)&nbsp;&nbsp; when <strong>WE</strong> believe it is necessary to protect the rights,
+          property, or safety of <strong>Hypersign </strong>or other persons, or
           <p>
             (vi)&nbsp;&nbsp; as otherwise required or permitted by law, including any contractual
             obligations of
-            <strong>Hypersign</strong>.
-          </p>
-        </li>
-        <li class="eighth">
-          <h3><strong>Children and Privacy</strong></h3>
-          <ul>
-            <li>
-              <p>
-                <strong>Hypersign</strong> does not process information of persons under the age of
-                obtaining full legal capacity (in most countries 18 years old) due to the character
-                of the <strong>Wallet</strong>.
+            <p>
+              <strong>Hypersign</strong>.
+            </p>
+          </li>
+          <li class="eighth">
+            <h3><strong>Children and Privacy</strong></h3>
+            <ul>
+              <li>
+                <p>
+                  <strong>Hypersign</strong> does not process information of persons under the age of
+                  obtaining full legal capacity (in most countries 18 years old) due to the character
+                  of the <strong>Wallet</strong>.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <strong>Hypersign</strong> will immediately delete any
+                  <strong>personal data</strong> referring to persons under the age of full legal
+                  capacity if <strong>Hypersign</strong> receives such information.
+                </p>
+              </li>
+              <li>
+                <p>
+                  We are not liable in any way if <strong>YOU</strong> provide false information about
+                  your age or use the <strong>application</strong> before <strong>YOU</strong> have
+                  turned the above-mentioned age.
+                </p>
+              </li>
+            </ul>
+          </li>
+          <li class="ninth">
+            <h3><strong>Measures for protection</strong></h3>
+            <p>
+              We undertake all necessary technological, technical and organizational measures to
+              protect your <strong>personal data</strong>. Your <strong>personal data</strong> is
+              stored on protected servers with a strictly controlled access.
+            </p>
+            <p>
+              Some of the above-mentioned information is stored in such a form that could not be used
+              to identify <strong>YOU</strong> directly.
+            </p>
+          </li>
+          <li class="tenth">
+            <h3><strong>Breach measures</strong></h3>
+            <p>
+              In case of <strong>breach</strong> in the software, disruptive interference in the
+              <strong>Wallet</strong>, the <strong>&AElig;ternity</strong> Network, malware, spyware,
+              virus attacks and any other harmful cyber-attacks, <strong>We</strong> will undertake
+              every possible action in an appropriate and timely manner, to avoid any material or
+              non-material damage to <strong>USERS</strong>. As soon as
+              <strong>Hypersign</strong> becomes aware of any <strong>breach</strong>,
+              <strong>USERS</strong> and the competent authorities will be notified immediately.
+              <strong>YOU</strong> may be asked to follow certain instructions for prevention of
+              <strong>breaches</strong>.
+            </p>
+          </li>
+          <li class="eleventh">
+            <h3><strong>How Do I contact Hypermine?</strong></h3>
+            <p>
+              To contact us with your questions or comments regarding this <strong>Policy</strong>,
+              please email us at&nbsp;
+              <a @click="openUrl('mailto:connect@hypermine.in', true)">
+                connect@hypermine.in</a
+                >.
               </p>
-            </li>
-            <li>
-              <p>
-                <strong>Hypersign</strong> will immediately delete any
-                <strong>personal data</strong> referring to persons under the age of full legal
-                capacity if <strong>Hypersign</strong> receives such information.
-              </p>
-            </li>
-            <li>
-              <p>
-                We are not liable in any way if <strong>YOU</strong> provide false information about
-                your age or use the <strong>application</strong> before <strong>YOU</strong> have
-                turned the above-mentioned age.
-              </p>
-            </li>
-          </ul>
-        </li>
-        <li class="ninth">
-          <h3><strong>Measures for protection</strong></h3>
-          <p>
-            We undertake all necessary technological, technical and organizational measures to
-            protect your <strong>personal data</strong>. Your <strong>personal data</strong> is
-            stored on protected servers with a strictly controlled access.
-          </p>
-          <p>
-            Some of the above-mentioned information is stored in such a form that could not be used
-            to identify <strong>YOU</strong> directly.
-          </p>
-        </li>
-        <li class="tenth">
-          <h3><strong>Breach measures</strong></h3>
-          <p>
-            In case of <strong>breach</strong> in the software, disruptive interference in the
-            <strong>Wallet</strong>, the <strong>&AElig;ternity</strong> Network, malware, spyware,
-            virus attacks and any other harmful cyber-attacks, <strong>We</strong> will undertake
-            every possible action in an appropriate and timely manner, to avoid any material or
-            non-material damage to <strong>USERS</strong>. As soon as
-            <strong>Hypersign</strong> becomes aware of any <strong>breach</strong>,
-            <strong>USERS</strong> and the competent authorities will be notified immediately.
-            <strong>YOU</strong> may be asked to follow certain instructions for prevention of
-            <strong>breaches</strong>.
-          </p>
-        </li>
-        <li class="eleventh">
-          <h3><strong>How Do I contact Æternity?</strong></h3>
-          <p>
-            To contact us with your questions or comments regarding this <strong>Policy</strong>,
-            please email us at&nbsp;
-            <a @click="openUrl('mailto:connect@hypermine.in', true)">
-              connect@hypermine.in</a
-            >.
           </p>
         </li>
       </ol>
@@ -395,4 +394,5 @@ ol.li{
     padding: 10px;
   }
 }
+
 </style>

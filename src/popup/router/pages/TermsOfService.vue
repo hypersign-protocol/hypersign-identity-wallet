@@ -5,14 +5,14 @@
     <h1 class="terms--heading heading-1 uppercase bolder">TERMS OF USE</h1>
     <p class="italic">The present <b>TERMS OF USE</b> are effective since 9th April 2020.</p>
     <p class="italic">
-      <b>Hypersign.io</b> reserves its right to modify and update these
+      <b>Hypersign.id</b> reserves its right to modify and update these
       <b>TERMS OF USE</b> according to the policy and practice of the <b>company</b>. The new
       version of thе <b>TERMS OF USE</b> becomes effective from the day it is announced on
       <b>Our Hypersign Wallet</b> unless stated otherwise.
     </p>
     <hr />
     <p class="bolder">
-      THE SOFTWARE IS PROVIDED BY Hypersign.io “AS IS” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      THE SOFTWARE IS PROVIDED BY Hypersign.id “AS IS” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
       IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
       PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
       CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
@@ -27,7 +27,7 @@
       by using it, we consider these actions implicit agreement to the <b>TERMS OF USE</b>. These
       <b>TERMS OF USE</b> represent a binding agreement between you, the legal entity you represent
       and the legal entity that registered you (collectively „<b>YOU</b>“) and
-      <b>Hypersign.io (“Hypersign”, “we”, “us”</b> or <b>“our”)</b> in connection to your use
+      <b>Hypersign.id (“Hypersign”, “we”, “us”</b> or <b>“our”)</b> in connection to your use
       of the <b>Hypersign Wallet application.</b>.
     </p>
     <p>
@@ -75,7 +75,7 @@
         <p>
           1.1.
           <strong
-            >Hypersign.io Establishment (&ldquo;Hypersign&rdquo;, &ldquo;we&rdquo;,
+            >Hypersign.id Establishment (&ldquo;Hypersign&rdquo;, &ldquo;we&rdquo;,
             &ldquo;us&rdquo;, &ldquo;our&rdquo; </strong
           >or<strong> &ldquo;the company&rdquo;</strong>) is a company with seat and registered
           address at: Dr. Grass Str. 12, 9490 Vaduz, Liechtenstein, with email address for
@@ -754,7 +754,7 @@
           <strong>USERS</strong> should be careful when they download and use the original
           <strong>application</strong>. <strong>USERS</strong> can identity the authentic
           <strong>Wallet</strong> by verifying that the developer on the marketplace is
-          <strong>Hypersign.io / Hypersign.io</strong> and can use the hyperlinks for
+          <strong>Hypersign.id / Hypersign.id</strong> and can use the hyperlinks for
           downloading, incorporated in the present Terms. Due to the fact
           <strong>&AElig;ternity blockchain</strong> is public and permissionless, any person has
           the possibility to create a &ldquo;<strong>fork</strong>&rdquo;. Any developer can copy
