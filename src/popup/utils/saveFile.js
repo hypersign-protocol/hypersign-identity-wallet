@@ -8,6 +8,25 @@ const downloadBrowserUrl = (fileName, data) => {
     document.body.appendChild(link);
     link.click();
 }
+const checkFilePermission = () => {
+    let perms = ["android.permission.MANAGE_EXTERNAL_STORAGE",
+    ]
+    let permissions = cordova.plugins.permissions;
+    permissions.checkPermission("android.permission.MANAGE_EXTERNAL_STORAGE", function (status) {
+        console.log('success checking permission');
+        console.log('HAS MANAGE_EXTERNAL_STORAGE:', status.hasPermission);
+        console.warn(status.hasPermission);
+        if (!status.hasPermission) {
+            permissions.requestPermissions(perms, function (status) {
+                console.log('success requesting MANAGE_EXTERNAL_STORAGEN permission');
+            }, function (err) {
+                console.log('failed to set permission');
+            });
+        }
+    }, function (err) {
+        console.log(err);
+    });
+}
 
 const writeFile = (path, filename, blob)=> {
     return new Promise((resolve, reject) => {
@@ -35,29 +54,38 @@ const writeFile = (path, filename, blob)=> {
     });
 }
 
-export default async (fileName, blob) => {
-  switch (process.env.PLATFORM) {
-    case 'extension-chrome':
-    case 'extension-firefox': {
-          downloadBrowserUrl(fileName, blob)
-      break;
-    }
-    case 'cordova':
-      document.addEventListener('deviceready', () => {
-         writeFile('download/hypersign',fileName, blob)
-         .then(res => {
-             console.log('File Downloaded sucessfulley')
-         })
-         .catch(err => {
-             console.warn('Error in file download')
-             console.log(JSON.stringify(err));
-         })
-      });
-      break;
-    case 'web':
-        downloadBrowserUrl(fileName, blob)
-      break;
-    default:
-      throw new Error(`Unknown platform: ${process.env.PLATFORM}`);
-  }
+export default (fileName, blob) => {
+    let resVal = true
+        switch (process.env.PLATFORM) {
+        case 'extension-chrome':
+        case 'extension-firefox': {
+            downloadBrowserUrl(fileName, blob)
+            resVal =true
+            break;
+        }
+        case 'cordova':
+            document.addEventListener('deviceready', () => {
+                checkFilePermission()
+
+                // writeFile('download/hypersign',fileName, blob)
+                // .then(res => {
+                //     console.log('File Downloaded sucessfulley')
+                //     resVal = true
+
+                // })
+                // .catch(err => {
+                //     console.warn('Error in file download')
+                //     console.log(JSON.stringify(err));
+                //     resVal = false
+                // })
+            });
+            break;
+        case 'web':
+            downloadBrowserUrl(fileName, blob)
+            resVal = true
+            break;
+        default:
+            throw new Error(`Unknown platform: ${process.env.PLATFORM}`);
+        }
+    return resVal
 };

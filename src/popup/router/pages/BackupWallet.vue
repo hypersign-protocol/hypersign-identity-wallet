@@ -124,7 +124,7 @@ export default {
 
         // Encrypt everything
         if(confirmed){
-            // this.loading = true;
+            this.loading = true;
             setTimeout(async () => {
                 const dataToEncrypt = {
                   mnemonic : this.mnemonic,
@@ -143,14 +143,18 @@ export default {
 
                 if(this.activeBackup == 'local'){
                   // download the file in local
-                  await saveFile(fileName,encryptedMessage);
+                  let x =  saveFile(fileName,encryptedMessage);
+                  this.loading = false;
+                  if(x) {
+                      this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
+                  } else {
+                      this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup Failled' });
+                  }
                 }else{
                   // send the file to server...
                   // TODO Backup on cloud
                 }
-                // this.loading = false;    
-                this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
-                this.$router.push('/account');
+                // this.$router.push('/account');
             }, 1000)
         }
         // save into a file 

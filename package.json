@@ -45,6 +45,7 @@
     "bluebird": "^3.7.1",
     "cordova-android": "^9.0.0",
     "cordova-ios": "^5.1.1",
+    "cordova-plugin-android-permissions": "^1.1.2",
     "cordova-plugin-file": "6.0.2",
     "cordova-plugin-headercolor": "^1.0.0",
     "cordova-plugin-inappbrowser": "^3.2.0",
@@ -140,7 +141,8 @@
         "DEEPLINK_HOST": "wallet.hypersign.com"
       },
       "cordova-plugin-qrscanner": {},
-      "cordova-plugin-file": {}
+      "cordova-plugin-file": {},
+      "cordova-plugin-android-permissions": {}
     },
     "platforms": [
       "ios",
