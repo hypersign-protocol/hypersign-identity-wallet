@@ -71,7 +71,7 @@ $ npm run test
 
 build a production version signed by the [corresponding key](https://cordova.apache.org/docs/en/latest/guide/platforms/android/#using-buildjson):
 ```bash
-cordova build android --release --buildConfig=myBuildConfig.json
+cordova build android --release --buildConfig=build.json
 ```
 
 ## Security
