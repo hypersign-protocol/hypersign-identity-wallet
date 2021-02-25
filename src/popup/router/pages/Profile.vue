@@ -60,6 +60,9 @@ export default {
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
       }
+      finally{
+        this.loading = false
+      }
     }
   }
 };

@@ -121,22 +121,20 @@ export default {
     validateMnemonic() {
       return validateMnemonic(this.mnemonic);
     },
-    onFileChange(){
+    async onFileChange(){
       try{
+        this.loading = true;
        const file = event.target.files[0];
-       console.log(file)
        if(!file) throw Error('Error loading backup file')
-
-       if(file.name != 'hypersign-identity-wallet-backup.txt') throw Error('Incorrect file. Please select hypersign backup file')
-       // TODO:  check if file name is correct
-       console.log('Reading file start')
-       this.readFile(file, this.onfileLoadSuccess);
+       if(file.name.indexOf('hypersign-identity-wallet-backup') < 0) throw Error('Incorrect file. Please select hypersign backup file')
+       await this.readFile(file, this.onfileLoadSuccess);
       }catch(e){
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+      }finally{
+        this.loading = false;
       }
     },
     readFile(file, cb){
-      //console.log('Inside reaffileDs')
       const reader = new FileReader();
       reader.onload = cb
       reader.readAsText(file);
@@ -147,6 +145,12 @@ export default {
      console.log('Reading file done')
     },
 
+    clear(){
+this.password = ""
+this.activeNetwork = ""
+this.walletJson = ""
+    },
+
     async restore(){
       try{
         this.loading = true;
@@ -155,7 +159,7 @@ export default {
         if(this.activeNetwork === "")throw new Error('Please choose a backup type.')
         if(this.walletJson === "") throw new Error('Incorrect data')
 
-        setTimeout(async () => {
+        // setTimeout(async () => {
           const walletData = await decrypt(this.walletJson, this.password);
           const { hypersign, mnemonic  } =  JSON.parse(walletData);
           console.log(walletData)
@@ -166,15 +170,19 @@ export default {
           this.mnemonic = mnemonic;
           await this.importAccount();
       
-          this.loading = false;
           this.$store.dispatch('modals/open', { name: 'default', msg: 'Restore successful' });
           this.$router.push('/account');
-        }, 1000)
+          this.loading = false;
+        // }, 1000)
 
 
       }catch(e){
+        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         this.loading = false;
-          if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+      }
+      finally{
+        this.loading = false;
+        this.clear();
       }
     }
   }

@@ -125,7 +125,7 @@ export default {
         // Encrypt everything
         if(confirmed){
             // this.loading = true;
-            setTimeout(async () => {
+            // setTimeout(async () => {
                 const dataToEncrypt = {
                   mnemonic : this.mnemonic,
                   hypersign:  this.hypersign
@@ -139,29 +139,29 @@ export default {
                 const encryptedMessage = await encrypt(walletDataJson, this.password);
                 const fileName = "hypersign-identity-wallet-backup.txt";
 
-                // console.log(encryptedMessage);
 
                 if(this.activeBackup == 'local'){
                   // download the file in local
                   let x =  saveFile(fileName,encryptedMessage);
-                  console.log(x,'return from saveFile')
-                  this.loading = false;
-                  // if(x) {
-                  //     this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
-                  // } else {
-                  //     this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup Failled' });
-                  // }
+                  if(x) {
+                      this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
+                  } else {
+                      this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup Failled' });
+                  }
                 }else{
                   // send the file to server...
                   // TODO Backup on cloud
                 }
-                // this.$router.push('/account');
-            }, 1000)
+                this.$router.push('/account');
+            // }, 1000)
         }
         // save into a file 
       }catch(e){
-        this.loading = false;
+        
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+      }
+      finally{
+        this.loading = false;
       }
     },
     // forceFileDownload(data) {
