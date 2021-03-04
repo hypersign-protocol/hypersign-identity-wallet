@@ -1,3 +1,4 @@
+import DeepLink from '../pages/Deeplink'
 import Index from '../pages/Index';
 import Account from '../pages/Account';
 import PopupSignTransaction from '../pages/Popups/SignTx';
@@ -66,6 +67,11 @@ export default [{
             ifNotAuthOnly: true,
             notPersist: true,
         },
+    },
+    {
+        path: '/deeplink',
+        name: 'deeplink',
+        component: DeepLink,
     },
     {
         path: '/account',
@@ -144,7 +150,8 @@ export default [{
         component: RestoreWallet,
         meta: {
             title: 'restore-wallet',
-            ifNotAuthOnly: true        },
+            ifNotAuthOnly: true
+        },
     },
     {
         path: '/aboutSettings',
