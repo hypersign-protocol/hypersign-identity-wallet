@@ -12,6 +12,13 @@ Clone the master branch of this repo.
 $ git clone https://github.com/aeternity/superhero-wallet.git
 $ cd superhero-wallet
 ```
+## Cordova
+
+```
+sudo npm install -g cordova
+cordova platform add android
+```
+
 
 ### Build locally
 
