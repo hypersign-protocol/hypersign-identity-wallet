@@ -96,11 +96,10 @@ export default {
       const hsSdk = new HypersignSsiSDK({ nodeUrl: HS_NODE_BASE_URL }); 
       this.mnemonic = generateMnemonic();
       
-      console.log(this.mnemonic);
 
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
       
-      console.log(seed)
+      // console.log(seed)
 
       const address = await this.$store.dispatch('generateWallet', { seed });
       this.$store.commit('setMnemonic', this.mnemonic);
@@ -108,7 +107,7 @@ export default {
         publicKey: address,
         privateKey: seed,
       };
-      console.log(keypair)
+      // console.log(keypair)
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
       try {
@@ -134,35 +133,53 @@ export default {
         // const { keys, did } = result.message;
         // keys['privateKeyBase58'] = hskeys.privateKey;
         // console.log(this.profile)
-        console.log('Before getting did')
-        console.log(hsSdk.did)
+        // console.log('Before getting did')
+        // console.log(hsSdk.did)
         const response1  = await hsSdk.did.getDid({user: { name: this.profile.name }});
-        console.log(response1);
+        // console.log(response1);
         const {didDoc, keys, did} = response1
-        console.log({didDoc, keys, did})
+        // console.log({didDoc, keys, did})
 
+        // console.log('Before calling register')
         const res = await hsSdk.did.register(didDoc);
+        // console.log(2)
+        // console.log('After registration')
 
-        console.log('After registration')
         this.profile.did = did;
+        // console.log(3)
         this.$store.commit('setHSkeys', {
           keys,
           did,
         });
 
-        console.log('Before calling setupprofile')
-        await this.setupProfile();
-        console.log('After calling setupprofile')
+        
+        // this.$store.commit('switchLoggedIn', true);
+        // this.$store.commit('updateAccount', keypair);
+        // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
+        console.log("Before setting profile")
+        if(await this.setupProfile()){
+            console.log("After setting profile");
+            console.log("Calling setLogin")
+            await this.$store.dispatch('setLogin', { keypair });
+            this.$store.commit('switchLoggedIn', true);
 
-        await this.$store.dispatch('setLogin', { keypair });
+            const msg = 'An email with a QR code has been sent to the address you provided.\
+            Scan the QR code to receieve the credential'
+            this.$store.dispatch('modals/open', { name: 'default', msg });
 
-        this.loading = false;
-        Object.assign(this.profile, {});
-        this.$router.push(this.$store.state.loginTargetLocation);
+            Object.assign(this.profile, {});
+            console.log("Moving to next route")
+            this.$router.push(this.$store.state.loginTargetLocation);
+        }else{
+          throw new Error("Could not setup profile");
+        }
 
       } catch (e) {
-        this.loading = false;
+        console.log(e);
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+        this.loading = false;
+      }finally{
+        this.loading = false;
       }
       ////HYPERSIGN Related
       ////////////////////////////////////////////////

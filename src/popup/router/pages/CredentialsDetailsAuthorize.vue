@@ -96,19 +96,20 @@ export default {
               challenge,
             );
 
-            console.log('Signed vp created..');
+            // console.log('Signed vp created..');
             const body = {
               challenge,
               vp: JSON.stringify(vp_signed),
             };
 
             let response = await axios.post(verifyUrl, body);
+            // console.log(response)
             response = response.data;
           
 
             if (!response) throw new Error('Could not verify the presentation');
             if(response.status == 401 || response.status == 403) {
-              throw new Error('Unauthorized')
+              throw new Error('Could not authorize the user')
             }else if(response.status == 200){
             if (response.message)
             await this.$store.dispatch('modals/open', {

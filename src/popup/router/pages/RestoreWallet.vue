@@ -124,12 +124,12 @@ export default {
     onFileChange(){
       try{
        const file = event.target.files[0];
-       console.log(file)
+      //  console.log(file)
        if(!file) throw Error('Error loading backup file')
 
        if(file.name.indexOf('hypersign-identity-wallet-backup') > 0) throw Error('Incorrect file. Please select hypersign backup file')
        // TODO:  check if file name is correct
-       console.log('Reading file start')
+      //  console.log('Reading file start')
        this.readFile(file, this.onfileLoadSuccess);
       }catch(e){
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
@@ -143,8 +143,8 @@ export default {
     },
     onfileLoadSuccess (evt){
      this.walletJson = evt.target.result;
-     console.log(this.walletJson);
-     console.log('Reading file done')
+    //  console.log(this.walletJson);
+    //  console.log('Reading file done')
     },
 
     async restore(){
@@ -159,7 +159,7 @@ export default {
           try{
             const walletData = await decrypt(this.walletJson, this.password);
             const { hypersign, mnemonic  } =  JSON.parse(walletData);
-            console.log(walletData)
+            // console.log(walletData)
 
             this.$store.commit('restoreHypersign',hypersign);
 

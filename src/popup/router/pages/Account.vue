@@ -119,7 +119,7 @@ export default {
       let data;
       try {
         data = JSON.parse(QRJsonString);
-        console.log(data);
+        // console.log(data);
         switch(data.QRType){
           case 'ISSUE_CRED': {
             this.credentialsQRData(data.url);
@@ -165,19 +165,19 @@ export default {
           throw new Error('The credential already exist in your wallet');
         }
 
-        console.log(1)
+        // console.log(1)
 
-        console.log({
-          hs_app_did: this.hypersign.did,
-          credentialSubjectDid: cred.credentialSubject.id
-        })
+        // console.log({
+        //   hs_app_did: this.hypersign.did,
+        //   credentialSubjectDid: cred.credentialSubject.id
+        // })
         
         // TODO: Check if you are the owner of this credenital: otherwise reject
         if (this.hypersign.did != cred.credentialSubject.id) {
           throw new Error('The credential is not issued to you');
         }
 
-        console.log(2)
+        // console.log(2)
 
         this.$store.commit('addHSVerifiableCredentialTemp', cred);
         this.$router.push(`/credential/temp/${cred.id}`);
@@ -203,11 +203,11 @@ export default {
         this.verifiableCredential = this.hypersign.credentials.find((x) => {
           const credentialSchemaUrl = x['@context'][1].hsscheme;
           const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
-          console.log({
-            credentialSchemaId, 
-            schemaId,
-            authDid: this.hsAuthDid
-          })
+          // console.log({
+          //   credentialSchemaId, 
+          //   schemaId,
+          //   authDid: this.hsAuthDid
+          // })
           if (credentialSchemaId === schemaId){
             if (x.issuer === appDid ){ // check if the app company issued this credential ;;  the registration flow
               return x;
