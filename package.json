@@ -40,6 +40,7 @@
     "@zxing/library": "^0.17.1",
     "aepp-raendom": "github:aeternity/aepp-raendom#feature/layout-superhero",
     "aeternity-tokens": "^1.0.2",
+    "auth0-js": "^9.16.2",
     "axios": "^0.19.0",
     "bignumber.js": "^8.1.1",
     "bluebird": "^3.7.1",
