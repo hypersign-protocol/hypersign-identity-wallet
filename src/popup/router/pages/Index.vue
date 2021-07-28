@@ -91,8 +91,8 @@ export default {
         newWebAuth.authorize(
           {
             connection: "google-oauth2",  
-            redirectUri: "http://localhost:4999/chrome/popup/popup#/",
-           
+            redirectUri: "http://localhost:4999/auth/gauth?"
+          
           });
     },
     gotoRestore(){
