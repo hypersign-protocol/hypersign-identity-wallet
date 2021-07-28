@@ -66,6 +66,16 @@ import registration from '../../../mixins/registration';
 import HypersignSsiSDK from 'hs-ssi-sdk';
 import { HS_NODE_BASE_URL } from '../../utils/hsConstants'
 import auth0 from "auth0-js";
+
+      const newWebAuth = new auth0.WebAuth({
+          domain: "fidato.us.auth0.com",
+          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
+          responseType: "token id_token",
+          scope: "openid profile email",
+   
+        })
+
+
 export default {
   mixins: [registration],
   components: { Logo,Input, SuperheroLogo, CheckBox, Button, Platforms },
@@ -78,27 +88,11 @@ export default {
   methods: {
     loginWithGoogle(){
 
-      const newWebAuth = new auth0.WebAuth({
-          domain: "fidato.us.auth0.com",
-          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
-          responseType: "token id_token",
-          scope: "openid profile email",
-          // redirectUri: window.location.origin + "/app/admin/login",
-        })
-
-        newWebAuth.popup.authorize(
+        newWebAuth.authorize(
           {
             connection: "google-oauth2",  
-            owp: true 
-          },
-          function (err, authRes) {
-            console.log(authRes, err)
-            if(!err){
-              newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
-                console.log(err, user)
-              })
-            }
-              
+            redirectUri: "http://localhost:4999/chrome/popup/popup#/",
+           
           });
     },
     gotoRestore(){
