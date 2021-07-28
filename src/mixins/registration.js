@@ -62,14 +62,12 @@ export default {
             res = res.data;
             if (res && res.status != 200) throw new Error(res.error);
 
-            const msg = 'An email with a QR code has been sent to the address you provided.\
-            Scan the QR code to receieve the credential'
-
-            if (res.message) this.$store.dispatch('modals/open', { name: 'default', msg });
             this.$store.commit('addHSProfile', this.profile);
             this.ifEdit = true;
             this.ifCreate = false;
             this.ifAllDisabled = true;
+
+            return true;
         },
     },
 };

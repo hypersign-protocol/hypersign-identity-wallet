@@ -40,7 +40,11 @@
       {{ $t('pages.index.generateWallet') }}
     </Button>
     <label class="sett_info">OR</label>
+    <Button @click="loginWithGoogle" data-cy="login-with-google">
+      Continue with Google
+    </Button>
     <br/>
+
     <a href="#" @click="gotoRestore">{{ $t('pages.index.restoreWallet') }}</a>
     <!-- <Button @click="gotoRestore" :disabled="!termsAgreed">
       {{ $t('pages.index.restoreWallet') }}
@@ -61,6 +65,7 @@ import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
 import HypersignSsiSDK from 'hs-ssi-sdk';
 import { HS_NODE_BASE_URL } from '../../utils/hsConstants'
+import auth0 from "auth0-js";
 export default {
   mixins: [registration],
   components: { Logo,Input, SuperheroLogo, CheckBox, Button, Platforms },
@@ -71,6 +76,31 @@ export default {
     loading:  false
   }),
   methods: {
+    loginWithGoogle(){
+
+      const newWebAuth = new auth0.WebAuth({
+          domain: "fidato.us.auth0.com",
+          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
+          responseType: "token id_token",
+          scope: "openid profile email",
+          // redirectUri: window.location.origin + "/app/admin/login",
+        })
+
+        newWebAuth.popup.authorize(
+          {
+            connection: "google-oauth2",  
+            owp: true 
+          },
+          function (err, authRes) {
+            console.log(authRes, err)
+            if(!err){
+              newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
+                console.log(err, user)
+              })
+            }
+              
+          });
+    },
     gotoRestore(){
       this.$router.push('restoreWallet') 
     },
@@ -152,24 +182,34 @@ export default {
           did,
         });
 
-        // console.log(4)
+        
+        // this.$store.commit('switchLoggedIn', true);
+        // this.$store.commit('updateAccount', keypair);
+        // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
+        console.log("Before setting profile")
+        if(await this.setupProfile()){
+            console.log("After setting profile");
+            console.log("Calling setLogin")
+            await this.$store.dispatch('setLogin', { keypair });
+            this.$store.commit('switchLoggedIn', true);
 
-        // console.log('Before calling setupprofile')
-        await this.setupProfile();
-        // console.log('After calling setupprofile')
+            const msg = 'An email with a QR code has been sent to the address you provided.\
+            Scan the QR code to receieve the credential'
+            this.$store.dispatch('modals/open', { name: 'default', msg });
 
-// console.log(5)
-        await this.$store.dispatch('setLogin', { keypair });
-        // console.log(6)
-
-        this.loading = false;
-        Object.assign(this.profile, {});
-        this.$router.push(this.$store.state.loginTargetLocation);
+            Object.assign(this.profile, {});
+            console.log("Moving to next route")
+            this.$router.push(this.$store.state.loginTargetLocation);
+        }else{
+          throw new Error("Could not setup profile");
+        }
 
       } catch (e) {
         console.log(e);
-        this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+        this.loading = false;
+      }finally{
+        this.loading = false;
       }
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
