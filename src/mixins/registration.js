@@ -41,7 +41,7 @@ export default {
             this.ifEdit = false;
             this.ifCreate = true;
         },
-        async setupProfile() {            
+        async setupProfile(isThridPartyAuth = false) {            
             // try {
             //     this.loading = true;
             //// HS_TODO::
@@ -52,22 +52,44 @@ export default {
             const HS_STUDIO_REGISTER_URL = `${SUPERHERO_HS_AUTH_BASE_URL}${SUPERHERO_HS_AUTH_CREDENTIAL_ISSUE_API}`
 
             const body = {
-                name: this.profile.name,
-                email: this.profile.email
+                user: {
+                    name: this.profile.name,
+                    email: this.profile.email
+                },
+                isThridPartyAuth:  false
             }
 
+            if(isThridPartyAuth){
+                body["user"]["did"] = this.profile.did;
+                body["isThridPartyAuth"] = true;
+            }
+
+            // console.log("Calling authserver register")
+            
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
             
             if (!res) throw new Error("Could not register the user");
+            // console.log("After getting response")
             res = res.data;
+            // console.log(res)
+            // console.log(res.message)
             if (res && res.status != 200) throw new Error(res.error);
+        
+            
+            // console.log(typeof(res.message))
+            // console.log(res.message)
+            if(isThridPartyAuth && res && res.message){
+                // console.log("Before setting 3rdPartyAuthVC");
+                // only in case of 3rd party auth, verifiable credenital will come
+                localStorage.setItem("3rdPartyAuthVC", JSON.stringify(res.message));
+            }
 
             this.$store.commit('addHSProfile', this.profile);
             this.ifEdit = true;
             this.ifCreate = false;
             this.ifAllDisabled = true;
 
-            return true;
+            return  true;
         },
     },
 };

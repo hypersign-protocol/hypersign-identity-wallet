@@ -83,17 +83,50 @@ export default {
     termsAgreed: false,
     IS_WEB: process.env.PLATFORM === 'web',
     IN_FRAME,
-    loading:  false
+    loading:  false,
+    isThridPartyAuth: false
   }),
   methods: {
     loginWithGoogle(){
 
-        newWebAuth.authorize(
+        // newWebAuth.authorize(
+        //   {
+        //     connection: "google-oauth2",  
+        //     redirectUri: "http://localhost:4999/auth/gauth?"
+          
+        //   });
+
+        // need to remove this hardcoding....
+         const newWebAuth = new auth0.WebAuth({
+          domain: "fidato.us.auth0.com",
+          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
+          responseType: "token id_token",
+          scope: "openid profile email",
+          // redirectUri: window.location.origin + "/app/admin/login",
+        })
+        const that = this;
+        newWebAuth.popup.authorize(
           {
             connection: "google-oauth2",  
-            redirectUri: "http://localhost:4999/auth/gauth?"
-          
+            owp: true 
+          },
+          function (err, authRes) {
+            // console.log(authRes, err)
+            if(!err){
+              newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
+                // console.log(err, user) 
+                const { email, name } = user;
+                // console.log({email, name})
+                that.profile.email = email;
+                that.profile.name = name;
+                that.isThridPartyAuth = true;
+                that.createWallet(true);
+              })
+            }
+              
           });
+
+
     },
     gotoRestore(){
       this.$router.push('restoreWallet') 
@@ -116,6 +149,9 @@ export default {
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         return;
       }
+
+
+      
       
       const hsSdk = new HypersignSsiSDK({ nodeUrl: HS_NODE_BASE_URL }); 
       this.mnemonic = generateMnemonic();
@@ -180,16 +216,18 @@ export default {
         // this.$store.commit('switchLoggedIn', true);
         // this.$store.commit('updateAccount', keypair);
         // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
-        console.log("Before setting profile")
-        if(await this.setupProfile()){
+        // console.log("Before setting profile")
+        if(await this.setupProfile(this.isThridPartyAuth)){
             console.log("After setting profile");
             console.log("Calling setLogin")
             await this.$store.dispatch('setLogin', { keypair });
             this.$store.commit('switchLoggedIn', true);
 
-            const msg = 'An email with a QR code has been sent to the address you provided.\
-            Scan the QR code to receieve the credential'
-            this.$store.dispatch('modals/open', { name: 'default', msg });
+            if(!this.isThridPartyAuth){
+              const msg = 'An email with a QR code has been sent to the address you provided.\
+              Scan the QR code to receieve the credential'
+              this.$store.dispatch('modals/open', { name: 'default', msg });
+            }
 
             Object.assign(this.profile, {});
             console.log("Moving to next route")

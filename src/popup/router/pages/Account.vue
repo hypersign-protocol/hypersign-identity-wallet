@@ -102,6 +102,19 @@ export default {
         const JSONData = decodeURI(this.$route.query.url);
         this.receiveOrGiveCredential(JSONData);
       }
+
+
+      const vcStr = localStorage.getItem("3rdPartyAuthVC");
+      if(vcStr){
+        // console.log("vcStr is present");
+        const vc = JSON.parse(vcStr);
+        // console.log("Able to parse vcStr")
+        if(vc){
+          // console.log("Vc is not null");
+          // console.log("Calling credentialsQRData()");
+          this.credentialsQRData(vc);
+        }
+      }
     } catch (e) {
       if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
     }
@@ -125,7 +138,9 @@ export default {
         // console.log(data);
         switch(data.QRType){
           case 'ISSUE_CRED': {
-            this.credentialsQRData(data.url);
+            this.credentialUrl = data.url;            
+            let cred = await this.fetchCredential();
+            this.credentialsQRData(cred);
             break;
           }
           case 'REQUEST_CRED': {
@@ -144,6 +159,9 @@ export default {
     },
 
     async fetchCredential() {      
+      if(!this.credentialUrl){
+        throw new Error("Credential Url is null or empty");
+      }
       this.credentialUrl = this.credentialUrl + '&did=' + this.hypersign.did;
       this.loading = true;
       let response = await axios.get(this.credentialUrl);
@@ -157,19 +175,18 @@ export default {
       return response.message;
     },
 
-    async credentialsQRData(data) {
+    async credentialsQRData(cred) {
       try {       
-        this.credentialUrl = data;
-        let cred = await this.fetchCredential();
-
+        if(!cred){
+          throw new Error('Credential can not be null or empty');
+        }
         // TODO: Check if this credential already exsits in wallet: otherwise reject
         const credInWallet = this.hypersign.credentials.find((x) => x.id == cred.id);
         if (credInWallet) {
           throw new Error('The credential already exist in your wallet');
         }
 
-        // console.log(1)
-
+      
         // console.log({
         //   hs_app_did: this.hypersign.did,
         //   credentialSubjectDid: cred.credentialSubject.id
@@ -178,12 +195,11 @@ export default {
         // TODO: Check if you are the owner of this credenital: otherwise reject
         if (this.hypersign.did != cred.credentialSubject.id) {
           throw new Error('The credential is not issued to you');
-        }
-
-        // console.log(2)
+        }        
 
         this.$store.commit('addHSVerifiableCredentialTemp', cred);
         this.$router.push(`/credential/temp/${cred.id}`);
+        localStorage.removeItem("3rdPartyAuthVC");
       } catch (e) {
         console.log(e);
         this.loading = false;
