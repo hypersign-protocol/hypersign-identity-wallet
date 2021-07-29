@@ -40,7 +40,7 @@
       {{ $t('pages.index.generateWallet') }}
     </Button>
     <label class="sett_info">OR</label>
-    <Button @click="loginWithGoogle" data-cy="login-with-google">
+    <Button :disabled="!termsAgreed" @click="loginWithGoogle" data-cy="login-with-google">
       Continue with Google
     </Button>
     <br/>
@@ -79,56 +79,31 @@ export default {
     isThridPartyAuth: false
   }),
   mounted(){
-    alert("Deploy-7")
+    
      const that = this;
+     
+
+     // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
-      
        webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
                 const { email, name } = user;
                 that.profile.email = email;
                 that.profile.name = name;
                 that.isThridPartyAuth = true;
+
+                localStorage.removeItem("authToken")
+                localStorage.removeItem("accessToken")
+                localStorage.removeItem("isRoute")
+
                 that.createWallet(true);
         })
       
     }
-
-
   },
   methods: {
     loginWithGoogle(){
 
-        // newWebAuth.authorize(
-        //   {
-        //     connection: "google-oauth2",  
-        //     redirectUri: "http://localhost:4999/auth/gauth?"
-          
-        //   });
-
-        // need to remove this hardcoding....
       
-       
-        // newWebAuth.popup.authorize(
-        //   {
-        //     connection: "google-oauth2",  
-        //     owp: true 
-        //   },
-        //   function (err, authRes) {
-        //     // console.log(authRes, err)
-        //     if(!err){
-        //       newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
-        //         // console.log(err, user) 
-        //         const { email, name } = user;
-        //         // console.log({email, name})
-        //         that.profile.email = email;
-        //         that.profile.name = name;
-        //         that.isThridPartyAuth = true;
-        //         that.createWallet(true);
-        //       })
-        //     }
-              
-        //   });
-
         webAuth.authorize(
           {
             connection: "google-oauth2",  
