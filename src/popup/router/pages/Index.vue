@@ -79,7 +79,7 @@ export default {
     isThridPartyAuth: false
   }),
   mounted(){
-    alert("Deploy-4")
+    alert("Deploy-5")
     console.log(localStorage, this.$route)
   },
   methods: {
