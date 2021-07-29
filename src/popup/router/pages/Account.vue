@@ -80,6 +80,18 @@ export default {
   },
   async created() {
     try {
+
+      const vcStr = localStorage.getItem("3rdPartyAuthVC");
+      if(vcStr){
+        // console.log("vcStr is present");
+        const vc = JSON.parse(vcStr);
+        // console.log("Able to parse vcStr")
+        if(vc){
+          // console.log("Vc is not null");
+          // console.log("Calling credentialsQRData()");
+          this.credentialsQRData(vc);
+        }
+      }
       
       // put it somewhere eles other whise it wont work... like somewhere when the app loads
       if (!this.hypersign.hsAuthDID) {
@@ -104,17 +116,7 @@ export default {
       }
 
 
-      const vcStr = localStorage.getItem("3rdPartyAuthVC");
-      if(vcStr){
-        // console.log("vcStr is present");
-        const vc = JSON.parse(vcStr);
-        // console.log("Able to parse vcStr")
-        if(vc){
-          // console.log("Vc is not null");
-          // console.log("Calling credentialsQRData()");
-          this.credentialsQRData(vc);
-        }
-      }
+      
     } catch (e) {
       if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
     }
