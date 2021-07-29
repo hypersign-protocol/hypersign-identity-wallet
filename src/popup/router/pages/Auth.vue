@@ -11,8 +11,14 @@
 
 export default {
     name: 'Auth',
-    components: {}
+    components: {},
+    mounted(){
+      console.log("HII I AM AUTH")
+    }
+    
 };
+
+
 </script>
 
 <style>

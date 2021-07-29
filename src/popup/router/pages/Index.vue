@@ -105,25 +105,31 @@ export default {
           // redirectUri: window.location.origin + "/app/admin/login",
         })
         const that = this;
-        newWebAuth.popup.authorize(
+        // newWebAuth.popup.authorize(
+        //   {
+        //     connection: "google-oauth2",  
+        //     owp: true 
+        //   },
+        //   function (err, authRes) {
+        //     // console.log(authRes, err)
+        //     if(!err){
+        //       newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
+        //         // console.log(err, user) 
+        //         const { email, name } = user;
+        //         // console.log({email, name})
+        //         that.profile.email = email;
+        //         that.profile.name = name;
+        //         that.isThridPartyAuth = true;
+        //         that.createWallet(true);
+        //       })
+        //     }
+              
+        //   });
+
+        newWebAuth.authorize(
           {
             connection: "google-oauth2",  
-            owp: true 
-          },
-          function (err, authRes) {
-            // console.log(authRes, err)
-            if(!err){
-              newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
-                // console.log(err, user) 
-                const { email, name } = user;
-                // console.log({email, name})
-                that.profile.email = email;
-                that.profile.name = name;
-                that.isThridPartyAuth = true;
-                that.createWallet(true);
-              })
-            }
-              
+           redirectUri: window.location.origin + "/auth/google?"
           });
 
 

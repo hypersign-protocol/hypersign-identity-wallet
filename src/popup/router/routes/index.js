@@ -41,9 +41,8 @@ export default [{
     },  
 
     {
-        path: "/auth/:authType",
-        name: "auth",
-        exactPath: true,
+        path: "/auth/nsdkjfnd",
+        name: "Auth",
         component: Auth,
     },
    
