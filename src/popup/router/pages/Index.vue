@@ -65,15 +65,7 @@ import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
 import HypersignSsiSDK from 'hs-ssi-sdk';
 import { HS_NODE_BASE_URL } from '../../utils/hsConstants'
-import auth0 from "auth0-js";
-
-      const newWebAuth = new auth0.WebAuth({
-          domain: "fidato.us.auth0.com",
-          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
-          responseType: "token id_token",
-          scope: "openid profile email",
-   
-        })
+import  webAuth from "../../utils/auth0Connection";
 
 
 export default {
@@ -88,6 +80,7 @@ export default {
   }),
   mounted(){
     alert("Deploy-4")
+    console.log(localStorage, this.$route)
   },
   methods: {
     loginWithGoogle(){
@@ -100,13 +93,7 @@ export default {
         //   });
 
         // need to remove this hardcoding....
-         const newWebAuth = new auth0.WebAuth({
-          domain: "fidato.us.auth0.com",
-          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
-          responseType: "token id_token",
-          scope: "openid profile email",
-          // redirectUri: window.location.origin + "/app/admin/login",
-        })
+      
         const that = this;
         // newWebAuth.popup.authorize(
         //   {

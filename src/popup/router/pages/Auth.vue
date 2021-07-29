@@ -12,11 +12,16 @@ export default {
     components: {},
     
     mounted(){
-      console.log(this.$route, location.search);
+      const routeHash = this.$route.hash;
 
-      const params = new URLSearchParams(location.search);
-      console.log("PARAMS", params);
-      localStorage.setItem("  ", JSON.stringify(this.$route.query))
+      const accessToken = routeHash.split("&")[0].split("=")[1];
+      const authToken = routeHash.split("&")[5].split("=")[1];
+
+      localStorage.setItem("accessToken", JSON.stringify(accessToken))
+      localStorage.setItem("authToken", JSON.stringify(authToken))
+      this.$router.push({path: "/", params: {
+        authToken: authToken, accessToken: accessToken
+      }})
     }
     
 };
