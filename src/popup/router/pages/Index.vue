@@ -87,7 +87,7 @@ export default {
     isThridPartyAuth: false
   }),
   mounted(){
-    alert("Deploy-2 ")
+    alert("Deploy-3")
   },
   methods: {
     loginWithGoogle(){
