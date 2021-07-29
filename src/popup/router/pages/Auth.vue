@@ -10,6 +10,9 @@
 export default {
     name: 'Auth',
     components: {},
+     created() {
+       console.log("UPDATED");
+     },
     mounted(){
       console.log(this.$route.query);
       localStorage.setItem("query", JSON.stringify(this.$route.query))

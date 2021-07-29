@@ -137,7 +137,9 @@ export default {
       loading: false,
     };
   },
-  created() {},
+  created() {
+    console.log("DEPLOYED");
+  },
   methods: {
     async createWallet() {
       this.mnemonic = generateMnemonic();
