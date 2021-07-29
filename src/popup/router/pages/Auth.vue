@@ -10,13 +10,13 @@
 export default {
     name: 'Auth',
     components: {},
-     created() {
-       console.log("UPDATED");
-       alert(JSON.stringify(this.$route))
-     },
+    
     mounted(){
-      console.log(this.$route.query);
-      localStorage.setItem("query", JSON.stringify(this.$route.query))
+      console.log(this.$route, location.search);
+
+      const params = new URLSearchParams(location.search);
+      console.log("PARAMS", params);
+      localStorage.setItem("  ", JSON.stringify(this.$route.query))
     }
     
 };
