@@ -13,7 +13,8 @@ export default {
     name: 'Auth',
     components: {},
     mounted(){
-      console.log("HII I AM AUTH")
+      console.log(this.$route.query);
+      localStorage.setItem("query", JSON.stringify(this.$route.query))
     }
     
 };
