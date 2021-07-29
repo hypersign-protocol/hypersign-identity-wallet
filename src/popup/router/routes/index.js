@@ -44,6 +44,13 @@ export default [{
         path: "/auth/:authType",
         name: "Auth",
         component: Auth,
+        meta: {
+            title: 'Auth',
+            navigation: false,
+            ifNotAuthOnly: true,
+            notPersist: true,
+        },
+      
     },
    
     {
