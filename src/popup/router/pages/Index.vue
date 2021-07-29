@@ -79,7 +79,7 @@ export default {
     isThridPartyAuth: false
   }),
   mounted(){
-    alert("Deploy-5")
+    alert("Deploy-6")
     console.log(localStorage, this.$route)
   },
   methods: {
@@ -116,7 +116,7 @@ export default {
               
         //   });
 
-        newWebAuth.authorize(
+        webAuth.authorize(
           {
             connection: "google-oauth2",  
            redirectUri: window.location.origin + "/auth/google?"
