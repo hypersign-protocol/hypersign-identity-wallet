@@ -17,8 +17,8 @@ export default {
       const accessToken = routeHash.split("&")[0].split("=")[1];
       const authToken = routeHash.split("&")[5].split("=")[1];
 
-      localStorage.setItem("accessToken", JSON.stringify(accessToken))
-      localStorage.setItem("authToken", JSON.stringify(authToken))
+      localStorage.setItem("accessToken", accessToken)
+      localStorage.setItem("authToken", authToken)
       this.$router.push({path: "/", params: {
         authToken: authToken, accessToken: accessToken
       }})

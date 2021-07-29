@@ -79,8 +79,21 @@ export default {
     isThridPartyAuth: false
   }),
   mounted(){
-    alert("Deploy-6")
-    console.log(localStorage, this.$route)
+    alert("Deploy-7")
+     const that = this;
+    if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
+      
+       webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
+                const { email, name } = user;
+                that.profile.email = email;
+                that.profile.name = name;
+                that.isThridPartyAuth = true;
+                that.createWallet(true);
+        })
+      
+    }
+
+
   },
   methods: {
     loginWithGoogle(){
@@ -94,7 +107,7 @@ export default {
 
         // need to remove this hardcoding....
       
-        const that = this;
+       
         // newWebAuth.popup.authorize(
         //   {
         //     connection: "google-oauth2",  
@@ -122,7 +135,6 @@ export default {
            redirectUri: window.location.origin + "/auth/google?"
           });
 
-
     },
     gotoRestore(){
       this.$router.push('restoreWallet') 
@@ -133,6 +145,7 @@ export default {
     },
 
     async createWallet() {
+
 
 
       try{
