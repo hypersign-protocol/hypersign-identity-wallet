@@ -12,6 +12,7 @@ export default {
     components: {},
      created() {
        console.log("UPDATED");
+       alert(JSON.stringify(this.$route))
      },
     mounted(){
       console.log(this.$route.query);

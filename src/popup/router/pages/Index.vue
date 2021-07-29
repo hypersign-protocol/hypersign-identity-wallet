@@ -86,6 +86,9 @@ export default {
     loading:  false,
     isThridPartyAuth: false
   }),
+  mounted(){
+    alert("HII")
+  },
   methods: {
     loginWithGoogle(){
 
@@ -253,6 +256,7 @@ export default {
       ////////////////////////////////////////////////
     }
   }
+  
 };
 </script>
 
