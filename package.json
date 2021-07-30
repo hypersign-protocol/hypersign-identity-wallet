@@ -24,7 +24,8 @@
     "build:Testnet": "cross-env NETWORK=Testnet npm run build",
     "watch:dev:Testnet": "cross-env NETWORK=Testnet npm run watch:dev",
     "watch:dev:tests": "cross-env NETWORK=Testnet RUNNING_IN_TESTS=true npm run watch:dev",
-    "build:tests": "cross-env NETWORK=Testnet RUNNING_IN_TESTS=true npm run build:dev"
+    "build:tests": "cross-env NETWORK=Testnet RUNNING_IN_TESTS=true npm run build:dev",
+    "webserver": "cp -R dist/web/root/* web-server/public/ && node web-server/index.js"
   },
   "dependencies": {
     "@aeternity/aepp-components": "git+https://github.com/aeternity/aepp-components.git#develop",
