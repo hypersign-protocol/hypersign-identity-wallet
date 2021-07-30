@@ -12,21 +12,18 @@ export default {
     components: {},
     
     mounted(){
-      console.log("AUTH MOUNTED");
       const routeHash = this.$route.hash;
 
 
       const accessToken = routeHash.split("&")[0].split("=")[1];
       const authToken = routeHash.split("&")[5].split("=")[1];
 
-      console.log(routeHash, accessToken, authToken);
-
       localStorage.setItem("accessToken", accessToken)
       localStorage.setItem("authToken", authToken)
       this.$router.push({path: "/", params: {
         authToken: authToken, accessToken: accessToken
       }})
-      
+
     }
     
 };
