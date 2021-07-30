@@ -14,6 +14,8 @@ export default {
     mounted(){
       const routeHash = this.$route.hash;
 
+      console.log(routeHash);
+
       const accessToken = routeHash.split("&")[0].split("=")[1];
       const authToken = routeHash.split("&")[5].split("=")[1];
 
