@@ -78,11 +78,9 @@ export default {
     loading:  false,
     isThridPartyAuth: false
   }),
-
-  created(){
+  mounted(){
      const that = this;
      
-
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
        webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
