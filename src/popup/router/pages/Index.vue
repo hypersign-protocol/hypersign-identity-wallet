@@ -27,20 +27,20 @@
         v-model="profile.email"
         :disabled="ifAllDisabled"
       /></div>
-    <CheckBox v-model="termsAgreed" data-cy="checkbox" style="padding: 20px;">
+    <!-- <CheckBox v-model="termsAgreed" data-cy="checkbox" style="padding: 20px;">
       <span class="heading-color">
         {{ $t('pages.index.term1') }}
         <RouterLink to="/termsOfService" data-cy="terms">
           {{ $t('pages.index.termsAndConditions') }}
         </RouterLink>
       </span>
-    </CheckBox>
+    </CheckBox> -->
 
-    <Button @click="createWallet" :disabled="!termsAgreed" data-cy="generate-wallet">
+    <Button @click="createWallet" data-cy="generate-wallet">
       {{ $t('pages.index.generateWallet') }}
     </Button>
-    <label class="sett_info">OR</label>
-    <Button :disabled="!termsAgreed" @click="loginWithGoogle" data-cy="login-with-google">
+    <label class="or-label">OR</label>
+    <Button @click="loginWithGoogle" data-cy="login-with-google">
       Continue with Google
     </Button>
     <br/>
@@ -79,10 +79,8 @@ export default {
     isThridPartyAuth: false
   }),
   mounted(){
-    
      const that = this;
      
-
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
        webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
@@ -99,7 +97,9 @@ export default {
         })
       
     }
+
   },
+  
   methods: {
     loginWithGoogle(){
 
@@ -237,6 +237,11 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
+label.or-label{
+ color: black;
+ font-weight: bold;
+}
+
 input.input {
     /* display: block; */
     width: 100%;

@@ -132,18 +132,18 @@ const getConfig = platform => {
         chunkFilename: '[id].css',
         ignoreOrder: false,
       }),
-      new webpack.DefinePlugin({
-        global: 'window',
-        'process.env': {
-          NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-          IS_EXTENSION: platform.startsWith('extension-') && !RUNNING_IN_TESTS,
-          PLATFORM: JSON.stringify(platform),
-          npm_package_version: JSON.stringify(process.env.npm_package_version),
-          NETWORK: JSON.stringify(process.env.NETWORK),
-          RUNNING_IN_TESTS,
-          COMMIT_HASH: JSON.stringify(commitHash),
-        },
-      }),
+      // new webpack.DefinePlugin({
+      //   global: 'window',
+      //   'process.env': {
+      //     NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+      //     IS_EXTENSION: platform.startsWith('extension-') && !RUNNING_IN_TESTS,
+      //     PLATFORM: JSON.stringify(platform),
+      //     npm_package_version: JSON.stringify(process.env.npm_package_version),
+      //     NETWORK: JSON.stringify(process.env.NETWORK),
+      //     RUNNING_IN_TESTS,
+      //     COMMIT_HASH: JSON.stringify(commitHash),
+      //   },
+      // }),
       ...(platform.startsWith('extension-')
         ? [
             new CopyWebpackPlugin([
