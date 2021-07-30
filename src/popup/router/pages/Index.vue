@@ -27,19 +27,19 @@
         v-model="profile.email"
         :disabled="ifAllDisabled"
       /></div>
-    <CheckBox v-model="termsAgreed" data-cy="checkbox" style="padding: 20px;">
+    <!-- <CheckBox v-model="termsAgreed" data-cy="checkbox" style="padding: 20px;">
       <span class="heading-color">
         {{ $t('pages.index.term1') }}
         <RouterLink to="/termsOfService" data-cy="terms">
           {{ $t('pages.index.termsAndConditions') }}
         </RouterLink>
       </span>
-    </CheckBox>
+    </CheckBox> -->
 
-    <Button @click="createWallet" :disabled="!termsAgreed" data-cy="generate-wallet">
+    <Button @click="createWallet" data-cy="generate-wallet">
       {{ $t('pages.index.generateWallet') }}
     </Button>
-    <label class="sett_info">OR</label>
+    <label class="or-label">OR</label>
     <Button @click="loginWithGoogle" data-cy="login-with-google">
       Continue with Google
     </Button>
@@ -65,7 +65,9 @@ import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
 import HypersignSsiSDK from 'hs-ssi-sdk';
 import { HS_NODE_BASE_URL } from '../../utils/hsConstants'
-import auth0 from "auth0-js";
+import  webAuth from "../../utils/auth0Connection";
+
+
 export default {
   mixins: [registration],
   components: { Logo,Input, SuperheroLogo, CheckBox, Button, Platforms },
@@ -73,33 +75,47 @@ export default {
     termsAgreed: false,
     IS_WEB: process.env.PLATFORM === 'web',
     IN_FRAME,
-    loading:  false
+    loading:  false,
+    isThridPartyAuth: false
   }),
+  created(){
+     const that = this;
+     
+     // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
+    if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
+      this.loading = true;
+       webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
+              if(err){
+                this.loading = false;
+                this.$store.dispatch('modals/open', { name: 'default', msg:err });
+                return;
+              }
+                const { email, name } = user;
+                that.profile.email = email;
+                that.profile.name = name;
+                that.isThridPartyAuth = true;
+
+                localStorage.removeItem("authToken")
+                localStorage.removeItem("accessToken")
+                localStorage.removeItem("isRoute")
+
+                that.createWallet(true);
+        })
+      
+    }
+
+  },
+  
   methods: {
     loginWithGoogle(){
 
-      const newWebAuth = new auth0.WebAuth({
-          domain: "fidato.us.auth0.com",
-          clientID: "hwM9GmM4nUstds9Fw5KsYZVDboJBeLTL",
-          responseType: "token id_token",
-          scope: "openid profile email",
-          // redirectUri: window.location.origin + "/app/admin/login",
-        })
-
-        newWebAuth.popup.authorize(
+      
+        webAuth.authorize(
           {
             connection: "google-oauth2",  
-            owp: true 
-          },
-          function (err, authRes) {
-            console.log(authRes, err)
-            if(!err){
-              newWebAuth.client.userInfo(authRes.accessToken, function(err, user) {
-                console.log(err, user)
-              })
-            }
-              
+           redirectUri: window.location.origin + "/auth/google?"
           });
+
     },
     gotoRestore(){
       this.$router.push('restoreWallet') 
@@ -112,6 +128,7 @@ export default {
     async createWallet() {
 
 
+
       try{
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
@@ -122,6 +139,9 @@ export default {
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         return;
       }
+
+
+      
       
       const hsSdk = new HypersignSsiSDK({ nodeUrl: HS_NODE_BASE_URL }); 
       this.mnemonic = generateMnemonic();
@@ -186,16 +206,18 @@ export default {
         // this.$store.commit('switchLoggedIn', true);
         // this.$store.commit('updateAccount', keypair);
         // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
-        console.log("Before setting profile")
-        if(await this.setupProfile()){
+        // console.log("Before setting profile")
+        if(await this.setupProfile(this.isThridPartyAuth)){
             console.log("After setting profile");
             console.log("Calling setLogin")
             await this.$store.dispatch('setLogin', { keypair });
             this.$store.commit('switchLoggedIn', true);
 
-            const msg = 'An email with a QR code has been sent to the address you provided.\
-            Scan the QR code to receieve the credential'
-            this.$store.dispatch('modals/open', { name: 'default', msg });
+            if(!this.isThridPartyAuth){
+              const msg = 'An email with a QR code has been sent to the address you provided.\
+              Scan the QR code to receieve the credential'
+              this.$store.dispatch('modals/open', { name: 'default', msg });
+            }
 
             Object.assign(this.profile, {});
             console.log("Moving to next route")
@@ -215,11 +237,17 @@ export default {
       ////////////////////////////////////////////////
     }
   }
+  
 };
 </script>
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
+label.or-label{
+ color: black;
+ font-weight: bold;
+}
+
 input.input {
     /* display: block; */
     width: 100%;

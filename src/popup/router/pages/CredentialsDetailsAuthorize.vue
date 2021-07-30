@@ -111,12 +111,22 @@ export default {
             if(response.status == 401 || response.status == 403) {
               throw new Error('Could not authorize the user')
             }else if(response.status == 200){
-            if (response.message)
-            await this.$store.dispatch('modals/open', {
+
+            const isMobileWallet = JSON.parse(localStorage.getItem("isMobileWallet"));
+            if (response.message){
+
+              if(!isMobileWallet){
+                 return window.close()
+              }
+            
+              await this.$store.dispatch('modals/open', {
                 name: 'default',
                 msg: 'Credential successfully verified',
               });
-            this.reject()
+              this.reject()
+            }
+          
+
             }else {
               throw new Error(response.error)
             }

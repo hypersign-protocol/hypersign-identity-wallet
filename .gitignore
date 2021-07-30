@@ -1,4 +1,6 @@
 /node_modules
+/web-server/node_modules
+/web-server/public
 /*.log
 /dist
 /dist-zip

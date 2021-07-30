@@ -22,6 +22,7 @@ import CredentialsDetails from '../pages/CredentialsDetails';
 import CredentialsDetailsTemp from '../pages/CredentialsDetailsTemp';
 import CredentialsDetailsAuthorize from '../pages/CredentialsDetailsAuthorize';
 import Deeplink  from '../pages/Deeplink';
+import Auth from "../pages/Auth";
 
 export default [{
         path: '/',
@@ -37,7 +38,21 @@ export default [{
         path: '/account',
         name: 'account',
         component: Account,
+    },  
+
+    {
+        path: "/auth/:authType",
+        name: "Auth",
+        component: Auth,
+        meta: {
+            title: 'Auth',
+            navigation: false,
+            ifNotAuthOnly: true,
+            notPersist: true,
+        },
+      
     },
+   
     {
         path: '/deeplink',
         name: 'deeplink',
@@ -180,6 +195,7 @@ export default [{
             title: 'credentialDetailsTemp'
         }
     },
+    
     {
         name: 'CredentialsDetailsAuthorize',
         path: '/credential/authorize/:credentialId',
