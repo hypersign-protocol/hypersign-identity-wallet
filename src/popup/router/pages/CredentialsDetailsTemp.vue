@@ -111,6 +111,7 @@ export default {
         localStorage.removeItem("qrDataQueryUrl");
         this.$router.push('/account?url=' + url);
         // return this.$router.push({ path: 'account', query: { url: url } }) 
+        return;
       }
 
       this.$router.push("/account");
