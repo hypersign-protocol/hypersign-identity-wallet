@@ -99,7 +99,7 @@ export default {
                 localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
 
-                that.createWallet(true);
+                that.createWallet();
         })
       
     }

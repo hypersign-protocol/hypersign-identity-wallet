@@ -87,14 +87,26 @@ export default {
     async acceptCredential(){
       this.$store.commit('addHSVerifiableCredential', this.verifiableCredential);
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
-      //console.log('Movigin to credental page')
       this.accepted = true;
-      this.$router.push('/credential');
+
+
+      // here 
+        /// decide if the 3rd party auth is enabled or not
+        /// if no, then go to /credential page
+        /// if yes, the go to /account page
+        // if(!localStorage.getItem("3rdPartyAuthVC")){
+        //   this.$router.push('/credential');
+        // }else{
+        //   localStorage.removeItem("3rdPartyAuthVC");
+        //   this.$router.push(this.$store.state.loginTargetLocation);
+        // }
+        this.rejectCredential();
     },
     async rejectCredential(){
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
-      //console.log('Movigin to account page')
-      this.$router.push('/account');
+      console.log('Moving to account page')
+      // this.$router.push('/account');
+      this.$router.push(this.$store.state.loginTargetLocation);
     }
   },
 };
