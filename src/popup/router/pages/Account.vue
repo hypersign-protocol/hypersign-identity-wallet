@@ -81,7 +81,7 @@ export default {
   async created() {
     try {
 
-      console.log("trying to Get 3rdPartyAuthVC")
+      // console.log("trying to Get 3rdPartyAuthVC")
       const vcStr = localStorage.getItem("3rdPartyAuthVC");
       if(vcStr){
         // console.log("vcStr is present");
@@ -89,7 +89,6 @@ export default {
         // console.log("Able to parse vcStr")
         if(vc){
           // console.log("Vc is not null");
-          console.log("Calling credentialsQRData()");
           this.credentialsQRData(vc);
           return;
         }
@@ -112,15 +111,12 @@ export default {
 
       localStorage.setItem("isMobileWallet", false);
 
-      console.log("Getting $route.query.url");
-      console.log(this.$route.query.url)
-      // console.log(this.$route));
+      // console.log("Getting $route.query.url");
+      // console.log(this.$route.query.url)
+      // console.log(this.$route);
       //Only for deeplinking
-      if (this.$route.query.url && this.$route.query.url != '') {
-        // localStorage.setItem("qrDataQueryUrl", this.$route.query.url);
-        console.log("Before decoding url")
+      if (this.$route.query.url && this.$route.query.url != '') {        
         const JSONData = decodeURI(this.$route.query.url);
-        console.log("calling receiveOrGiveCredential with JSONData")
         this.receiveOrGiveCredential(JSONData);
       }
 

@@ -59,11 +59,11 @@ router.beforeEach(async (to, from, next) => {
   const { loggedIn } = await wallet.init();
   if (!loggedIn) {
 
-    console.log(to.path)
-    console.log(to.query.url)
+    // console.log(to.path)
+    // console.log(to.query.url)
     if(to.path.indexOf("deeplink") > 0){
-      console.log("BeforeEach:: Path is deeplink and url query exists");
-      console.log("BeforeEach:: Setting qrDataQueryUrl")
+      // console.log("BeforeEach:: Path is deeplink and url query exists");
+      // console.log("BeforeEach:: Setting qrDataQueryUrl")
       localStorage.setItem("qrDataQueryUrl", to.query.url);
     }
 
