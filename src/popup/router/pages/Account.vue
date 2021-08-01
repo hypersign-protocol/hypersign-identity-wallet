@@ -91,6 +91,7 @@ export default {
           // console.log("Vc is not null");
           console.log("Calling credentialsQRData()");
           this.credentialsQRData(vc);
+          return;
         }
       }
       
@@ -113,10 +114,10 @@ export default {
 
       console.log("Getting $route.query.url");
       console.log(this.$route.query.url)
-      console.log(JSON.stringify(this.$route));
+      // console.log(this.$route));
       //Only for deeplinking
       if (this.$route.query.url && this.$route.query.url != '') {
-        localStorage.setItem("qrDataQueryUrl", this.$route.query.url);
+        // localStorage.setItem("qrDataQueryUrl", this.$route.query.url);
         console.log("Before decoding url")
         const JSONData = decodeURI(this.$route.query.url);
         console.log("calling receiveOrGiveCredential with JSONData")
@@ -212,7 +213,7 @@ export default {
 
         this.$store.commit('addHSVerifiableCredentialTemp', cred);
         this.$router.push(`/credential/temp/${cred.id}`);
-        localStorage.removeItem("3rdPartyAuthVC");
+        // localStorage.removeItem("3rdPartyAuthVC");
       } catch (e) {
         console.log(e);
         this.loading = false;

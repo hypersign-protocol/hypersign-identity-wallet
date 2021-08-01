@@ -20,6 +20,7 @@ export default {
     // console.log(this.$route.query.url)
     //Only for deeplinking
     if(this.$route.query.url && this.$route.query.url !=''){
+      localStorage.setItem("qrDataQueryUrl", this.$route.query.url);
       this.$router.push('/account?url=' + this.$route.query.url);
     }
 

@@ -108,13 +108,18 @@ export default {
       // this.$router.push('/account');
       const url = localStorage.getItem("qrDataQueryUrl");
       if(url){
-        localStorage.removeItem("qrDataQueryUrl");
-        this.$router.push('/account?url=' + url);
-        // return this.$router.push({ path: 'account', query: { url: url } }) 
-        return;
+        const isFromThridParty = localStorage.getItem("3rdPartyAuthVC");
+        if(isFromThridParty){
+          localStorage.removeItem("qrDataQueryUrl");
+          localStorage.removeItem("3rdPartyAuthVC");
+          this.$router.push('/account?url=' + url);
+        }else{
+          localStorage.removeItem("qrDataQueryUrl");
+          this.$router.push("/account");
+        }
+      }else{
+        this.$router.push("/account");
       }
-
-      this.$router.push("/account");
     }
   },
 };
