@@ -107,12 +107,13 @@ export default {
       console.log('Moving to account page')
       // this.$router.push('/account');
       const url = localStorage.getItem("qrDataQueryUrl");
-      localStorage.removeItem("qrDataQueryUrl");
       if(url){
-        return this.$router.push({ path: 'account', query: { url: url } }) 
+        localStorage.removeItem("qrDataQueryUrl");
+        this.$router.push('/account?url=' + url);
+        // return this.$router.push({ path: 'account', query: { url: url } }) 
       }
 
-      return this.$router.push("/account");
+      this.$router.push("/account");
     }
   },
 };
