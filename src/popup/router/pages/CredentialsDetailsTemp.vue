@@ -104,15 +104,14 @@ export default {
     },
     async rejectCredential(){
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
-      console.log('rejectCredential:: Moving to account page')
-      // this.$router.push('/account');
+      // console.log('rejectCredential:: Moving to account page')
+      
       const url = localStorage.getItem("qrDataQueryUrl");
-      // const isFromThridParty = localStorage.getItem("3rdPartyAuthVC");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
 
       if(url){
-        console.log('rejectCredential:: url found');        
+        // console.log('rejectCredential:: url found');        
         this.$router.push('/account?url=' + url);
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')
@@ -122,7 +121,7 @@ export default {
         //   this.$router.push("/account");
         // }
       }else{
-        console.log('rejectCredential:: url not found')
+        // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
       }
     }
