@@ -109,12 +109,16 @@ export default {
         this.hsAuthDid = this.hypersign.hsAuthDID;
       }
 
-      localStorage.setItem("isMobileWallet", false)
+      localStorage.setItem("isMobileWallet", false);
 
-      console.log("Getting 3rdPartyAuthVC")
+      console.log("Getting $route.query.url");
+      console.log(this.$route.query.url)
+      localStorage.setItem("qrDataQueryUrl", this.$route.query.url);
       //Only for deeplinking
       if (this.$route.query.url && this.$route.query.url != '') {
+        console.log("Before decoding url")
         const JSONData = decodeURI(this.$route.query.url);
+        console.log("calling receiveOrGiveCredential with JSONData")
         this.receiveOrGiveCredential(JSONData);
       }
 

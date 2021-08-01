@@ -106,7 +106,13 @@ export default {
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       console.log('Moving to account page')
       // this.$router.push('/account');
-      this.$router.push(this.$store.state.loginTargetLocation);
+      const url = localStorage.getItem("qrDataQueryUrl");
+      localStorage.removeItem("qrDataQueryUrl");
+      if(url){
+        return this.$router.push({ path: 'account', query: { url: url } }) 
+      }
+
+      return this.$router.push("/account");
     }
   },
 };
