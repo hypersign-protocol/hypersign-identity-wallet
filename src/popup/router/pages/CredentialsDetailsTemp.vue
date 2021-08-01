@@ -107,19 +107,20 @@ export default {
       console.log('rejectCredential:: Moving to account page')
       // this.$router.push('/account');
       const url = localStorage.getItem("qrDataQueryUrl");
-      const isFromThridParty = localStorage.getItem("3rdPartyAuthVC");
+      // const isFromThridParty = localStorage.getItem("3rdPartyAuthVC");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
 
       if(url){
         console.log('rejectCredential:: url found');        
-        if(isFromThridParty){
-          console.log('rejectCredential:: isFromThridParty found')
-          this.$router.push('/account?url=' + url);
-        }else{          
-          console.log('rejectCredential:: isFromThridParty not found')
-          this.$router.push("/account");
-        }
+        this.$router.push('/account?url=' + url);
+        // if(isFromThridParty){
+        //   console.log('rejectCredential:: isFromThridParty found')
+        //   this.$router.push('/account?url=' + url);
+        // }else{          
+        //   console.log('rejectCredential:: isFromThridParty not found')
+        //   this.$router.push("/account");
+        // }
       }else{
         console.log('rejectCredential:: url not found')
         this.$router.push("/account");
