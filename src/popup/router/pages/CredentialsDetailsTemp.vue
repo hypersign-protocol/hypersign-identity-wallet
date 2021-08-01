@@ -117,9 +117,11 @@ export default {
           console.log('rejectCredential:: isFromThridParty found')
           this.$router.push('/account?url=' + url);
         }else{          
+          console.log('rejectCredential:: isFromThridParty not found')
           this.$router.push("/account");
         }
       }else{
+        console.log('rejectCredential:: url not found')
         this.$router.push("/account");
       }
     }
