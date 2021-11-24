@@ -78,10 +78,13 @@ export default {
       try {
         const credentialSchemaUrl = this.verifiableCredential['@context'][1].hsscheme;
         const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
-            const { serviceEndpoint, schemaId } = this.hypersign.requestingAppInfo;
+            let { serviceEndpoint, schemaId, challenge } = this.hypersign.requestingAppInfo;
             if(schemaId != credentialSchemaId) throw new Error('Invalid credential request: Requesting schema does not exist. Make sure you register first to get credential');
             const url = Url(serviceEndpoint, true);
-            const challenge = url.query.challenge;
+            // TODO: need to remove this later. this is depreciated
+            if(!challenge){
+              challenge = url.query.challenge;
+            }
             this.loading= true;
             const verifyUrl = url.origin + url.pathname;
             const vp_unsigned = await hypersignSDK.credential.generatePresentation(
