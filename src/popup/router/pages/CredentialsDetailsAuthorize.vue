@@ -105,41 +105,31 @@ export default {
               vp: JSON.stringify(vp_signed),
             };
 
-            let response = await axios.post(verifyUrl, body);
-            // console.log(response)
-            response = response.data;
-          
-
-            if (!response) throw new Error('Could not verify the presentation');
-            if(response.status == 401 || response.status == 403) {
-              throw new Error('Could not authorize the user')
-            }else if(response.status == 200){
-
-            const isMobileWallet = JSON.parse(localStorage.getItem("isMobileWallet"));
-            if (response.message){
-
+            const response = await axios.post(verifyUrl, body);
+            if(response.status === 200){
+              const isMobileWallet = JSON.parse(localStorage.getItem("isMobileWallet"));
               if(!isMobileWallet){
-                 return window.close()
+                return window.close();
               }
-            
               await this.$store.dispatch('modals/open', {
                 name: 'default',
-                msg: 'Credential successfully verified',
+                msg: 'Credential successfully verified. Go back to the application.',
               });
-              this.reject()
+            } else {
+              throw new Error("Could not authorize the user. Reload the login page and try again")
             }
           
-
-            }else {
-              throw new Error(response.error)
-            }
-            
-        // }
-        this.loading=false;
       } catch (e) {
+        if (e.message) {
+          if(e.message.indexOf(401) >= 0 || e.message.indexOf(403) >= 0){
+            this.$store.dispatch('modals/open', { name: 'default', msg: "Could not authorize the user. Reload the login page and try again" })  
+          } else {
+            this.$store.dispatch('modals/open', { name: 'default', msg: e.message })
+          }
+        }
+      } finally {
         this.loading=false;
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
-        this.reject()
+        this.reject();
       }
     },
     async reject () {
