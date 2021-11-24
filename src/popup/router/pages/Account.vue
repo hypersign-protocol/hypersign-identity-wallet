@@ -222,8 +222,6 @@ export default {
         if (qrData == {}) throw new Error('Parsed QR data is empty');
 
         // TODO: verifying all fields
-
-
         const { appDid, schemaId } = qrData;
 
         if (!schemaId) throw new Error('Invalid schemaId');
@@ -232,11 +230,7 @@ export default {
         this.verifiableCredential = this.hypersign.credentials.find((x) => {
           const credentialSchemaUrl = x['@context'][1].hsscheme;
           const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
-          // console.log({
-          //   credentialSchemaId, 
-          //   schemaId,
-          //   authDid: this.hsAuthDid
-          // })
+
           if (credentialSchemaId === schemaId){
             if (x.issuer === appDid ){ // check if the app company issued this credential ;;  the registration flow
               return x;
