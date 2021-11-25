@@ -175,14 +175,16 @@ export default {
       this.credentialUrl = this.credentialUrl + '&did=' + this.hypersign.did;
       this.loading = true;
       let response = await axios.get(this.credentialUrl);
-      response = response.data;
-
-
-      if (!response) throw new Error('Can not accept credential');
-      if (response && response.status != 200) throw new Error(response.error);
-      if (!response.message) throw new Error('Can not accept credential');
       this.loading = false;
-      return response.message;
+      if(response.status === 200){
+        const { data } = response;
+        if(!data){
+          throw new Error('Some error occurred while accepting the credential');
+        }
+        return data;
+      } else{
+        throw new Error('Some error occurred while accepting the credential');
+      }
     },
 
     async credentialsQRData(cred) {
