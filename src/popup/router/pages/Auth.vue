@@ -1,8 +1,4 @@
 <template>
-  
-  <div class="auth">
-      sdfnkjsdfn
-  </div>
 </template>
 
 <script>

@@ -58,6 +58,15 @@ router.beforeEach(async (to, from, next) => {
 
   const { loggedIn } = await wallet.init();
   if (!loggedIn) {
+
+    // console.log(to.path)
+    // console.log(to.query.url)
+    if(to.path.indexOf("deeplink") > 0){
+      // console.log("BeforeEach:: Path is deeplink and url query exists");
+      // console.log("BeforeEach:: Setting qrDataQueryUrl")
+      localStorage.setItem("qrDataQueryUrl", to.query.url);
+    }
+
     if (to.meta.ifNotAuthOnly || to.meta.ifNotAuth) next();
     else {
       store.commit('setLoginTargetLocation', to);
@@ -105,7 +114,7 @@ if (process.env.PLATFORM === 'cordova') {
   (async () => {
     await Promise.all([deviceReadyPromise, routerReadyPromise]);
     window.IonicDeeplink.onDeepLink(({ url }) => {
-      const prefix = ['hypersign:', 'https://wallet.hypermine.in/'].find(p => url.startsWith(p));
+      const prefix = ['hypersign:', 'https://wallet.hypersign.id/'].find(p => url.startsWith(p));
       if (!prefix) throw new Error(`Unknown url: ${url}`);
       try {
         window.location = `#/${url.slice(prefix.length)}`;

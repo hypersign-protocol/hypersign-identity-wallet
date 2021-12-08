@@ -99,7 +99,7 @@ export default {
                 localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
 
-                that.createWallet(true);
+                that.createWallet();
         })
       
     }
@@ -208,8 +208,8 @@ export default {
         // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
         // console.log("Before setting profile")
         if(await this.setupProfile(this.isThridPartyAuth)){
-            console.log("After setting profile");
-            console.log("Calling setLogin")
+            // console.log("After setting profile");
+            // console.log("Calling setLogin")
             await this.$store.dispatch('setLogin', { keypair });
             this.$store.commit('switchLoggedIn', true);
 
@@ -220,7 +220,7 @@ export default {
             }
 
             Object.assign(this.profile, {});
-            console.log("Moving to next route")
+            // console.log("Moving to next rout/e")
             this.$router.push(this.$store.state.loginTargetLocation);
         }else{
           throw new Error("Could not setup profile");
