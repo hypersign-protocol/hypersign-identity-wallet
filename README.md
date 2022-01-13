@@ -1,16 +1,12 @@
 # Hypersign Wallet
 
-**Superhero is a browser extension that allows you to send and recieve value to URLs and content accross Internet.**
-
-[![Build Status](https://travis-ci.com/aeternity/superhero-wallet.svg?branch=develop)](https://travis-ci.com/aeternity/superhero-wallet) [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/superhero-wallet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/superhero-wallet/context:javascript)
 
 ## Build
 
-Clone the master branch of this repo.
-
+Tested on version
 ```
-$ git clone https://github.com/aeternity/superhero-wallet.git
-$ cd superhero-wallet
+Node version: v14.0.7
+NPM version : v16.14.13
 ```
 
 ### Build locally
