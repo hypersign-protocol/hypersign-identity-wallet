@@ -1,55 +1,51 @@
 <template>
   <div class="index">
-    <img v-if="IN_FRAME" src="../../../icons/iframe/sendAndReceive.svg" />
-    <div v-else class="not-iframe">
-      <img src="../../../icons/hypersign-logo.png" :class="{ logo: !IS_WEB }" />
-      <!-- <Component :is="IS_WEB ? 'SuperheroLogo' : 'Logo'" :class="{ logo: !IS_WEB }" /> -->
-      <!-- <span :class="{ blue: IS_WEB }" class="heading-color">
-        {{ $t('pages.index.heading') }}
-      </span>
-      <template v-if="IS_WEB">
-        <Platforms class="heading-color">
-          {{ $t('pages.index.platforms.heading') }}
-        </Platforms>
-        <span class="heading-color">{{ $t('pages.index.webVersion') }}</span>
-      </template> -->
+    
+    <div v-if="!isProviderPresent">
+        <img v-if="IN_FRAME" src="../../../icons/iframe/sendAndReceive.svg" />
+    
+        <div v-else class="not-iframe">
+          <img src="../../../icons/hypersign-logo.png" :class="{ logo: !IS_WEB }" />
+          <!-- <Component :is="IS_WEB ? 'SuperheroLogo' : 'Logo'" :class="{ logo: !IS_WEB }" /> -->
+          <!-- <span :class="{ blue: IS_WEB }" class="heading-color">
+            {{ $t('pages.index.heading') }}
+          </span>
+          <template v-if="IS_WEB">
+            <Platforms class="heading-color">
+              {{ $t('pages.index.platforms.heading') }}
+            </Platforms>
+            <span class="heading-color">{{ $t('pages.index.webVersion') }}</span>
+          </template> -->
+        </div>
+        
+        <!-- <div class="">
+          <Input
+            placeholder="Name"
+            label=""
+            v-model="profile.name"
+            :disabled="ifAllDisabled"
+          />
+          <Input
+            placeholder="Email"
+            label=""
+            v-model="profile.email"
+            :disabled="ifAllDisabled"
+          /></div>
+        <Button @click="createWallet" data-cy="generate-wallet">
+          {{ $t('pages.index.generateWallet') }}
+        </Button>
+        <label class="or-label">OR</label>-->
+        <Button @click="loginWithGoogle" data-cy="login-with-google">
+          Continue with Google
+        </Button>
+        <br/>
+
+        <a href="#" @click="gotoRestore">{{ $t('pages.index.restoreWallet') }}</a>
+        
     </div>
-    <div class="">
-      <Input
-        placeholder="Name"
-        label=""
-        v-model="profile.name"
-        :disabled="ifAllDisabled"
-      />
-      <Input
-        placeholder="Email"
-        label=""
-        v-model="profile.email"
-        :disabled="ifAllDisabled"
-      /></div>
-    <!-- <CheckBox v-model="termsAgreed" data-cy="checkbox" style="padding: 20px;">
-      <span class="heading-color">
-        {{ $t('pages.index.term1') }}
-        <RouterLink to="/termsOfService" data-cy="terms">
-          {{ $t('pages.index.termsAndConditions') }}
-        </RouterLink>
-      </span>
-    </CheckBox> -->
-
-    <Button @click="createWallet" data-cy="generate-wallet">
-      {{ $t('pages.index.generateWallet') }}
-    </Button>
-    <label class="or-label">OR</label>
-    <Button @click="loginWithGoogle" data-cy="login-with-google">
-      Continue with Google
-    </Button>
-    <br/>
-
-    <a href="#" @click="gotoRestore">{{ $t('pages.index.restoreWallet') }}</a>
-    <!-- <Button @click="gotoRestore" :disabled="!termsAgreed">
-      {{ $t('pages.index.restoreWallet') }}
-    </Button> -->
-     <Loader v-if="loading" />
+    
+    
+    <Loader v-if="loading" />
   </div>
 </template>
 
@@ -64,7 +60,7 @@ import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
 import HypersignSsiSDK from 'hs-ssi-sdk';
-import { HS_NODE_BASE_URL, WALLET_TYPE } from '../../utils/hsConstants'
+import { HS_NODE_BASE_URL, WALLET_TYPE, HYPERSIGN_AUTH_PROVIDER } from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
 
 
@@ -76,15 +72,17 @@ export default {
     IS_WEB: process.env.PLATFORM === 'web',
     IN_FRAME,
     loading:  false,
-    isThridPartyAuth: false
+    isThridPartyAuth: false,
+    isProviderPresent: false,
   }),
    created(){
-     const that = this;
-this.loading = true;
+    const authToken  = localStorage.getItem("authToken");
+    const accessToken = localStorage.getItem("accessToken"); 
+    const that = this;
+    
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
-    if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
-      
-       webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
+    if(authToken && accessToken){
+       webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
                 this.loading = false;
                 this.$store.dispatch('modals/open', { name: 'default', msg:err });
@@ -103,9 +101,24 @@ this.loading = true;
         })
       
     } else {
-      if(WALLET_TYPE === 'web') this.loginWithGoogle();
+      const queryDataFromServiceProviderStr = localStorage.getItem("qrDataQueryUrl");
+      if(queryDataFromServiceProviderStr){
+        const { provider } = JSON.parse(queryDataFromServiceProviderStr);
+        if(provider){
+          this.isProviderPresent = true;
+          switch(provider){
+            case HYPERSIGN_AUTH_PROVIDER.GOOGLE: {
+              this.loginWithGoogle();
+              localStorage.setItem("isRegisterFlow", true)
+              break;
+            }
+            default:  // do nothing
+          }
+        } else {
+         }
+      } else {
+      }
     }
-
   },
   
   methods: {

@@ -110,10 +110,6 @@ export default {
       }
 
       localStorage.setItem("isMobileWallet", false);
-
-      // console.log("Getting $route.query.url");
-      // console.log(this.$route.query.url)
-      // console.log(this.$route);
       //Only for deeplinking
       if (this.$route.query.url && this.$route.query.url != '') {        
         const JSONData = decodeURI(this.$route.query.url);
@@ -139,9 +135,6 @@ export default {
     },
 
     async receiveOrGiveCredential(QRJsonString){
-      console.log("receive or give credentials....")
-      console.log(QRJsonString);
-
       let data;
       try {
         data = JSON.parse(QRJsonString);
