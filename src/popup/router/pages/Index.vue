@@ -102,6 +102,8 @@ export default {
                 that.createWallet();
         })
       
+    } else {
+      this.loginWithGoogle();
     }
 
   },
