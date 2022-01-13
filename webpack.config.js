@@ -13,6 +13,8 @@ const commitHash = require('child_process')
   .toString().trim();
 const sass = require('node-sass');
 const genManifest = require('./src/manifest');
+const Dotenv = require('dotenv-webpack');
+
 
 const parseBool = val => (val ? JSON.parse(val) : false);
 const RUNNING_IN_TESTS = parseBool(process.env.RUNNING_IN_TESTS);
@@ -123,6 +125,7 @@ const getConfig = platform => {
       ],
     },
     plugins: [
+      new Dotenv(),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
       }),
@@ -141,7 +144,7 @@ const getConfig = platform => {
           npm_package_version: JSON.stringify(process.env.npm_package_version),
           NETWORK: JSON.stringify(process.env.NETWORK),
           RUNNING_IN_TESTS,
-          COMMIT_HASH: JSON.stringify(commitHash),
+          COMMIT_HASH: JSON.stringify(commitHash)
         },
       }),
       ...(platform.startsWith('extension-')

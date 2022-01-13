@@ -64,7 +64,7 @@ import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
 import HypersignSsiSDK from 'hs-ssi-sdk';
-import { HS_NODE_BASE_URL } from '../../utils/hsConstants'
+import { HS_NODE_BASE_URL, WALLET_TYPE } from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
 
 
@@ -78,9 +78,9 @@ export default {
     loading:  false,
     isThridPartyAuth: false
   }),
-   beforeCreate(){
+   created(){
      const that = this;
-     
+
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
       this.loading = true;
@@ -103,13 +103,14 @@ export default {
         })
       
     } else {
-      this.loginWithGoogle();
+      if(WALLET_TYPE === 'web') this.loginWithGoogle();
     }
 
   },
   
   methods: {
     loginWithGoogle(){
+    
 
       
         webAuth.authorize(
