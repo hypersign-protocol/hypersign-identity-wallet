@@ -76,12 +76,14 @@ export default {
     isProviderPresent: false,
   }),
    created(){
-    const authToken  = localStorage.getItem("authToken");
-    const accessToken = localStorage.getItem("accessToken"); 
+    const { authToken,  accessToken,  provider} =  this.$router.params; //localStorage.getItem("authToken");
+    // const accessToken = localStorage.getItem("accessToken"); 
+    
     const that = this;
     
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(authToken && accessToken){
+      if(provider) this.isProviderPresent = true;
        webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
                 this.loading = false;
