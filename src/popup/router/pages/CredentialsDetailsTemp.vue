@@ -121,7 +121,6 @@ export default {
       const url = localStorage.getItem("qrDataQueryUrl");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
-      localStorage.removeItem("isRegisterFlow")
       if(url){
         // console.log('rejectCredential:: url found');        
         this.$router.push('/account?url=' + url);
