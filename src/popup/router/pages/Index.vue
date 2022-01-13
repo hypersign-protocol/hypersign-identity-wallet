@@ -78,7 +78,7 @@ export default {
     loading:  false,
     isThridPartyAuth: false
   }),
-  created(){
+   beforeCreate(){
      const that = this;
      
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
