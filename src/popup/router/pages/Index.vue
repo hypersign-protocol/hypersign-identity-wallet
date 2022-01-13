@@ -76,13 +76,14 @@ export default {
     isProviderPresent: false,
   }),
    created(){
-    const { authToken,  accessToken,  provider} =  this.$router.params; //localStorage.getItem("authToken");
-    // const accessToken = localStorage.getItem("accessToken"); 
+    const authToken = localStorage.getItem("authToken");
+    const accessToken = localStorage.getItem("accessToken"); 
     
     const that = this;
     
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(authToken && accessToken){
+      const provider = localStorage.getItem("provider"); 
       if(provider) this.isProviderPresent = true;
        webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
@@ -96,6 +97,7 @@ export default {
                 that.isThridPartyAuth = true;
 
                 localStorage.removeItem("authToken")
+                localStorage.removeItem("provider")
                 localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
 
@@ -108,6 +110,7 @@ export default {
         const { provider } = JSON.parse(queryDataFromServiceProviderStr);
         if(provider){
           this.isProviderPresent = true;
+          localStorage.setItem("provider", true)
           switch(provider){
             case HYPERSIGN_AUTH_PROVIDER.GOOGLE: {
               this.loginWithGoogle();
