@@ -80,10 +80,10 @@ export default {
   }),
    created(){
      const that = this;
-
+this.loading = true;
      // CAN IMPROVE THIS WITH ROUTER PARAMETERS, REPLACING LOCAL STORAGE
     if(localStorage.getItem("authToken") && localStorage.getItem("accessToken")){
-      this.loading = true;
+      
        webAuth.client.userInfo(localStorage.getItem("accessToken"), function(err, user) {
               if(err){
                 this.loading = false;
