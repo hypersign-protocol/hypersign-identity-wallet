@@ -13,7 +13,6 @@ const commitHash = require('child_process')
   .toString().trim();
 const sass = require('node-sass');
 const genManifest = require('./src/manifest');
-const Dotenv = require('dotenv-webpack');
 
 
 const parseBool = val => (val ? JSON.parse(val) : false);
@@ -125,7 +124,6 @@ const getConfig = platform => {
       ],
     },
     plugins: [
-      new Dotenv(),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
       }),
