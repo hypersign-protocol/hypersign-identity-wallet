@@ -97,7 +97,7 @@ export default {
                 that.isThridPartyAuth = true;
 
                 localStorage.removeItem("authToken")
-                localStorage.removeItem("provider")
+                // localStorage.removeItem("provider")
                 localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
 
