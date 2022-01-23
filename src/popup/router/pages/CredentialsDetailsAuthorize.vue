@@ -1,19 +1,19 @@
 <template>
   <div class="popup">
-    <div class="">
-      <div class="appInfo">
-        <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
-        is requesting the following information.</p>
+    <div v-if="!isProviderPresent">
+      <div class="">
+        <div class="appInfo">
+          <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
+          is requesting the following information.</p>
+        </div>
+        <ul class="list-group credential-item">
+          <li class="list-group-item" v-for="claim in claims" :key="claim">
+            <div class="list-title">{{ claim }}: </div>
+            <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
+          </li>
+        </ul>
+        <Loader v-if="loading" />
       </div>
-      <ul class="list-group credential-item">
-        <li class="list-group-item" v-for="claim in claims" :key="claim">
-          <div class="list-title">{{ claim }}: </div>
-          <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
-        </li>
-      </ul>
-      <Loader v-if="loading" />
-       
-    </div>
       <div class="scanner d-flex">
         <Button class="scan"  data-cy="scan-button" @click="authorize">
           <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
@@ -24,11 +24,12 @@
           <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
         </Button>
       </div>
-    <!-- <div class="scanner d-flex">
-      <div class="scan" data-cy="scan-button" @click="scan">
-        <QrIcon width="20" height="20" /><span class="scan-text">{{ $t('pages.credential.scan') }}</span>
-      </div>
-    </div> -->
+    </div>
+    <div v-else>
+      <Loader v-if="loading" />
+      Presenting Your Credential...
+    </div>
+    
   </div>
 </template>
 <script>
@@ -53,7 +54,8 @@ export default {
         formattedExpirationDate: "",
         formattedIssuanceDate: "",
         formattedSchemaName: ""
-      }
+      },
+      isProviderPresent: false,
     };
   },
   beforeDestroy() {
@@ -69,6 +71,12 @@ export default {
       this.credDetials.formattedSchemaName =  this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
+
+    const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+    if(isRegisterFlow){
+        this.isProviderPresent = true;
+        this.authorize();
+    }
   },
   computed: {
     ...mapGetters(['hypersign']),
@@ -78,10 +86,13 @@ export default {
       try {
         const credentialSchemaUrl = this.verifiableCredential['@context'][1].hsscheme;
         const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
-            const { serviceEndpoint, schemaId } = this.hypersign.requestingAppInfo;
+            let { serviceEndpoint, schemaId, challenge } = this.hypersign.requestingAppInfo;
             if(schemaId != credentialSchemaId) throw new Error('Invalid credential request: Requesting schema does not exist. Make sure you register first to get credential');
             const url = Url(serviceEndpoint, true);
-            const challenge = url.query.challenge;
+            // TODO: need to remove this later. this is depreciated
+            if(!challenge){
+              challenge = url.query.challenge;
+            }
             this.loading= true;
             const verifyUrl = url.origin + url.pathname;
             const vp_unsigned = await hypersignSDK.credential.generatePresentation(
@@ -102,46 +113,39 @@ export default {
               vp: JSON.stringify(vp_signed),
             };
 
-            let response = await axios.post(verifyUrl, body);
-            // console.log(response)
-            response = response.data;
-          
-
-            if (!response) throw new Error('Could not verify the presentation');
-            if(response.status == 401 || response.status == 403) {
-              throw new Error('Could not authorize the user')
-            }else if(response.status == 200){
-
-            const isMobileWallet = JSON.parse(localStorage.getItem("isMobileWallet"));
-            if (response.message){
-
+            const response = await axios.post(verifyUrl, body);
+            if(response.status === 200){
+              const isMobileWallet = JSON.parse(localStorage.getItem("isMobileWallet"));
               if(!isMobileWallet){
-                 return window.close()
+                return window.close();
               }
-            
               await this.$store.dispatch('modals/open', {
                 name: 'default',
-                msg: 'Credential successfully verified',
+                msg: 'Credential successfully verified. Go back to the application.',
               });
-              this.reject()
+            } else {
+              throw new Error("Could not authorize the user. Reload the login page and try again")
             }
           
-
-            }else {
-              throw new Error(response.error)
-            }
-            
-        // }
-        this.loading=false;
       } catch (e) {
+        if (e.message) {
+          if(e.message.indexOf(401) >= 0 || e.message.indexOf(403) >= 0){
+            this.$store.dispatch('modals/open', { name: 'default', msg: "Could not authorize the user. Reload the login page and try again" })  
+          } else {
+            this.$store.dispatch('modals/open', { name: 'default', msg: e.message })
+          }
+        }
+      } finally {
         this.loading=false;
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
-        this.reject()
+        this.reject();
       }
     },
     async reject () {
       this.$store.commit('clearRequestingAppInfo');
-      this.$router.push('/account')
+      this.$router.push('/account');
+      localStorage.removeItem("qrDataQueryUrl");
+      localStorage.removeItem("3rdPartyAuthVC");
+      localStorage.removeItem("isRegisterFlow")
     }
   },
 };

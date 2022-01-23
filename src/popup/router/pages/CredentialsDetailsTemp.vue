@@ -1,37 +1,40 @@
 <template>
   <div class="popup">
-    <div class="">
-      <div class="cred-card">
-        <div class="cred-card-header">
-          <span>{{ credDetials.formattedSchemaName }}</span>
+    <div v-if="!isProviderPresent">
+      <div class="">
+        <div class="cred-card">
+          <div class="cred-card-header">
+            <span>{{ credDetials.formattedSchemaName }}</span>
+          </div>
+          <div class="cred-card-body">
+            <span class="cred-card-body-detail">SCHEMA ID: {{ credDetials.schemaId }}</span><br />
+            <span class="cred-card-body-detail">ISSUER ID: {{ credDetials.formattedIssuer }}</span><br />
+            <span class="cred-card-body-detail">ISSUED ON: {{ credDetials.formattedIssuanceDate }}</span><br />
+          </div>
         </div>
-        <div class="cred-card-body">
-          <span class="cred-card-body-detail">SCHEMA ID: {{ credDetials.schemaId }}</span><br />
-          <span class="cred-card-body-detail">ISSUER ID: {{ credDetials.formattedIssuer }}</span><br />
-          <span class="cred-card-body-detail">ISSUED ON: {{ credDetials.formattedIssuanceDate }}</span><br />
-        </div>
+        <ul class="list-group credential-item">
+          <li class="list-group-item" v-for="claim in claims" :key="claim">
+            <div class="list-title">{{ toUpper(claim) }}: </div>
+            <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
+          </li>
+        </ul>
+        <Loader v-if="loading" />
       </div>
-      <ul class="list-group credential-item">
-        <li class="list-group-item" v-for="claim in claims" :key="claim">
-          <div class="list-title">{{ toUpper(claim) }}: </div>
-          <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
-        </li>
-      </ul>
+      <div class="scanner d-flex">
+        <Button class="scan"  data-cy="scan-button" @click="acceptCredential">
+          <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.accept') }}</span>
+        </Button>
+      </div>
+      <div class="scanner d-flex">
+        <Button class="scan"  data-cy="scan-button" @click="rejectCredential">
+          <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.reject') }}</span>
+        </Button>
+      </div>
+    </div>
+    <div v-else>
       <Loader v-if="loading" />
-      
+      Storing Your Credential...
     </div>
-    <div class="scanner d-flex">
-      <Button class="scan"  data-cy="scan-button" @click="acceptCredential">
-        <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.accept') }}</span>
-      </Button>
-    </div>
-    <div class="scanner d-flex">
-      <Button class="scan"  data-cy="scan-button" @click="rejectCredential">
-        <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.reject') }}</span>
-      </Button>
-    </div>
-   
-    
   </div>
 </template>
 <script>
@@ -48,6 +51,7 @@ export default {
       claims: [],
       loading: false,
       accepted: false,
+      isProviderPresent: false,
       credDetials: {
         formattedIssuer: "",
         formattedExpirationDate: "",
@@ -61,6 +65,8 @@ export default {
     if(!this.accepted) this.rejectCredential()
   },
   created() {
+   
+
     const credentialId = this.$route.params.credentialId;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentialsTemp.find(x => x.id == credentialId);
@@ -73,6 +79,12 @@ export default {
       this.credDetials.schemaId = toStringShorner(credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim(),32, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
+
+     const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+      if(isRegisterFlow){
+        this.isProviderPresent = true;
+        this.acceptCredential();
+      }  
   },
   computed: {
     ...mapGetters(['hypersign']),
@@ -109,7 +121,6 @@ export default {
       const url = localStorage.getItem("qrDataQueryUrl");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
-
       if(url){
         // console.log('rejectCredential:: url found');        
         this.$router.push('/account?url=' + url);

@@ -1,6 +1,6 @@
 {
   "name": "hypersign-wallet",
-  "version": "0.3.7",
+  "version": "3.0.2",
   "description": "Hypersign wallet",
   "author": "Hypermine",
   "license": "MIT",
@@ -96,6 +96,7 @@
     "cross-env": "^5.2.1",
     "css-loader": "^0.28.11",
     "cypress": "^4.12.1",
+    "dotenv-webpack": "^7.0.3",
     "ejs": "^2.7.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",

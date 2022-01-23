@@ -1,40 +1,45 @@
 <template>
   <div class="height-100 primary-bg">
-    <div class="popup popup-no-padding">
+    <div v-if="!isProviderPresent">
+      <div class="popup popup-no-padding">
+        <Loader v-if="loading" />
+        <div v-if="!backedUpSeed && !tourRunning" class="noti" data-cy="seed-notif">
+        </div>
+        <div class="tour__step1">
+          <AccountInfo />
+          <!-- <BalanceInfo /> -->
+        </div>
+        <div class="submenu-bg">
+          <BoxButton
+            :text="$t('pages.appVUE.profile')"
+            to="/profile"
+            style="font-size: smaller; color: white"
+            class="tour__step9"
+          >
+            <Profile width="24.5" height="24.5" slot="icon" />
+          </BoxButton>
+          <BoxButton
+            :text="$t('pages.appVUE.credential')"
+            style="font-size: smaller; color: white"
+            to="/credential"
+            class="tour__step10"
+          >
+            <Credential width="24.5" height="24.5" slot="icon" color="white" />
+          </BoxButton>
+          <BoxButton :text="$t('pages.appVUE.settings')" to="/settings" class="tour__step8">
+            <Settings slot="icon" />
+          </BoxButton>
+        </div>
+        <!-- <RecentTransactions /> -->
+        <div style="justify-content: center; display: flex">
+          <button @click="scan" class="round-button" value="Scan Qr">
+              <img src="../../../icons/qr-code-white.svg" class="round-button-qr" />
+          </button>
+        </div>
+      </div>
+    </div>
+    <div v-else>
       <Loader v-if="loading" />
-      <div v-if="!backedUpSeed && !tourRunning" class="noti" data-cy="seed-notif">
-      </div>
-      <div class="tour__step1">
-        <AccountInfo />
-        <!-- <BalanceInfo /> -->
-      </div>
-      <div class="submenu-bg">
-        <BoxButton
-          :text="$t('pages.appVUE.profile')"
-          to="/profile"
-          style="font-size: smaller; color: white"
-          class="tour__step9"
-        >
-          <Profile width="24.5" height="24.5" slot="icon" />
-        </BoxButton>
-        <BoxButton
-          :text="$t('pages.appVUE.credential')"
-          style="font-size: smaller; color: white"
-          to="/credential"
-          class="tour__step10"
-        >
-          <Credential width="24.5" height="24.5" slot="icon" color="white" />
-        </BoxButton>
-        <BoxButton :text="$t('pages.appVUE.settings')" to="/settings" class="tour__step8">
-          <Settings slot="icon" />
-        </BoxButton>
-      </div>
-      <!-- <RecentTransactions /> -->
-      <div style="justify-content: center; display: flex">
-        <button @click="scan" class="round-button" value="Scan Qr">
-            <img src="../../../icons/qr-code-white.svg" class="round-button-qr" />
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -71,7 +76,8 @@ export default {
       credentialUrl: '',
       loading: false,
       verifiableCredential: {},
-      hsAuthDid: ""
+      hsAuthDid: "",
+      isProviderPresent:  false,
     };
   },
   computed: {
@@ -80,6 +86,11 @@ export default {
   },
   async created() {
     try {
+
+      const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+      if(isRegisterFlow){
+        this.isProviderPresent = true;        
+      }  
 
       // console.log("trying to Get 3rdPartyAuthVC")
       const vcStr = localStorage.getItem("3rdPartyAuthVC");
@@ -110,10 +121,6 @@ export default {
       }
 
       localStorage.setItem("isMobileWallet", false);
-
-      // console.log("Getting $route.query.url");
-      // console.log(this.$route.query.url)
-      // console.log(this.$route);
       //Only for deeplinking
       if (this.$route.query.url && this.$route.query.url != '') {        
         const JSONData = decodeURI(this.$route.query.url);
@@ -139,9 +146,6 @@ export default {
     },
 
     async receiveOrGiveCredential(QRJsonString){
-      console.log("receive or give credentials....")
-      console.log(QRJsonString);
-
       let data;
       try {
         data = JSON.parse(QRJsonString);
@@ -175,14 +179,16 @@ export default {
       this.credentialUrl = this.credentialUrl + '&did=' + this.hypersign.did;
       this.loading = true;
       let response = await axios.get(this.credentialUrl);
-      response = response.data;
-
-
-      if (!response) throw new Error('Can not accept credential');
-      if (response && response.status != 200) throw new Error(response.error);
-      if (!response.message) throw new Error('Can not accept credential');
       this.loading = false;
-      return response.message;
+      if(response.status === 200){
+        const { data } = response;
+        if(!data){
+          throw new Error('Some error occurred while accepting the credential');
+        }
+        return data;
+      } else{
+        throw new Error('Some error occurred while accepting the credential');
+      }
     },
 
     async credentialsQRData(cred) {
@@ -222,8 +228,6 @@ export default {
         if (qrData == {}) throw new Error('Parsed QR data is empty');
 
         // TODO: verifying all fields
-
-
         const { appDid, schemaId } = qrData;
 
         if (!schemaId) throw new Error('Invalid schemaId');
@@ -232,11 +236,7 @@ export default {
         this.verifiableCredential = this.hypersign.credentials.find((x) => {
           const credentialSchemaUrl = x['@context'][1].hsscheme;
           const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
-          // console.log({
-          //   credentialSchemaId, 
-          //   schemaId,
-          //   authDid: this.hsAuthDid
-          // })
+
           if (credentialSchemaId === schemaId){
             if (x.issuer === appDid ){ // check if the app company issued this credential ;;  the registration flow
               return x;
