@@ -1,19 +1,19 @@
 <template>
   <div class="popup">
-    <div class="">
-      <div class="appInfo">
-        <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
-        is requesting the following information.</p>
+    <div v-if="!isProviderPresent">
+      <div class="">
+        <div class="appInfo">
+          <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
+          is requesting the following information.</p>
+        </div>
+        <ul class="list-group credential-item">
+          <li class="list-group-item" v-for="claim in claims" :key="claim">
+            <div class="list-title">{{ claim }}: </div>
+            <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
+          </li>
+        </ul>
+        <Loader v-if="loading" />
       </div>
-      <ul class="list-group credential-item">
-        <li class="list-group-item" v-for="claim in claims" :key="claim">
-          <div class="list-title">{{ claim }}: </div>
-          <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
-        </li>
-      </ul>
-      <Loader v-if="loading" />
-       
-    </div>
       <div class="scanner d-flex">
         <Button class="scan"  data-cy="scan-button" @click="authorize">
           <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
@@ -24,11 +24,12 @@
           <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
         </Button>
       </div>
-    <!-- <div class="scanner d-flex">
-      <div class="scan" data-cy="scan-button" @click="scan">
-        <QrIcon width="20" height="20" /><span class="scan-text">{{ $t('pages.credential.scan') }}</span>
-      </div>
-    </div> -->
+    </div>
+    <div v-else>
+      <Loader v-if="loading" />
+      Presenting Your Credential...
+    </div>
+    
   </div>
 </template>
 <script>
@@ -53,7 +54,8 @@ export default {
         formattedExpirationDate: "",
         formattedIssuanceDate: "",
         formattedSchemaName: ""
-      }
+      },
+      isProviderPresent: false,
     };
   },
   beforeDestroy() {
@@ -68,6 +70,12 @@ export default {
       this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
       this.credDetials.formattedSchemaName =  this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
+    }
+
+    const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+    if(isRegisterFlow){
+        this.isProviderPresent = true;
+        this.authorize();
     }
   },
   computed: {
@@ -134,7 +142,10 @@ export default {
     },
     async reject () {
       this.$store.commit('clearRequestingAppInfo');
-      this.$router.push('/account')
+      this.$router.push('/account');
+      localStorage.removeItem("qrDataQueryUrl");
+      localStorage.removeItem("3rdPartyAuthVC");
+      localStorage.removeItem("isRegisterFlow")
     }
   },
 };

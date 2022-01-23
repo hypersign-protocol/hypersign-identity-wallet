@@ -16,7 +16,7 @@ export default {
 
       localStorage.setItem("accessToken", accessToken)
       localStorage.setItem("authToken", authToken)
-      this.$router.push({path: "/", params: {
+      this.$router.push({path: "/", query: {
         authToken: authToken, accessToken: accessToken
       }})
 
