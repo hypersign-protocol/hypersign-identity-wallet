@@ -59,10 +59,10 @@ import Platforms from '../components/Platforms';
 import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
-import HypersignSsiSDK from 'hs-ssi-sdk';
-import { HS_NODE_BASE_URL, WALLET_TYPE, HYPERSIGN_AUTH_PROVIDER } from '../../utils/hsConstants'
+import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
-
+import { createHidWallet } from '../../utils/hidWallet';
+const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
   mixins: [registration],
@@ -103,6 +103,18 @@ export default {
 
                 that.createWallet();
         })
+
+                // const user = {email: "vishwas@gmail.com", name: "Vishwas Bhushan"}
+                // const { email, name } =   user;
+                // this.profile.email = email;
+                // this.profile.name = name;
+                // this.isThridPartyAuth = true;
+
+                // localStorage.removeItem("authToken")
+                // localStorage.removeItem("accessToken")
+                // localStorage.removeItem("isRoute")
+
+                // this.createWallet();
       
     } else {
       const queryDataFromServiceProviderStr = localStorage.getItem("qrDataQueryUrl");
@@ -128,13 +140,10 @@ export default {
   
   methods: {
     loginWithGoogle(){
-    
-
-      
         webAuth.authorize(
           {
             connection: "google-oauth2",  
-            redirectUri: window.location.origin + "/auth/google?"
+             redirectUri: window.location.origin + "/auth/google?"
           });
 
     },
@@ -147,93 +156,75 @@ export default {
     },
 
     async createWallet() {
-
-
-
+      console.log('Inside credateWallet')
       try{
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
         if(!this.isemail(this.profile.email)) throw new Error("Enter a valid email address");
-
-
       }catch(e){
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         return;
       }
 
+      //this.mnemonic = generateMnemonic();
 
-      
-      
-      const hsSdk = new HypersignSsiSDK({ nodeUrl: HS_NODE_BASE_URL }); 
-      this.mnemonic = generateMnemonic();
-      
+      // TODO: generate mnemonic dynamically
+      // TODO: fund this wallet with some $HID
+      this.mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
+      const offlineSigner = await createHidWallet(this.mnemonic);
+      const hsSdk = new HypersignSsiSDK(offlineSigner, HIDNODE_RPC, HIDNODE_REST);
+      await hsSdk.init();
 
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
-      
-      // console.log(seed)
-
-      const address = await this.$store.dispatch('generateWallet', { seed });
+      const accounts = await offlineSigner.getAccounts();
+      const address = accounts[0].address;  //await this.$store.dispatch('generateWallet', { seed });
       this.$store.commit('setMnemonic', this.mnemonic);
       const keypair = {
         publicKey: address,
         privateKey: seed,
       };
-      // console.log(keypair)
+      console.log(keypair)
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
       try {
         this.loading = true;
-        // We will not use native aeternity keys, instead will use hypersign keys.
-        // The reason to do this, because giving flexibility to use different algorithm for keys
-        // const newKeyPair = await hypersignSDK.did.generateKeys({seed});  
-        // if(!newKeyPair)       throw Error('Error: could not generate keypair');
-        // console.log(newKeyPair);
-        // const hskeys = {
-        //   publicKey: newKeyPair.publicKey.publicKeyBase58,
-        //   privateKey: newKeyPair.privateKeyBase58,
-        // };
-        // if(!hskeys.publicKey)  throw new Error('Error: Public key is empty')
-        // const HS_CORE_DID_REGISTER = `${HS_NODE_BASE_URL}${HS_NODE_DID_REGISTER_API}`;
-        // //console.log(HS_CORE_DID_REGISTER);
-        // let result = await axios.get(`${HS_CORE_DID_REGISTER}?publicKey=${hskeys.publicKey}`)//.then(result => result.json());
-        // console.log(result)
-        // result = result.data;
-        // if (!result) throw new Error('Could not fetch from hypersign');
-        // if (result && result.error) throw new Error(result.error);
-        
-        // const { keys, did } = result.message;
-        // keys['privateKeyBase58'] = hskeys.privateKey;
-        // console.log(this.profile)
-        // console.log('Before getting did')
-        // console.log(hsSdk.did)
-        const response1  = await hsSdk.did.getDid({user: { name: this.profile.name }});
-        // console.log(response1);
-        const {didDoc, keys, did} = response1
-        // console.log({didDoc, keys, did})
+        const seedParam = "blade sting surge cube valid scr"
+        const kp = await hsSdk.did.generateKeys({ seed: seedParam });
+        console.log(kp)
+        const privateKeyMultibase = kp.privateKeyMultibase
+        const publicKeyMultibase = kp.publicKeyMultibase
 
-        // console.log('Before calling register')
-        const res = await hsSdk.did.register(didDoc);
-        // console.log(2)
-        // console.log('After registration')
+        console.log('before genrating did using publicKeyMultibase = ' +  publicKeyMultibase)
+        const didDocString = hsSdk.did.generate({ publicKeyMultibase });
+        const didDoc = JSON.parse(didDocString);
+
+        console.log('after genrating didDoc' +  JSON.stringify(didDoc))
+        const did  = didDoc.id;
+        const verificationMethodId = didDoc['verificationMethod'][0].id
+        const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
+        console.log({
+          kp,
+          result
+        })
+        if(!result){
+          throw new Error("Could not register the did");
+        }
+
+        const {transactionHash } =  result;
+        console.log('RegisterDid TxHash ' +  transactionHash)
+        if(!transactionHash) {
+          throw new Error("Could not register the did");
+        }
 
         this.profile.did = did;
-        // console.log(3)
         this.$store.commit('setHSkeys', {
-          keys,
+          keys: kp,
           did,
         });
 
-        
-        // this.$store.commit('switchLoggedIn', true);
-        // this.$store.commit('updateAccount', keypair);
-        // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
-        // console.log("Before setting profile")
         if(await this.setupProfile(this.isThridPartyAuth)){
-            // console.log("After setting profile");
-            // console.log("Calling setLogin")
             await this.$store.dispatch('setLogin', { keypair });
             this.$store.commit('switchLoggedIn', true);
-
             if(!this.isThridPartyAuth){
               const msg = 'An email with a QR code has been sent to the address you provided.\
               Scan the QR code to receieve the credential'
@@ -241,7 +232,6 @@ export default {
             }
 
             Object.assign(this.profile, {});
-            // console.log("Moving to next rout/e")
             this.$router.push(this.$store.state.loginTargetLocation);
         }else{
           throw new Error("Could not setup profile");

@@ -55,6 +55,7 @@ import AccountInfo from '../components/AccountInfo';
 import BoxButton from '../components/BoxButton';
 import axios from 'axios';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
+import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 
 
 export default {
@@ -234,8 +235,11 @@ export default {
         
         this.$store.commit('addRequestingAppInfo', qrData);
         this.verifiableCredential = this.hypersign.credentials.find((x) => {
-          const credentialSchemaUrl = x['@context'][1].hsscheme;
-          const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
+          
+          // hs:"http://localhost:1317/hypersign-protocol/hidnode/ssi/schema/did:hs:a58d3f48-7f29-47a9-ae73-a0800b409be7;id=e5419418-76e0-473b-8af8-09258bb2b761;version=1.0:"
+          // http://localhost:1317/hypersign-protocol/hidnode/ssi/schema/did:hs:a58d3f48-7f29-47a9-ae73-a0800b409be7;id=e5419418-76e0-473b-8af8-09258bb2b761;version=1.0: 
+          const credentialSchemaUrl = x['@context'][1].hs;
+          const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
 
           if (credentialSchemaId === schemaId){
             if (x.issuer === appDid ){ // check if the app company issued this credential ;;  the registration flow

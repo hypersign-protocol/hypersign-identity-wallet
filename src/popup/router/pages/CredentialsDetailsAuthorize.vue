@@ -39,13 +39,16 @@ import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
-import { hypersignSDK } from '../../utils/hypersign';
+import { createHidWallet } from '../../utils/hidWallet';
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
+import HypersignSSISdk from 'hs-ssi-sdk';
+import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 
 export default {
   components: { QrIcon,CloseIcon,VerifiedIcon },
   data() {
     return {
+      hsSDK: null,
       verifiableCredential: {},
       claims: [],
       loading: false,
@@ -61,10 +64,21 @@ export default {
   beforeDestroy() {
     this.reject()
   },
-  created() {
+  async created() {
+    this.mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
+      const offlineSigner = await createHidWallet(this.mnemonic);
+    this.hsSDK = new HypersignSSISdk(offlineSigner, "http://localhost:26657", "http://localhost:1317");
+    await this.hsSDK.init();
+
     const credentialId = this.$route.params.credentialId;
+    console.log(credentialId)
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
+      if(!this.verifiableCredential){
+        throw new Error('No credenital foud with id - ' + credentialId)
+      }
+      console.log(this.verifiableCredential)
+
       this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate) ;
       this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate) ;
       this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
@@ -84,8 +98,10 @@ export default {
   methods: {    
     async authorize() {
       try {
-        const credentialSchemaUrl = this.verifiableCredential['@context'][1].hsscheme;
-        const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
+        const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
+        const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+
+        
             let { serviceEndpoint, schemaId, challenge } = this.hypersign.requestingAppInfo;
             if(schemaId != credentialSchemaId) throw new Error('Invalid credential request: Requesting schema does not exist. Make sure you register first to get credential');
             const url = Url(serviceEndpoint, true);
@@ -95,16 +111,26 @@ export default {
             }
             this.loading= true;
             const verifyUrl = url.origin + url.pathname;
-            const vp_unsigned = await hypersignSDK.credential.generatePresentation(
-              this.verifiableCredential,
-              this.hypersign.did,
+            const vp_unsigned = await this.hsSDK.vp.getPresentation(
+              {verifiableCredential: this.verifiableCredential,
+              holderDid:  this.hypersign.did}
             );
+
+            console.log(
+              { presentation: vp_unsigned,
+               holderDid: this.hypersign.did,
+               privateKey: this.hypersign.keys.privateKeyMultibase,
+               challenge
+              }
+            )
           
-            const vp_signed = await hypersignSDK.credential.signPresentation(
-              vp_unsigned,
-              this.hypersign.did,
-              this.hypersign.keys.privateKeyBase58,
-              challenge,
+
+            const vp_signed = await this.hsSDK.vp.signPresentation(
+             { presentation: vp_unsigned,
+               holderDid: this.hypersign.did,
+               privateKey: this.hypersign.keys.privateKeyMultibase,
+               challenge
+              }
             );
 
             // console.log('Signed vp created..');
@@ -112,6 +138,19 @@ export default {
               challenge,
               vp: JSON.stringify(vp_signed),
             };
+
+
+            console.log({
+              verifyUrl,
+              body
+            })
+
+             await this.$store.dispatch('modals/open', {
+                name: 'default',
+                msg: 'Credential successfully verified. Go back to the application.',
+              });
+
+              return
 
             const response = await axios.post(verifyUrl, body);
             if(response.status === 200){

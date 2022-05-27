@@ -41,7 +41,7 @@ export default {
             this.ifEdit = false;
             this.ifCreate = true;
         },
-        async setupProfile(isThridPartyAuth = false) {            
+        async setupProfile(isThridPartyAuth = false) {
             // try {
             //     this.loading = true;
             //// HS_TODO::
@@ -56,29 +56,29 @@ export default {
                     name: this.profile.name,
                     email: this.profile.email
                 },
-                isThridPartyAuth:  false
+                isThridPartyAuth: false
             }
 
-            if(isThridPartyAuth){
+            if (isThridPartyAuth) {
                 body["user"]["did"] = this.profile.did;
                 body["isThridPartyAuth"] = true;
             }
 
             // console.log("Calling authserver register")
-            
+
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
-            
+
             if (!res) throw new Error("Could not register the user");
             // console.log("After getting response")
             res = res.data;
             // console.log(res)
             // console.log(res.message)
             if (res && res.status != 200) throw new Error(res.error);
-        
-            
+
+
             // console.log(typeof(res.message))
-            // console.log(res.message)
-            if(isThridPartyAuth && res && res.message){
+            console.log(res.message)
+            if (isThridPartyAuth && res && res.message) {
                 // console.log("Before setting 3rdPartyAuthVC");
                 // only in case of 3rd party auth, verifiable credenital will come
                 localStorage.setItem("3rdPartyAuthVC", JSON.stringify(res.message));
@@ -89,7 +89,7 @@ export default {
             this.ifCreate = false;
             this.ifAllDisabled = true;
 
-            return  true;
+            return true;
         },
     },
 };
