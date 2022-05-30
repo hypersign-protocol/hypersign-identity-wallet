@@ -9,7 +9,6 @@ export const HYPERSIGN_AUTH_PROVIDER = {
     FACEBOOK: 'facebook'
 }
 
-
-
 export const HIDNODE_RPC = "http://localhost:26657"
 export const HIDNODE_REST = "http://localhost:1317"
+export const HIDNODE_FAUCET = "http://ec2-13-233-118-114.ap-south-1.compute.amazonaws.com:8081"

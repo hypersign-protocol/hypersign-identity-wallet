@@ -33,13 +33,15 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
-import { createHidWallet } from '../../utils/hidWallet';
+import hidWalletInstance from '../../utils/hidWallet';
+
+
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
 import HypersignSSISdk from 'hs-ssi-sdk';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
@@ -65,20 +67,17 @@ export default {
     this.reject()
   },
   async created() {
-    this.mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
-      const offlineSigner = await createHidWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(offlineSigner, "http://localhost:26657", "http://localhost:1317");
+    await hidWalletInstance.generateWallet(this.mnemonic);
+    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, "http://localhost:26657", "http://localhost:1317");
     await this.hsSDK.init();
 
     const credentialId = this.$route.params.credentialId;
-    console.log(credentialId)
+
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
       if(!this.verifiableCredential){
         throw new Error('No credenital foud with id - ' + credentialId)
       }
-      console.log(this.verifiableCredential)
-
       this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate) ;
       this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate) ;
       this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
@@ -94,14 +93,13 @@ export default {
   },
   computed: {
     ...mapGetters(['hypersign']),
+    ...mapState(['mnemonic'])
   },
   methods: {    
     async authorize() {
       try {
         const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-        const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
-
-        
+        const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);        
             let { serviceEndpoint, schemaId, challenge } = this.hypersign.requestingAppInfo;
             if(schemaId != credentialSchemaId) throw new Error('Invalid credential request: Requesting schema does not exist. Make sure you register first to get credential');
             const url = Url(serviceEndpoint, true);
@@ -116,15 +114,6 @@ export default {
               holderDid:  this.hypersign.did}
             );
 
-            console.log(
-              { presentation: vp_unsigned,
-               holderDid: this.hypersign.did,
-               privateKey: this.hypersign.keys.privateKeyMultibase,
-               challenge
-              }
-            )
-          
-
             const vp_signed = await this.hsSDK.vp.signPresentation(
              { presentation: vp_unsigned,
                holderDid: this.hypersign.did,
@@ -133,24 +122,10 @@ export default {
               }
             );
 
-            // console.log('Signed vp created..');
             const body = {
               challenge,
               vp: JSON.stringify(vp_signed),
             };
-
-
-            console.log({
-              verifyUrl,
-              body
-            })
-
-             await this.$store.dispatch('modals/open', {
-                name: 'default',
-                msg: 'Credential successfully verified. Go back to the application.',
-              });
-
-              return
 
             const response = await axios.post(verifyUrl, body);
             if(response.status === 200){
@@ -213,7 +188,7 @@ export default {
   border-radius: 14px;
   margin-top: 7%;
   text-align: left;
-  font-size: small;
+  font-size: 13px;
   color: gray;
   padding-top: 7%;
 }

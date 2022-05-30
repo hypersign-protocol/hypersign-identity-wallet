@@ -6,35 +6,8 @@
     
         <div v-else class="not-iframe">
           <img src="../../../icons/hypersign-logo.png" :class="{ logo: !IS_WEB }" />
-          <!-- <Component :is="IS_WEB ? 'SuperheroLogo' : 'Logo'" :class="{ logo: !IS_WEB }" /> -->
-          <!-- <span :class="{ blue: IS_WEB }" class="heading-color">
-            {{ $t('pages.index.heading') }}
-          </span>
-          <template v-if="IS_WEB">
-            <Platforms class="heading-color">
-              {{ $t('pages.index.platforms.heading') }}
-            </Platforms>
-            <span class="heading-color">{{ $t('pages.index.webVersion') }}</span>
-          </template> -->
         </div>
         
-        <!-- <div class="">
-          <Input
-            placeholder="Name"
-            label=""
-            v-model="profile.name"
-            :disabled="ifAllDisabled"
-          />
-          <Input
-            placeholder="Email"
-            label=""
-            v-model="profile.email"
-            :disabled="ifAllDisabled"
-          /></div>
-        <Button @click="createWallet" data-cy="generate-wallet">
-          {{ $t('pages.index.generateWallet') }}
-        </Button>
-        <label class="or-label">OR</label>-->
         <Button @click="loginWithGoogle" data-cy="login-with-google">
           Continue with Google
         </Button>
@@ -61,7 +34,7 @@ import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
 import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
-import { createHidWallet } from '../../utils/hidWallet';
+import hidWalletInstance from '../../utils/hidWallet';
 const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
@@ -97,25 +70,11 @@ export default {
                 that.isThridPartyAuth = true;
 
                 localStorage.removeItem("authToken")
-                // localStorage.removeItem("provider")
                 localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
 
                 that.createWallet();
-        })
-
-                // const user = {email: "vishwas@gmail.com", name: "Vishwas Bhushan"}
-                // const { email, name } =   user;
-                // this.profile.email = email;
-                // this.profile.name = name;
-                // this.isThridPartyAuth = true;
-
-                // localStorage.removeItem("authToken")
-                // localStorage.removeItem("accessToken")
-                // localStorage.removeItem("isRoute")
-
-                // this.createWallet();
-      
+        })      
     } else {
       const queryDataFromServiceProviderStr = localStorage.getItem("qrDataQueryUrl");
       if(queryDataFromServiceProviderStr){
@@ -156,7 +115,6 @@ export default {
     },
 
     async createWallet() {
-      console.log('Inside credateWallet')
       try{
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
@@ -166,52 +124,44 @@ export default {
         return;
       }
 
-      //this.mnemonic = generateMnemonic();
+      /// Generate HID wallet and recharge it using faucet
+      this.mnemonic = generateMnemonic(); 
+      await hidWalletInstance.generateWallet(this.mnemonic);
+      await hidWalletInstance.rechargeWallet(); 
 
-      // TODO: generate mnemonic dynamically
-      // TODO: fund this wallet with some $HID
-      this.mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
-      const offlineSigner = await createHidWallet(this.mnemonic);
-      const hsSdk = new HypersignSsiSDK(offlineSigner, HIDNODE_RPC, HIDNODE_REST);
+      /// Use the HID wallet with SSI sdk
+      const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST);
       await hsSdk.init();
 
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
-      const accounts = await offlineSigner.getAccounts();
-      const address = accounts[0].address;  //await this.$store.dispatch('generateWallet', { seed });
+      const address = await hidWalletInstance.getWalletAddress();  
+      
       this.$store.commit('setMnemonic', this.mnemonic);
       const keypair = {
         publicKey: address,
         privateKey: seed,
-      };
-      console.log(keypair)
+      }
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
       try {
         this.loading = true;
-        const seedParam = "blade sting surge cube valid scr"
-        const kp = await hsSdk.did.generateKeys({ seed: seedParam });
-        console.log(kp)
+        const kp = await hsSdk.did.generateKeys();
+
         const privateKeyMultibase = kp.privateKeyMultibase
         const publicKeyMultibase = kp.publicKeyMultibase
 
-        console.log('before genrating did using publicKeyMultibase = ' +  publicKeyMultibase)
         const didDocString = hsSdk.did.generate({ publicKeyMultibase });
         const didDoc = JSON.parse(didDocString);
 
-        console.log('after genrating didDoc' +  JSON.stringify(didDoc))
         const did  = didDoc.id;
         const verificationMethodId = didDoc['verificationMethod'][0].id
         const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
-        console.log({
-          kp,
-          result
-        })
+
         if(!result){
           throw new Error("Could not register the did");
         }
 
-        const {transactionHash } =  result;
-        console.log('RegisterDid TxHash ' +  transactionHash)
+        const {transactionHash } =  result;s
         if(!transactionHash) {
           throw new Error("Could not register the did");
         }
@@ -224,7 +174,9 @@ export default {
 
         if(await this.setupProfile(this.isThridPartyAuth)){
             await this.$store.dispatch('setLogin', { keypair });
+
             this.$store.commit('switchLoggedIn', true);
+            
             if(!this.isThridPartyAuth){
               const msg = 'An email with a QR code has been sent to the address you provided.\
               Scan the QR code to receieve the credential'

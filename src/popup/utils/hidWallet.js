@@ -1,28 +1,65 @@
-// import HypersignSSISdk from "hs-ssi-sdk";
 const { DirectSecp256k1HdWallet } = require("@cosmjs/proto-signing");
-// import { mnemonic, HIDNODE_RPC, HIDNODE_REST } from './constants';
+const { HIDNODE_REST, HIDNODE_FAUCET } = require('./hsConstants');
+const axios = require("axios");
+class HIDWallet {
+    constructor() {
+        this.prefix = 'hid';
+        this.offlineSigner = null;
+    }
 
+    async generateWallet(mnemonic) {
+        if (!mnemonic) {
+            this.offlineSigner = await DirectSecp256k1HdWallet.generate(24, {
+                prefix: this.prefix,
+            });
+        } else {
+            this.offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+                prefix: this.prefix,
+            });
+        }
+    }
 
-export async function createHidWallet(mnemonic) {
-    console.log('inside createwakket')
-    if (!mnemonic) {
-        return await DirectSecp256k1HdWallet.generate(24, {
-            prefix: "hid",
-        });
-    } else {
-        return await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-            prefix: "hid",
-        });
+    async getWalletAddress() {
+        const accounts = await this.offlineSigner.getAccounts()
+        this.walletAddress = accounts[0].address
+        return this.walletAddress
+    }
+
+    async rechargeWallet() {
+        const walletAddress = await this.getWalletAddress();
+        const url = HIDNODE_FAUCET
+        const data = {
+            address: walletAddress,
+            coins: [
+                '100000uhid'
+            ]
+        }
+        await axios.post(url, data)
+        const balance = await this.getBalance();
+        return balance;
+    }
+
+    async getBalance() {
+        const walletAddress = await this.getWalletAddress();
+        const url = HIDNODE_REST + "/cosmos/bank/v1beta1/balances/" + walletAddress;
+        const res = await axios.get(url);
+
+        if (!res || !res.data || !res.data.balances || res.data.balances.length == 0) {
+            console.error('Could not fetch the balance for wallet ' + walletAddress)
+            return 0;
+        }
+
+        const bal = res.data.balances.find(x => x.denom === 'uhid')
+        if (!bal) {
+            console.error('Invalid balance')
+            return 0;
+        }
+        return bal.amount
     }
 }
 
+const hidWalletInstance = new HIDWallet();
 
+// Object.freeze(hidWalletInstance);
 
-// export async function hypersignSDKInit(){
-//         console.log('inside init')
-//         const offlineSigner = await createWallet(mnemonic);
-//         console.log(offlineSigner)
-//         const hsSDK = new HypersignSSISdk(offlineSigner, HIDNODE_RPC, HIDNODE_REST);
-//         await hsSDK.init();
-//         return hsSDK;
-// }
+export default hidWalletInstance;

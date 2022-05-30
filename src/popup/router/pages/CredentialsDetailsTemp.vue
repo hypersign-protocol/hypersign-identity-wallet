@@ -165,7 +165,7 @@ export default {
   border-radius: 14px;
   margin-top: 7%;
   text-align: left;
-  font-size: small;
+  font-size: 13px;
   color: gray;
   padding-top: 7%;
 }
