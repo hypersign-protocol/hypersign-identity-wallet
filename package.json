@@ -57,7 +57,7 @@
         "cordova-plugin-wkwebview-engine": "github:mwchambers/cordova-plugin-wkwebview-engine#da67d6bb6ce8597c38fc69e66b84566e34efea8d",
         "crypto-js": "^4.0.0",
         "detect-browser": "^4.8.0",
-        "hs-ssi-sdk": "file:../hs-ssi-sdk",
+        "hs-ssi-sdk": "git+https://github.com/hypersign-protocol/hid-ssi-js-sdk.git#ssi-integration",
         "jdenticon": "^2.2.0",
         "lodash-es": "^4.17.15",
         "qrcode.vue": "^1.6.3",
