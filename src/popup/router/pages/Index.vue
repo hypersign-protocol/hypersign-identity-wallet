@@ -161,7 +161,7 @@ export default {
           throw new Error("Could not register the did");
         }
 
-        const {transactionHash } =  result;s
+        const { transactionHash } =  result;
         if(!transactionHash) {
           throw new Error("Could not register the did");
         }
@@ -193,7 +193,7 @@ export default {
         console.log(e);
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         this.loading = false;
-      }finally{
+      } finally {
         this.loading = false;
       }
       ////HYPERSIGN Related

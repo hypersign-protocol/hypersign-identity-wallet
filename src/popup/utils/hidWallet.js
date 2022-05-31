@@ -1,5 +1,5 @@
 const { DirectSecp256k1HdWallet } = require("@cosmjs/proto-signing");
-const { HIDNODE_REST, HIDNODE_FAUCET } = require('./hsConstants');
+const { HIDNODE_REST, HIDNODE_FAUCET, SUPERHERO_HS_AUTH_BASE_URL, AUTH_SERVER_FAUCET_PATH } = require('./hsConstants');
 const axios = require("axios");
 class HIDWallet {
     constructor() {
@@ -19,26 +19,46 @@ class HIDWallet {
         }
     }
 
+    /**
+     * Get first wallet address of signer
+     * @returns walletAddrss {string}
+     */
     async getWalletAddress() {
         const accounts = await this.offlineSigner.getAccounts()
         this.walletAddress = accounts[0].address
         return this.walletAddress
     }
 
+
+    /**
+     * Get 10000uhid from faucet
+     **/
     async rechargeWallet() {
         const walletAddress = await this.getWalletAddress();
-        const url = HIDNODE_FAUCET
-        const data = {
-            address: walletAddress,
-            coins: [
-                '100000uhid'
-            ]
+        const url = SUPERHERO_HS_AUTH_BASE_URL + AUTH_SERVER_FAUCET_PATH + walletAddress
+        const res = await axios.get(url)
+        console.log(res)
+            // const { data } = res;
+        if (!res || res.message) {
+            throw new Error('Could not fund the wallets')
         }
-        await axios.post(url, data)
-        const balance = await this.getBalance();
-        return balance;
+        return res.message
+
+        // const url = HIDNODE_FAUCET
+        // const data = {
+        //     address: walletAddress,
+        //     coins: [
+        //         '10000uhid'
+        //     ]
+        // }
+        // const balance = await this.getBalance();
+        // return balance;
     }
 
+    /**
+     * Get wallet HID balance of the current account
+     * @returns walletBalance {string}
+     */
     async getBalance() {
         const walletAddress = await this.getWalletAddress();
         const url = HIDNODE_REST + "/cosmos/bank/v1beta1/balances/" + walletAddress;
@@ -59,7 +79,4 @@ class HIDWallet {
 }
 
 const hidWalletInstance = new HIDWallet();
-
-// Object.freeze(hidWalletInstance);
-
 export default hidWalletInstance;
