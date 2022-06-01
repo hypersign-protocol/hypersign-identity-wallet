@@ -40,10 +40,13 @@ import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
 import hidWalletInstance from '../../utils/hidWallet';
+import {  HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants'
+
 
 
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
-import HypersignSSISdk from 'hs-ssi-sdk';
+// import HypersignSSISdk from 'hs-ssi-sdk';
+const HypersignSSISdk = require('hs-ssi-sdk');
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 
 export default {
@@ -68,7 +71,7 @@ export default {
   },
   async created() {
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, "http://localhost:26657", "http://localhost:1317");
+    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST);
     await this.hsSDK.init();
 
     const credentialId = this.$route.params.credentialId;
