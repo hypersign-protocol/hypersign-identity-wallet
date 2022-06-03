@@ -58,6 +58,7 @@ export default {
     if(authToken && accessToken){
       const provider = localStorage.getItem("provider"); 
       if(provider) this.isProviderPresent = true;
+      this.loading = true;
        webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
                 this.loading = false;
@@ -121,9 +122,10 @@ export default {
         if(!this.isemail(this.profile.email)) throw new Error("Enter a valid email address");
       }catch(e){
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+        this.loading = false;
         return;
       }
-
+      this.loading = true;
       /// Generate HID wallet and recharge it using faucet
       this.mnemonic = generateMnemonic(); 
       await hidWalletInstance.generateWallet(this.mnemonic);
@@ -144,7 +146,7 @@ export default {
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
       try {
-        this.loading = true;
+        
         const kp = await hsSdk.did.generateKeys();
 
         const privateKeyMultibase = kp.privateKeyMultibase
