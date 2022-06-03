@@ -10,30 +10,27 @@
           <!-- <BalanceInfo /> -->
         </div>
         <div class="submenu-bg">
-          <BoxButton
-            :text="$t('pages.appVUE.profile')"
-            to="/profile"
-            style="font-size: smaller; color: white"
-            class="tour__step9"
-          >
+          <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
+            class="tour__step9">
             <Profile width="24.5" height="24.5" slot="icon" />
           </BoxButton>
-          <BoxButton
-            :text="$t('pages.appVUE.credential')"
-            style="font-size: smaller; color: white"
-            to="/credential"
-            class="tour__step10"
-          >
+          <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
+            class="tour__step10">
             <Credential width="24.5" height="24.5" slot="icon" color="white" />
           </BoxButton>
           <BoxButton :text="$t('pages.appVUE.settings')" to="/settings" class="tour__step8">
             <Settings slot="icon" />
           </BoxButton>
+
+          <BoxButton :text="$t('pages.appVUE.transfer')" to="/transfer" style="font-size: smaller; color: white"
+            class="tour__step9">
+            <Transfer width="24.5" height="24.5" slot="icon" />
+          </BoxButton>
         </div>
         <!-- <RecentTransactions /> -->
         <div style="justify-content: center; display: flex">
           <button @click="scan" class="round-button" value="Scan Qr">
-              <img src="../../../icons/qr-code-white.svg" class="round-button-qr" />
+            <img src="../../../icons/qr-code-white.svg" class="round-button-qr" />
           </button>
         </div>
       </div>
@@ -49,6 +46,8 @@ import { mapGetters, mapState } from 'vuex';
 import Settings from '../../../icons/settings-icon.svg?vue-component';
 
 import Profile from '../../../icons/profile.svg?vue-component';
+import Transfer from '../../../icons/tip-icon.svg?vue-component';
+
 import Credential from '../../../icons/credential.svg?vue-component';
 import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
 import AccountInfo from '../components/AccountInfo';
@@ -67,6 +66,7 @@ export default {
     BoxButton,
     Credential,
     Profile,
+    Transfer
   },
   data() {
     return {

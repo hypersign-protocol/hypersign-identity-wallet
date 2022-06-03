@@ -1,5 +1,6 @@
 const { DirectSecp256k1HdWallet } = require("@cosmjs/proto-signing");
-const { HIDNODE_REST, HIDNODE_FAUCET, SUPERHERO_HS_AUTH_BASE_URL, AUTH_SERVER_FAUCET_PATH } = require('./hsConstants');
+const { HIDNODE_REST, HIDNODE_FAUCET, HIDNODE_RPC, SUPERHERO_HS_AUTH_BASE_URL, AUTH_SERVER_FAUCET_PATH } = require('./hsConstants');
+const { SigningStargateClient } = require('@cosmjs/stargate');
 const axios = require("axios");
 class HIDWallet {
     constructor() {
@@ -75,6 +76,40 @@ class HIDWallet {
             return 0;
         }
         return bal.amount
+    }
+
+    async sendTokens({ recipient, amount }) {
+        if (!this.offlineSigner) {
+            throw new Error('Signer is not initialized');
+        }
+        const walletAddress = await this.getWalletAddress();
+        const client = await SigningStargateClient.connectWithSigner(HIDNODE_RPC, this.offlineSigner, {
+            gasPrice: "0.0001uhid"
+        });
+
+
+        //client.simulate(walletAddress, )
+        let message = {
+                message: "",
+                transactionHash: "",
+                gasUsed: 0,
+                gasWanted: 0,
+                height: 0,
+                error: ""
+            }
+            /// TODO: need to make the fee dynamic
+        const result = await client.sendTokens(walletAddress, recipient, amount, 'auto', '');
+        if (result && result.code == 0) {
+            message.transactionHash = result.transactionHash
+            message.gasUsed = result.gasUsed
+            message.gasWanted = result.gasWanted
+            message.height = result.height
+            message.message = "Transaction successfull"
+        } else {
+            message.message = "Transaction failed"
+            message.error = result.rawLog ? result.rawLog : "Transaction failed"
+        }
+        return message;
     }
 }
 

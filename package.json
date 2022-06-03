@@ -35,6 +35,7 @@
         "@aeternity/bip39": "^0.1.0",
         "@aeternity/hd-wallet": "^0.2.0",
         "@cosmjs/proto-signing": "^0.28.4",
+        "@cosmjs/stargate": "^0.28.4",
         "@dicebear/avatars": "^4.2.5",
         "@dicebear/avatars-avataaars-sprites": "^4.2.5",
         "@stamp/it": "^1.1.0",

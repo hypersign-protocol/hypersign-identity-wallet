@@ -18,10 +18,11 @@ import webIframePopups from './web-iframe-popups';
 // Hypersign related
 import Credentials from '../pages/Credentials';
 import Profile from '../pages/Profile';
+import Transfer from '../pages/Transfer';
 import CredentialsDetails from '../pages/CredentialsDetails';
 import CredentialsDetailsTemp from '../pages/CredentialsDetailsTemp';
 import CredentialsDetailsAuthorize from '../pages/CredentialsDetailsAuthorize';
-import Deeplink  from '../pages/Deeplink';
+import Deeplink from '../pages/Deeplink';
 import Auth from "../pages/Auth";
 
 export default [{
@@ -38,7 +39,7 @@ export default [{
         path: '/account',
         name: 'account',
         component: Account,
-    },  
+    },
 
     {
         path: "/auth/:authType",
@@ -50,9 +51,9 @@ export default [{
             ifNotAuthOnly: true,
             notPersist: true,
         },
-      
+
     },
-   
+
     {
         path: '/deeplink',
         name: 'deeplink',
@@ -94,7 +95,8 @@ export default [{
         component: RestoreWallet,
         meta: {
             title: 'restore-wallet',
-            ifNotAuthOnly: true        },
+            ifNotAuthOnly: true
+        },
     },
     {
         path: '/aboutSettings',
@@ -169,6 +171,15 @@ export default [{
         },
     },
     {
+        name: 'transfer',
+        path: '/transfer',
+        component: Transfer,
+        props: true,
+        meta: {
+            title: 'transfer',
+        },
+    },
+    {
         name: 'credential',
         path: '/credential',
         component: Credentials,
@@ -195,7 +206,7 @@ export default [{
             title: 'credentialDetailsTemp'
         }
     },
-    
+
     {
         name: 'CredentialsDetailsAuthorize',
         path: '/credential/authorize/:credentialId',
