@@ -17,6 +17,9 @@ import webIframePopups from './web-iframe-popups';
 
 // Hypersign related
 import Credentials from '../pages/Credentials';
+import Transactions from '../pages/Transactions';
+import TransactionDetails from '../pages/TransactionDetails';
+
 import Profile from '../pages/Profile';
 import Transfer from '../pages/Transfer';
 import CredentialsDetails from '../pages/CredentialsDetails';
@@ -186,6 +189,24 @@ export default [{
         props: true,
         meta: {
             title: 'credential',
+        },
+    },
+    {
+        name: 'transactions',
+        path: '/transactions',
+        component: Transactions,
+        props: true,
+        meta: {
+            title: 'transactions',
+        },
+    },
+    {
+        name: 'transactionDetails',
+        path: '/transaction/:txhash',
+        component: TransactionDetails,
+        props: true,
+        meta: {
+            title: 'transactionDetails',
         },
     },
     {

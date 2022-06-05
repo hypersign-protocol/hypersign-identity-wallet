@@ -18,7 +18,11 @@
 
           <BoxButton :text="$t('pages.appVUE.transfer')" to="/transfer" style="font-size: smaller; color: white"
             class="tour__step9">
-            <Transfer slot="icon" />
+            <Transfer height="24.5" slot="icon" />
+          </BoxButton>
+
+          <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions">
+            <Transactions height="24.5" slot="icon" />
           </BoxButton>
 
           <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
@@ -26,7 +30,7 @@
             <Profile width="24.5" height="24.5" slot="icon" />
           </BoxButton>
 
-          <BoxButton :text="$t('pages.appVUE.settings')" to="/settings" class="tour__step8">
+          <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
             <Settings slot="icon" />
           </BoxButton>
 
@@ -51,7 +55,9 @@ import { mapGetters, mapState } from 'vuex';
 import Settings from '../../../icons/settings-icon.svg?vue-component';
 
 import Profile from '../../../icons/profile.svg?vue-component';
-import Transfer from '../../../icons/tip-icon.svg?vue-component';
+import Transfer from '../../../icons/invite.svg?vue-component';
+import Transactions from '../../../icons/hamburger.svg?vue-component';
+
 
 import Credential from '../../../icons/credential.svg?vue-component';
 import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
@@ -71,7 +77,8 @@ export default {
     BoxButton,
     Credential,
     Profile,
-    Transfer
+    Transfer,
+    Transactions
   },
   data() {
     return {
