@@ -85,7 +85,8 @@ export default {
     async fetchInTxs() {
 
 
-      const txListHeReceivedURL = `${HIDNODE_REST}/cosmos/tx/v1beta1/txs?events=message.sender='${this.walletAddress}'`
+      const txListHeReceivedURL = `${HIDNODE_REST}/cosmos/tx/v1beta1/txs?events=transfer.recipient='${this.walletAddress}'` 
+
 
       let response = await axios.get(txListHeReceivedURL);
       response = response.data;
