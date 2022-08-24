@@ -95,6 +95,7 @@ export default {
         ////HS_TODO
         state.hypersign.keys = payload.keys;
         state.hypersign.did = payload.did;
+        state.hypersign.didDoc = payload.didDoc;
     },
     restoreHypersign(state, payload) {
         Object.assign(state.hypersign, payload);

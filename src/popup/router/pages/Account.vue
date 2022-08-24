@@ -174,6 +174,11 @@ export default {
             this.credentialDetailsQRdata(data);
             break;
           }
+          case 'ISSUE_SCHEMA':{
+            this.$store.commit('addRequestingAppInfo', data);
+            this.$router.push(`/schema`);
+            break;
+          }
           default: {
             throw new Error('Invalid QR code');
           }

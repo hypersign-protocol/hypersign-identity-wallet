@@ -78,8 +78,17 @@ export default {
     },
 
     getFee(tx){
-      const fee = tx.tx.auth_info.fee.amount[0];
-      return fee.amount + fee.denom;
+      if(tx && tx.tx){
+        if(tx.tx.auth_info){
+          if(tx.tx.auth_info.fee){
+            const fee = tx.tx.auth_info.fee.amount[0];
+            if(fee){
+              return fee.amount + fee.denom;
+            }
+          }
+        }
+      }
+      return '0';
     },
 
     async fetchInTxs() {

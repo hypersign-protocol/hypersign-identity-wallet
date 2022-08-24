@@ -178,6 +178,7 @@ export default {
         this.$store.commit('setHSkeys', {
           keys: kp,
           did,
+          didDoc
         });
 
         if(await this.setupProfile(this.isThridPartyAuth)){

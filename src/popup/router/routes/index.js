@@ -19,6 +19,7 @@ import webIframePopups from './web-iframe-popups';
 import Credentials from '../pages/Credentials';
 import Transactions from '../pages/Transactions';
 import TransactionDetails from '../pages/TransactionDetails';
+import SchemaIssue from '../pages/IssueSchema';
 
 import Profile from '../pages/Profile';
 import Transfer from '../pages/Transfer';
@@ -55,6 +56,15 @@ export default [{
             notPersist: true,
         },
 
+    },
+
+    {
+        path: "/schema",
+        name: "IssueSchema",
+        component: SchemaIssue,
+        meta: {
+            title: 'IssueSchema',
+        },
     },
 
     {
