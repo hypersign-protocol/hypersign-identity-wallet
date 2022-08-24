@@ -35,6 +35,7 @@ import registration from '../../../mixins/registration';
 import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
 import hidWalletInstance from '../../utils/hidWallet';
+// import HypersignSsiSDK  from 'hs-ssi-sdk'
 const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
@@ -116,6 +117,8 @@ export default {
     },
 
     async createWallet() {
+
+      console.log('Inside createWallet')
       try{
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
@@ -129,6 +132,9 @@ export default {
       /// Generate HID wallet and recharge it using faucet
       this.mnemonic = generateMnemonic(); 
       await hidWalletInstance.generateWallet(this.mnemonic);
+
+      
+      console.log('before rechargewallet')
       await hidWalletInstance.rechargeWallet(); 
 
       /// Use the HID wallet with SSI sdk
@@ -156,7 +162,7 @@ export default {
         const didDoc = JSON.parse(didDocString);
 
         const did  = didDoc.id;
-        const verificationMethodId = didDoc['verificationMethod'][0].id
+        const verificationMethodId = didDoc['verificationMethod'][0].id;        
         const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
 
         if(!result){

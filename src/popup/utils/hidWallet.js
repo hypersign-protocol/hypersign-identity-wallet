@@ -1,5 +1,5 @@
 const { DirectSecp256k1HdWallet } = require("@cosmjs/proto-signing");
-const { HIDNODE_REST, HIDNODE_FAUCET, HIDNODE_RPC, SUPERHERO_HS_AUTH_BASE_URL, AUTH_SERVER_FAUCET_PATH } = require('./hsConstants');
+const { HIDNODE_REST, HIDNODE_RPC, SUPERHERO_HS_AUTH_BASE_URL, AUTH_SERVER_FAUCET_PATH } = require('./hsConstants');
 const { SigningStargateClient } = require('@cosmjs/stargate');
 const axios = require("axios");
 class HIDWallet {
@@ -32,13 +32,13 @@ class HIDWallet {
 
 
     /**
-     * Get 10000uhid from faucet
+     * Get 50uhid from faucet
      **/
+    //// Post Request New Code
     async rechargeWallet() {
         const walletAddress = await this.getWalletAddress();
-        const url = SUPERHERO_HS_AUTH_BASE_URL + AUTH_SERVER_FAUCET_PATH + walletAddress
+        const url = SUPERHERO_HS_AUTH_BASE_URL + AUTH_SERVER_FAUCET_PATH + walletAddress;
         const res = await axios.get(url)
-        console.log(res)
             // const { data } = res;
         if (!res || res.message) {
             throw new Error('Could not fund the wallets')
@@ -55,6 +55,7 @@ class HIDWallet {
         // const balance = await this.getBalance();
         // return balance;
     }
+
 
     /**
      * Get wallet HID balance of the current account
