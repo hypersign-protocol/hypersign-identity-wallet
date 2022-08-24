@@ -102,7 +102,9 @@ export default {
                     if(serviceEndpoint){
                         try{
                             const body = {
-                                result
+                                transactionHash:  result.transactionHash,
+                                schemaId: schemaToSign.id,
+                                author: this.hypersign.did
                             }
                             axios.post(serviceEndpoint, body).then(response => {
                                 if(response && response.status === 200){
