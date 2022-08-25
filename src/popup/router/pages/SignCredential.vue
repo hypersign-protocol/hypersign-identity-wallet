@@ -126,7 +126,7 @@ export default {
                 })
 
                 if (result) {
-                    this.$store.dispatch('modals/open', { name: 'default', msg: result.transactionHash });
+                    this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Issued Credential' });
                     /// call the sutatus API of the studio/dappp server to for updating the status in db.
                     const { serviceEndpoint } = this.hypersign.requestingAppInfo;
                     if(serviceEndpoint){
