@@ -164,7 +164,7 @@ export default {
         data = JSON.parse(QRJsonString);
         // console.log(data);
         switch(data.QRType){
-          case 'ISSUE_CRED': {
+          case 'ISSUE_CRED': { // change it to ACCEPT_CRED
             this.credentialUrl = data.url;            
             let cred = await this.fetchCredential();
             this.credentialsQRData(cred);
@@ -174,9 +174,14 @@ export default {
             this.credentialDetailsQRdata(data);
             break;
           }
-          case 'ISSUE_SCHEMA':{
+          case 'ISSUE_SCHEMA':{ // sign schema and send to blockchain
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push(`/schema`);
+            break;
+          }
+          case 'ISSUE_CREDENTIAL': { // sign credentials and send to blockchain
+            this.$store.commit('addRequestingAppInfo', data);
+            this.$router.push(`/signcredential`);
             break;
           }
           default: {

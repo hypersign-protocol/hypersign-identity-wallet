@@ -19,7 +19,8 @@ import webIframePopups from './web-iframe-popups';
 import Credentials from '../pages/Credentials';
 import Transactions from '../pages/Transactions';
 import TransactionDetails from '../pages/TransactionDetails';
-import SchemaIssue from '../pages/IssueSchema';
+import SignSchema from '../pages/SignSchema';
+import SignCredential from '../pages/SignCredential';
 
 import Profile from '../pages/Profile';
 import Transfer from '../pages/Transfer';
@@ -57,16 +58,22 @@ export default [{
         },
 
     },
-
     {
-        path: "/schema",
+        path: "/schema", // sign schema
         name: "IssueSchema",
-        component: SchemaIssue,
+        component: SignSchema,
         meta: {
             title: 'IssueSchema',
         },
     },
-
+    {
+        path: "/signcredential", // sign schema
+        name: "SignCredential",
+        component: SignCredential,
+        meta: {
+            title: 'SignCredential',
+        },
+    },
     {
         path: '/deeplink',
         name: 'deeplink',
