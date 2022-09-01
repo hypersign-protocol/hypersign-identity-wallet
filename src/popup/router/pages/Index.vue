@@ -76,8 +76,10 @@ export default {
     isProviderPresent: false,
   }),
    created(){
-    const authToken = localStorage.getItem("authToken");
-    const accessToken = localStorage.getItem("accessToken"); 
+    const thridPartyAuthGetter = this.$store.getters.thirdPartyGoogleAuth;
+
+    const authToken = thridPartyAuthGetter? thridPartyAuthGetter.authToken: null;
+    const accessToken = thridPartyAuthGetter ? thridPartyAuthGetter.accessToken: null; 
     
     const that = this;
     
@@ -87,8 +89,8 @@ export default {
       if(provider) this.isProviderPresent = true;
        webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
-                this.loading = false;
-                this.$store.dispatch('modals/open', { name: 'default', msg:err });
+                that.loading = false;
+                that.$store.dispatch('modals/open', { name: 'default', msg:err });
                 return;
               }
                 const { email, name } = user;
@@ -96,11 +98,9 @@ export default {
                 that.profile.name = name;
                 that.isThridPartyAuth = true;
 
-                localStorage.removeItem("authToken")
-                // localStorage.removeItem("provider")
-                localStorage.removeItem("accessToken")
+                // localStorage.removeItem("authToken")
+                // localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
-
                 that.createWallet();
         })
       
@@ -128,9 +128,6 @@ export default {
   
   methods: {
     loginWithGoogle(){
-    
-
-      
         webAuth.authorize(
           {
             connection: "google-oauth2",  
@@ -147,9 +144,6 @@ export default {
     },
 
     async createWallet() {
-
-
-
       try{
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
@@ -160,18 +154,12 @@ export default {
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         return;
       }
-
-
-      
       
       const hsSdk = new HypersignSsiSDK({ nodeUrl: HS_NODE_BASE_URL }); 
       this.mnemonic = generateMnemonic();
-      
-
+    
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
       
-      // console.log(seed)
-
       const address = await this.$store.dispatch('generateWallet', { seed });
       this.$store.commit('setMnemonic', this.mnemonic);
       const keypair = {

@@ -60,11 +60,14 @@ export default {
             }
 
             if(isThridPartyAuth){
+                const thridPartyAuthGetter = this.$store.getters.thirdPartyGoogleAuth;
                 body["user"]["did"] = this.profile.did;
                 body["isThridPartyAuth"] = true;
+                if(thridPartyAuthGetter){
+                    body["thridPartyAuthProvider"] = thridPartyAuthGetter.provider;
+                    body["accessToken"] = thridPartyAuthGetter.accessToken;
+                }
             }
-
-            // console.log("Calling authserver register")
             
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
             
@@ -85,6 +88,7 @@ export default {
             }
 
             this.$store.commit('addHSProfile', this.profile);
+            this.$store.commit('clearThridPartyAuth', { provider: 'Google' })
             this.ifEdit = true;
             this.ifCreate = false;
             this.ifAllDisabled = true;

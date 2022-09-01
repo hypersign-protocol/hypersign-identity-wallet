@@ -45,4 +45,7 @@ export default {
       ? state.tokens[state.current.token].balance.toFixed(2)
       : state.balance.toFixed(2);
   },
+  thirdPartyGoogleAuth(state){
+    return state.hypersign.thridPartyAuths.find(x => x.provider === 'Google')
+  }
 };

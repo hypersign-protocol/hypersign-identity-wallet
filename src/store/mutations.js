@@ -103,6 +103,16 @@ export default {
         ////HS_TODO
         state.hypersign.credentials.push(payload)
     },
+    setThridPartyAuth(state, payload) {
+        const thridPartyAuth = state.hypersign.thridPartyAuths.find(x => x.provider === payload.provider)
+        if(!thridPartyAuth){
+            state.hypersign.thridPartyAuths.push(payload);
+        }
+    },
+    clearThridPartyAuth(state, payload) {
+        const indexToRemove = state.hypersign.thridPartyAuths.findIndex(x => x.provider === payload.provider)
+        state.hypersign.thridPartyAuths.splice(indexToRemove, 1);
+    },
     addRequestingAppInfo(state, payload) {
         ////HS_TODO
         state.hypersign.requestingAppInfo = payload
