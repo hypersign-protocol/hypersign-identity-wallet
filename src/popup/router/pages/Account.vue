@@ -184,8 +184,13 @@ export default {
             this.$router.push(`/signcredential`);
             break;
           }
+          case 'ISSUE_DID': { // sign did and send to blockchain
+            this.$store.commit('addRequestingAppInfo', data);
+            this.$router.push('/signdid');
+            break;
+          }
           default: {
-            throw new Error('Invalid QR code');
+            throw new Error('Invalid QR code type');
           }
         }
         
