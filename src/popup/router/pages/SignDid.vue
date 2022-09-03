@@ -5,8 +5,8 @@
       <div class="">
         <div class="appInfo">
           <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
-          is requesting the following information.</p>
-          <p>{{ JSON.stringify(this.credentialRaw) }}</p>
+          is requesting to sign the following</p>
+          <p>{{ JSON.stringify(this.didRaw) }}</p>
         </div>
       </div>
       <div class="scanner d-flex">
@@ -49,7 +49,7 @@ export default {
         return {
             hsSDK: null,
             loading:  false,
-            credentialRaw: ''
+            didRaw: ''
         }
     },
     async created(){
@@ -65,17 +65,13 @@ export default {
   challenge: '',
   provider: '',
   data: {
-    userDid: 'did:hs:zERsQiJV5PCDaLqr7WLtpjJSCx5Euq4xJB7MLQmcKzrqy',
-    orgDid: '',
-    region: 'US EAST',
-    name: 'Hypermine Pvt Ltd',
-    domain: 'hypermine.in',
-    logo: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.5EZ51foyo3QBV2FHnKq1cwHaEc%26pid%3DApi&f=1',
-    status: undefined
+    serviceEndpoint: "https://stage.hypermine.in/studioserver/api/v1/org/"
+    controllers : ['did:hs:zERsQiJV5PCDaLqr7WLtpjJSCx5Euq4xJB7MLQmcKzrqy'],
+    alsoKnownAs: 'hypermine.in',
   }
 }
 */        
-        this.credentialRaw = this.hypersign.requestingAppInfo.data;
+        this.didRaw = this.hypersign.requestingAppInfo.data;
         await hidWalletInstance.generateWallet(this.mnemonic);
         this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST);
         await this.hsSDK.init();
@@ -90,30 +86,98 @@ export default {
         async signAndSendToBlockchain(){
             try{
                 this.loading = true;
-
                 
-                        
-                const result = await this.hsSDK.vc.issueCredential({
-                    credential: vc,
-                    issuerDid: this.hypersign.did,
-                    privateKey: this.hypersign.keys.privateKeyMultibase
-                })
+                // Generating dummy key
+                const kp = await this.hsSDK.did.generateKeys();
+                const didDocString = this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase});
+                let didDoc = JSON.parse(didDocString);
+
+                const { controllers, alsoKnownAs, serviceEndpoint } = this.didRaw;
+
+                if(!Array.isArray(controllers)){
+                    throw new Error('controllers should be an array')
+                }
+                
+                // If no controllers then added issuer dID by default
+                if(controllers.length === 0){
+                    controllers.push(this.hypersign.did)
+                }
+
+                //// If the issuer DID is not present then add issue DID as well.
+                if(!controllers.find(x => x === this.hypersign.did)){
+                    controllers.unshift(this.hypersign.did)
+                }
+
+                // Assigning issuer as controller of this DID
+                // This sohuld have been done at SDK, issue created for this.
+                // TODO: https://github.com/hypersign-protocol/hid-ssi-js-sdk/issues/49 
+                didDoc.controller = [];
+                didDoc.verificationMethod = [];
+                didDoc.authentication = [];
+                didDoc.assertionMethod = [];
+                didDoc.keyAgreement = [];
+                didDoc.capabilityInvocation = [];
+                didDoc.capabilityDelegation = [];
+                didDoc.alsoKnownAs = [];
+                didDoc.service = []
+
+                console.log(controllers)
+                for(let i=0; i < controllers.length; i++){
+
+                    const controllerDid = controllers[i]
+                    if(controllerDid){
+                        console.log('Resolve did controllerDid = ' + controllerDid);
+                        const { didDocument } = await this.hsSDK.did.resolve({did: controllerDid})
+                        console.log(JSON.stringify(didDocument))
+                        didDoc.controller.push(didDocument.id);
+                        didDoc.verificationMethod.push(didDocument.verificationMethod[0])
+                        didDoc.authentication.push(didDocument.authentication[0]);
+                        didDoc.assertionMethod.push(didDocument.assertionMethod[0])
+                        didDoc.keyAgreement.push(didDocument.keyAgreement[0]);
+                        didDoc.capabilityInvocation.push(didDocument.capabilityInvocation[0]);
+                        didDoc.capabilityDelegation.push(didDocument.capabilityDelegation[0]);
+                    }
+                    
+                }
+                
+
+                // https://www.w3.org/TR/did-core/#assigning-dids-to-existing-web-resources
+                if(alsoKnownAs){
+                    didDoc.alsoKnownAs.push(alsoKnownAs);
+                }
+
+                if(serviceEndpoint){
+                    didDoc.service.push({
+                        "id": didDoc.id + "#linked-domain",
+                        "type": "LinkedDomains", 
+                        "serviceEndpoint": serviceEndpoint + didDoc.id
+                    })
+                }                
+
+                const verificationMethodId = didDoc['verificationMethod'][0].id;        
+                const result = await this.hsSDK.did.register({ didDocString: JSON.stringify(didDoc), privateKeyMultibase: this.hypersign.keys.privateKeyMultibase, verificationMethodId })
+
+                console.log(result);
+                if(!result){
+                    throw new Error("Could not register the did");
+                }
+
 
                 if (result) {
-                    this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Issued Credential' });
+                    this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully DID Created' });
                     /// call the sutatus API of the studio/dappp server to for updating the status in db.
                     const { serviceEndpoint } = this.hypersign.requestingAppInfo;
                     if(serviceEndpoint){
                         try{
                             const body = {
-                                transactionHash:  result.transactionHash,
-                                vc,
+                                transactionHash: result.transactionHash,
+                                orgDid: didDoc.id,
                             }
                             axios.post(serviceEndpoint, body).then(response => {
                                 if(response && response.status === 200){
-                                    console.log('Successfully sent result to serviceEndpoint')
+                                    console.log('Successfully sent result to webhook')
                                 } else {
-                                    console.log("Could not sent result to serviceEndpoint")
+                                    console.log("Could not sent result to webhook")
                                 }
                             }).catch(e => {
                                 console.error(e)    

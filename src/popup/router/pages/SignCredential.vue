@@ -5,7 +5,7 @@
       <div class="">
         <div class="appInfo">
           <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
-          is requesting the following information.</p>
+            is requesting to sign the following</p>
           <p>{{ JSON.stringify(this.credentialRaw) }}</p>
         </div>
       </div>
