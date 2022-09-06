@@ -27,7 +27,7 @@
 import { mapGetters, mapState } from 'vuex';
 import hidWalletInstance from '../../utils/hidWallet';
 const HypersignSSISdk = require('hs-ssi-sdk');
-import { HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants';
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE  } from '../../utils/hsConstants';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
@@ -57,7 +57,7 @@ export default {
         this.schemaRaw = this.hypersign.requestingAppInfo.data;
         console.log(JSON.stringify(this.schemaRaw))
         await hidWalletInstance.generateWallet(this.mnemonic);
-        this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST);
+        this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
         await this.hsSDK.init();
         // await this.signAndSendToBlockchain();
     },

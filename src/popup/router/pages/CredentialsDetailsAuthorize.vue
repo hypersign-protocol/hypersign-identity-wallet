@@ -40,7 +40,7 @@ import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
 import hidWalletInstance from '../../utils/hidWallet';
-import {  HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants'
+import {  HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE  } from '../../utils/hsConstants'
 
 
 
@@ -71,7 +71,7 @@ export default {
   },
   async created() {
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST);
+    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
     await this.hsSDK.init();
 
     const credentialId = this.$route.params.credentialId;

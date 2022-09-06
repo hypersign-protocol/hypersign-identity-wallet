@@ -32,7 +32,7 @@ import Platforms from '../components/Platforms';
 import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
-import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST  } from '../../utils/hsConstants'
+import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST,  HIDNODE_NAMESPACE} from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
 import hidWalletInstance from '../../utils/hidWallet';
 // import HypersignSsiSDK  from 'hs-ssi-sdk'
@@ -138,7 +138,7 @@ export default {
       await hidWalletInstance.rechargeWallet(); 
 
       /// Use the HID wallet with SSI sdk
-      const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST);
+      const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
       await hsSdk.init();
 
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
