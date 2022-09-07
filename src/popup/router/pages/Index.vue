@@ -138,6 +138,9 @@ export default {
       await hidWalletInstance.rechargeWallet(); 
 
       /// Use the HID wallet with SSI sdk
+      console.log({
+        HIDNODE_NAMESPACE
+      })
       const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
       await hsSdk.init();
 

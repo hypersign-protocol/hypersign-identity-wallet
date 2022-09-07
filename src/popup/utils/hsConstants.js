@@ -12,3 +12,4 @@ export const HYPERSIGN_AUTH_PROVIDER = {
 
 export const HIDNODE_RPC = "https://jagrat.hypersign.id/node1/rpc/"
 export const HIDNODE_REST = "https://jagrat.hypersign.id/node1/rest/"
+export const HIDNODE_NAMESPACE = 'devnet'
