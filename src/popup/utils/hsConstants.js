@@ -10,6 +10,6 @@ export const HYPERSIGN_AUTH_PROVIDER = {
     FACEBOOK: 'facebook'
 }
 
-export const HIDNODE_RPC = "https://jagrat.hypersign.id/node1/rpc/"
-export const HIDNODE_REST = "https://jagrat.hypersign.id/node1/rest/"
-export const HIDNODE_NAMESPACE = 'devnet'
+export const HIDNODE_RPC = "https://jagrat.hypersign.id/rpc/"
+export const HIDNODE_REST = "https://jagrat.hypersign.id/rest/"
+export const HIDNODE_NAMESPACE = 'testnet'
