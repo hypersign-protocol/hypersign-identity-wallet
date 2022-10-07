@@ -113,21 +113,23 @@ export default {
             this.loading= true;
             const verifyUrl = url.origin + url.pathname;
             const vp_unsigned = await this.hsSDK.vp.getPresentation(
-              {verifiableCredential: this.verifiableCredential,
+              {verifiableCredentials: [this.verifiableCredential],
               holderDid:  this.hypersign.did}
             );
-
+            const verificationMethodId=this.hypersign.did + '#key-1';
             const vp_signed = await this.hsSDK.vp.signPresentation(
              { presentation: vp_unsigned,
-               holderDid: this.hypersign.did,
+                holderDidDocSigned: this.hypersign.didDoc,
                privateKey: this.hypersign.keys.privateKeyMultibase,
-               challenge
+               challenge,
+                verificationMethodId
               }
             );
 
             const body = {
               challenge,
               vp: JSON.stringify(vp_signed),
+              holderDidDocSigned: JSON.stringify( this.hypersign.didDoc),
             };
 
             const response = await axios.post(verifyUrl, body);

@@ -35,6 +35,7 @@ import registration from '../../../mixins/registration';
 import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST,  HIDNODE_NAMESPACE} from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
 import hidWalletInstance from '../../utils/hidWallet';
+import {generateMnemonicToHDSeed} from '../../utils/SSIWallet';
 // import HypersignSsiSDK  from 'hs-ssi-sdk'
 const HypersignSsiSDK = require('hs-ssi-sdk');
 
@@ -134,8 +135,8 @@ export default {
       await hidWalletInstance.generateWallet(this.mnemonic);
 
       
-      console.log('before rechargewallet')
-      await hidWalletInstance.rechargeWallet(); 
+      // console.log('before rechargewallet')
+      //  await hidWalletInstance.rechargeWallet(); 
 
       /// Use the HID wallet with SSI sdk
       console.log({
@@ -155,27 +156,27 @@ export default {
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
       try {
-        
-        const kp = await hsSdk.did.generateKeys();
+        const seedHd=await generateMnemonicToHDSeed(this.mnemonic);
+        const kp=await hsSdk.did.generateKeys({seed:seedHd});
 
         const privateKeyMultibase = kp.privateKeyMultibase
         const publicKeyMultibase = kp.publicKeyMultibase
 
-        const didDocString = hsSdk.did.generate({ publicKeyMultibase });
-        const didDoc = JSON.parse(didDocString);
+        const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
+        // const didDoc = JSON.parse(didDocString);
 
         const did  = didDoc.id;
         const verificationMethodId = didDoc['verificationMethod'][0].id;        
-        const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
+        // const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
 
-        if(!result){
-          throw new Error("Could not register the did");
-        }
+        // if(!result){
+        //   throw new Error("Could not register the did");
+        // }
 
-        const { transactionHash } =  result;
-        if(!transactionHash) {
-          throw new Error("Could not register the did");
-        }
+        // const { transactionHash } =  result;
+        // if(!transactionHash) {
+        //   throw new Error("Could not register the did");
+        // }
 
         this.profile.did = did;
         this.$store.commit('setHSkeys', {
