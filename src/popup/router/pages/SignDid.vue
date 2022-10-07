@@ -127,8 +127,8 @@ export default {
                     const controllerDid = controllers[i]
                     if(controllerDid){
                         console.log('Resolve did controllerDid = ' + controllerDid);
-                        const { didDocument } = await this.hsSDK.did.resolve({did: controllerDid})
-                        console.log(JSON.stringify(didDocument))
+                        // const { didDocument } = await this.hsSDK.did.resolve({did: controllerDid})
+                        const didDocument = this.hypersign.didDoc;
                         didDoc.controller.push(didDocument.id);
                         didDoc.verificationMethod.push(didDocument.verificationMethod[0])
                         didDoc.authentication.push(didDocument.authentication[0]);
@@ -137,10 +137,7 @@ export default {
                         didDoc.capabilityInvocation.push(didDocument.capabilityInvocation[0]);
                         didDoc.capabilityDelegation.push(didDocument.capabilityDelegation[0]);
                     }
-                    
                 }
-                
-
                 // https://www.w3.org/TR/did-core/#assigning-dids-to-existing-web-resources
                 if(alsoKnownAs){
                     didDoc.alsoKnownAs.push(alsoKnownAs);
