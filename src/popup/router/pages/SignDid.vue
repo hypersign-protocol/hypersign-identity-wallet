@@ -89,8 +89,8 @@ export default {
                 
                 // Generating dummy key
                 const kp = await this.hsSDK.did.generateKeys();
-                const didDocString = this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase});
-                let didDoc = JSON.parse(didDocString);
+                let didDoc = await this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase});
+                // let didDoc = JSON.parse(didDocString);
 
                 const { controllers, alsoKnownAs, serviceEndpoint } = this.didRaw;
 
@@ -155,7 +155,7 @@ export default {
                 }                
 
                 const verificationMethodId = didDoc['verificationMethod'][0].id;        
-                const result = await this.hsSDK.did.register({ didDocString: JSON.stringify(didDoc), privateKeyMultibase: this.hypersign.keys.privateKeyMultibase, verificationMethodId })
+                const result = await this.hsSDK.did.register({  didDocument: didDoc, privateKeyMultibase: this.hypersign.keys.privateKeyMultibase, verificationMethodId })
 
                 console.log(result);
                 if(!result){

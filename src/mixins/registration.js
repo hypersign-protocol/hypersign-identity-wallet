@@ -13,7 +13,8 @@ export default {
         profile: {
             email: "",
             name: "",
-            did: ""
+            did: "",
+            didDoc: "",
         },
         copied: false,
     }),
@@ -27,7 +28,7 @@ export default {
     async created() {
         if (Object.keys(this.hypersign.profile).length == 0) {
             this.profile.did = this.hypersign.did
-
+            this.profile.didDoc = this.hypersign.didDoc
         } else {
             this.profile = {...this.hypersign.profile }
             this.ifEdit = true;
@@ -54,13 +55,17 @@ export default {
             const body = {
                 user: {
                     name: this.profile.name,
-                    email: this.profile.email
+                    email: this.profile.email,
+                    
                 },
-                isThridPartyAuth: false
+                didDoc:this.profile.didDoc,
+                isThridPartyAuth: false,
+                expirationDate: "2030-12-31T00:00:00.000Z"
             }
 
             if (isThridPartyAuth) {
                 body["user"]["did"] = this.profile.did;
+                body["didDoc"] = this.profile.didDoc;
                 body["isThridPartyAuth"] = true;
             }
 
