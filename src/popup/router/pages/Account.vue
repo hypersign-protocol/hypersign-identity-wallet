@@ -21,8 +21,8 @@
             <Transfer height="24.5" slot="icon" />
           </BoxButton>
 
-          <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions">
-            <Transactions height="24.5" slot="icon" />
+          <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions" style="font-size: smaller; color: white">
+            <Transactions height="24.5" width="25" slot="icon" />
           </BoxButton>
 
           <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
@@ -99,6 +99,23 @@ export default {
   },
   async created() {
     try {
+      
+      try{
+        // For backward compatiblity
+        // Make users loging if they have old did wallet. [did:hs]. So that they can create a new DID for our testnet, 
+        if(this.hypersign.did.includes('did:hs')){
+          console.log('Inside if check')
+          await this.$store.dispatch('reset');
+          await this.$router.push('/');
+          this.$store.commit('setMainLoading', false);
+          this.$store.commit('switchLoggedIn', false);
+        } else {
+          console.log('Inside else  check')
+        }
+      }catch(e){
+        console.log(e.message)
+      }
+      
 
       const isRegisterFlow = localStorage.getItem("isRegisterFlow")
       if(isRegisterFlow){
