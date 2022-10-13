@@ -9,8 +9,8 @@
       />
 
       <Input
-        label="BALANCE (uHID)"
-        :value="walletBalance"
+        label="DID"
+        :value="hypersign.did"
         disabled
         class="ae-address"
       />
@@ -45,7 +45,7 @@ export default {
   mixins: [registration],
   components: { Input },
    computed: { 
-    ...mapState(['mnemonic']),
+    ...mapState(['mnemonic', 'hypersign']),
   },
   data: () => ({
     loading:  false,
