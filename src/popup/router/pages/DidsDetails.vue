@@ -131,6 +131,7 @@ export default {
             });
 
             this.status = 'Registred'
+            this.selectDid()
           }
 
           this.loading = false;
