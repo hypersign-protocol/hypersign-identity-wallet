@@ -2,7 +2,7 @@
   <div class="account-info">
     <div class="title">
       <div class="account-name" data-cy="account-name">
-        <UserAvatar :address="profile.did" :name="profile.name" class="avatar" size="small" />
+        <UserAvatar :address="hypersign.did" :name="profile.name" class="avatar" size="small" />
         <template v-if="profile.name!=''">{{ profile.name }}</template>
         <router-link to="/profile" v-else>{{ $t('pages.account.claim-name') }} </router-link>
       </div>

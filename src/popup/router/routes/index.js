@@ -28,6 +28,7 @@ import SignDid from '../pages/SignDid';
 import Profile from '../pages/Profile';
 import Transfer from '../pages/Transfer';
 import CredentialsDetails from '../pages/CredentialsDetails';
+import DidsDetails from '../pages/DidsDetails';
 import CredentialsDetailsTemp from '../pages/CredentialsDetailsTemp';
 import CredentialsDetailsAuthorize from '../pages/CredentialsDetailsAuthorize';
 import Deeplink from '../pages/Deeplink';
@@ -225,9 +226,19 @@ export default [{
         component: Dids,
         props: true,
         meta: {
-            title: 'did',
+            title: 'Did',
         },
     },
+    {
+        name:'DidsDetails',
+        path:'/did/:did',
+        component:DidsDetails,
+        props:true,
+        meta:{
+            title:'DidsDetails',
+        }
+    }
+    ,
     {
         name: 'transactions',
         path: '/transactions',

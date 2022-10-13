@@ -12,7 +12,6 @@ function makeSSIWalletPath(minHardIndex) {
 }
 
 export async function generateMnemonicToHDSeed(mnemonic, minHardIndex = 0) {
-    console.log("mnemonic", mnemonic);
     const seed = Bip39.decode(mnemonic)
     const slipPathKeys = Slip10.derivePath(Slip10Curve.Ed25519, seed, makeSSIWalletPath(minHardIndex))
     const seedHD = slipPathKeys.privkey

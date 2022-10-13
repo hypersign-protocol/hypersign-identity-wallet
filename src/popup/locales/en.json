@@ -54,6 +54,10 @@
         "insufficient-balance": {
             "msg": "You do not have enough balance for this transaction."
         },
+        "registerDid": {
+            "msg": "This action will register you did on the blockchain. This action cannot be undone!",
+            "title": "Are you sure you want to register this did?"
+        },
         "removeAccount": {
             "title": "Are you sure you want to remove this account?",
             "msg": "This action will remove your account from the wallet and will delete the extension storage. Make sure you have backed up your seed phrase before proceeding. This action cannot be undone!"
@@ -227,6 +231,8 @@
             "invite": "Invite",
             "profile": "Profile",
             "transactions": "My transactions",
+            "Did": "My Dids",
+            "DidsDetails": "Did Details",
             "transactionDetails": "Transaction Details",
             "transfer": "Transfer",
             "credential": "Credentials",
@@ -273,7 +279,8 @@
             "tokens": "Fungible tokens",
             "manageTokens": "Manage tokens",
             "invite": "Invite",
-            "credential": "Credential"
+            "credential": "Credential",
+            "Did": "DID"
         },
         "aboutSettings": {
             "heading": "About",
@@ -1024,7 +1031,8 @@
     },
     "phishing": {
         "detection": "Hypersign Phishing Detection",
-        "sections": [{
+        "sections": [
+            {
                 "text": "This domain is currently on the Hypersign domain warning list. This means that based on information available to us, Hypersign believes this domain could currently compromise your security and, as an added safety feature, Hypersign has restricted access to the site. To override this, please read the rest of this warning for instructions on how to continue at your own risk."
             },
             {

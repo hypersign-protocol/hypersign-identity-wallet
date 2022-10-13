@@ -99,12 +99,14 @@ export default {
             state.hypersign.keys = payload.keys;
             state.hypersign.did = payload.did;
             state.hypersign.didDoc = payload.didDoc;
+            state.hypersign.keys= payload.keys;
         }
         
         state.hypersign.dids[did] = {
             didDoc,
             hdPathIndex,
-            status
+            status,
+            keys,
         }
         
     },

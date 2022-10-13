@@ -1,23 +1,25 @@
 <template>
-    <div class="popup">
-      <button data-cy="copy" @click="copy">
+  <div class="popup">
+    <!-- <button data-cy="copy" @click="copy">
         + Create
-      </button>
-      <button class="back-button" @click="$router.push(to)">
+      </button> -->
+    <!-- <button class="back-button" @click="$router.push(to)">
         <ae-icon name="left-more" class="back-icon" /> Create
-      </button>
-      <span class="altText" v-if="Object.keys(hypersign.dids).length == 0">No credential found. Scan QR to get credentials.</span>
-      <Panel v-else>
-        <PanelItem
-          v-for="did in Object.keys(hypersign.dids)"
-          :key="hypersign.dids[did].didDoc.id"
-          :to="`/did/`"
-          title="Somernadom"
-          info="some randion info"
-        />
-      </Panel>
-      <Loader v-if="loading" />
-    </div>
+      </button> -->
+    <span class="altText" v-if="Object.keys(hypersign.dids).length == 0">No credential found. Scan QR to get
+      credentials.</span>
+    <Panel v-else>
+      <PanelItem v-for="did in Object.keys(hypersign.dids)" :key="hypersign.dids[did].didDoc.id"
+        :to="`/did/${hypersign.dids[did].didDoc.id}`"
+        :title="`ID: ${hypersign.dids[did].didDoc.id.substring(0, 25)}...`"
+        :info="`Type: ${hypersign.dids[did].status}`" />
+
+    </Panel>
+    <Button @click="generateNewDid" data-cy="generate-new-did">
+      Create Another
+    </Button>
+    <Loader v-if="loading" />
+  </div>
 </template>
 
 <script>
@@ -30,100 +32,75 @@ import PanelItem from '../components/PanelItem';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
 import axios from 'axios';
-import {toFormattedDate, toStringShorner} from '../../utils/helper'
+import { toFormattedDate, toStringShorner } from '../../utils/helper'
+import hidWalletInstance from '../../utils/hidWallet';
+import { generateMnemonicToHDSeed } from '../../utils/SSIWallet';
+import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants'
+
+// import HypersignSsiSDK  from 'hs-ssi-sdk'
+const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel,Button, PanelItem, QrIcon, Textarea },
+  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea },
   data() {
     return {
-      form: {
-        url: '',
-        amount: '',
-      },
       loading: false,
-      credentialDetail: {
-        formattedSchemaName: "",
-        formattedIssuanceDate: "",
-      }
     };
   },
   props: ['address'],
   computed: {
     ...mapState(['saveErrorLog']),
     ...mapGetters(['hypersign']),
+    ...mapState(['mnemonic']),
     validUrl() {
       return this.form.url != '';
     },
   },
   created() {
     //Only for deeplinking
-    if(this.$route.query.url && this.$route.query.url !='')
+    if (this.$route.query.url && this.$route.query.url != '')
       this.deeplink(this.$route.query.url)
   },
 
-  methods: {  
-    toFormattedDate(dateStr) {
-    const d = new Date(dateStr);
-    return d.toDateString();
-    },
-    async scan() {
-      try {
-        //console.log('scanning...')
-        this.form.url = await this.$store.dispatch('modals/open', {
-          name: 'read-qr-code',
-          title: this.$t('pages.credential.scanCredential'),
-        });
-        await this.fetchCredential();
-      } catch (e) {
-        this.loading = false;
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
-      }
-    },
+  methods: {
 
-    async fetchCredential(){
-      //console.log('fetchCredential...')
-        this.form.url = this.form.url + '&did=' + this.hypersign.did;
+    async generateNewDid() {
+      try {
         this.loading = true;
-        let response = await axios.get(this.form.url);
-        response = response.data;
-        if (!response) throw new Error('Can not accept credential');
-        if (response && response.status != 200) throw new Error(response.error);
-        if (!response.message) throw new Error('Can not accept credential');
-        await this.acceptCredential(response.message)
-        this.loading =false;
-    },
+        const hdIndex=Object.keys(this.hypersign.dids).length
+        
+        await hidWalletInstance.generateWallet(this.mnemonic);
+        const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+        await hsSdk.init();
+        const seedHd = await generateMnemonicToHDSeed(this.mnemonic,hdIndex);
+        const kp = await hsSdk.did.generateKeys({ seed: seedHd });
+        const privateKeyMultibase = kp.privateKeyMultibase
+        const publicKeyMultibase = kp.publicKeyMultibase
 
-    async deeplink(url) {
-      try {
-        //console.log('deeplink...')
-        this.form.url = url; 
-        await this.fetchCredential();
-      } catch (e) {
+        const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
+        this.$store.commit('setHSkeys', {
+          keys: kp,
+          did: didDoc.id,
+          didDoc,
+          status: "private",
+          hdPathIndex: hdIndex, // TODO remove hardcoded path index
+          selected: false // true/false
+        });
         this.loading = false;
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+
+      } catch (e) {
+        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
+        this.loading = false;
+
       }
+
+    },
+    toFormattedDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toDateString();
     },
 
-    async acceptCredential(credential){
-      //console.log('acceptCredential...')
-          if(this.hypersign.did != credential.credentialSubject.id) throw new Error('This credential is not being issued to you');
-          const confirmed = await this.$store.dispatch('modals/open', {
-                    name: 'confirm',
-                    title: 'Credential Acceptance',
-                    msg: `You are receiving credential: '${credential.type[1]}' \
-                    from an issuer: '${credential.issuer}'. \
-                    Do you want to accept?`,
-                  })
-                  .catch(() => false);
-        if(confirmed){
-          credential.expirationDate = toFormattedDate(credential.expirationDate) ;
-          credential.issuanceDate = toFormattedDate(credential.issuanceDate) ;
-          credential.formattedIssuer =  toStringShorner(credential.issuer, 32, 15);
-          credential.formattedSchemaName =  toStringShorner(credential.type[1], 26, 15);
-          this.$store.commit('addHSVerifiableCredential', credential);
-        }
-    }
 
   },
 };
@@ -132,17 +109,19 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
-.altText{
+
+.altText {
   color: #80808091;
   font-size: larger;
 }
+
 .d-flex {
   display: flex;
   float: right;
   padding: 5px;
 }
 
-.scan-text{
+.scan-text {
   margin-left: 20px;
   margin-bottom: 2px;
   // float: right;
@@ -185,7 +164,7 @@ export default {
     color: $text-color;
   }
 
-  p > svg {
+  p>svg {
     margin-right: 10px;
   }
 

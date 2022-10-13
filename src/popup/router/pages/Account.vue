@@ -7,9 +7,18 @@
         </div>
         <div class="tour__step1">
           <AccountInfo />
-          <!-- <BalanceInfo /> -->
+          <BalanceInfo />
         </div>
         <div class="submenu-bg">
+          
+          <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
+            class="tour__step9">
+            <Profile width="24.5" height="24.5" slot="icon" />
+          </BoxButton>
+
+          <BoxButton :text="$t('pages.appVUE.Did')" to="/did">
+            <DidIcon slot="icon" />
+          </BoxButton>
 
           <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
             class="tour__step10">
@@ -23,20 +32,13 @@
 
           <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions" style="font-size: smaller; color: white">
             <Transactions height="24.5" width="25" slot="icon" />
-          </BoxButton>
-
-          <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
-            class="tour__step9">
-            <Profile width="24.5" height="24.5" slot="icon" />
-          </BoxButton>
+          </BoxButton>         
 
           <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
             <Settings slot="icon" />
           </BoxButton>
 
-          <BoxButton :text="$t('pages.appVUE.settings')" to="/did">
-            <Settings slot="icon" />
-          </BoxButton>
+          
 
 
         </div>
@@ -61,7 +63,7 @@ import Settings from '../../../icons/settings-icon.svg?vue-component';
 import Profile from '../../../icons/profile.svg?vue-component';
 import Transfer from '../../../icons/invite.svg?vue-component';
 import Transactions from '../../../icons/hamburger.svg?vue-component';
-
+import DidIcon from '../../../icons/claim-icon.svg?vue-component';
 
 import Credential from '../../../icons/credential.svg?vue-component';
 import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
@@ -82,7 +84,8 @@ export default {
     Credential,
     Profile,
     Transfer,
-    Transactions
+    Transactions,
+    DidIcon,
   },
   data() {
     return {
