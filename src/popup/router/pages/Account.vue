@@ -10,21 +10,30 @@
           <BalanceInfo />
         </div>
         <div class="submenu-bg">
+            <div class="box-club">
+
+              <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
+              class="tour__step9">
+              <Profile width="24.5" height="24.5" slot="icon" />
+              </BoxButton>
+
+              <BoxButton :text="$t('pages.appVUE.Did')" to="/did">
+                <DidIcon slot="icon" />
+              </BoxButton>
+
+              <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
+                class="tour__step10">
+                <Credential width="24.5" height="24.5" slot="icon" color="white" />
+              </BoxButton>
           
-          <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
-            class="tour__step9">
-            <Profile width="24.5" height="24.5" slot="icon" />
-          </BoxButton>
 
-          <BoxButton :text="$t('pages.appVUE.Did')" to="/did">
-            <DidIcon slot="icon" />
-          </BoxButton>
+            </div>
+            
+            
+        
+            <div class="box-club">
 
-          <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
-            class="tour__step10">
-            <Credential width="24.5" height="24.5" slot="icon" color="white" />
-          </BoxButton>
-
+            
           <BoxButton :text="$t('pages.appVUE.transfer')" to="/transfer" style="font-size: smaller; color: white"
             class="tour__step9">
             <Transfer height="24.5" slot="icon" />
@@ -32,12 +41,16 @@
 
           <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions" style="font-size: smaller; color: white">
             <Transactions height="24.5" width="25" slot="icon" />
-          </BoxButton>         
-
+          </BoxButton>    
+          
           <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
             <Settings slot="icon" />
           </BoxButton>
 
+
+        </div>
+
+         
           
 
 
@@ -63,11 +76,12 @@ import Settings from '../../../icons/settings-icon.svg?vue-component';
 import Profile from '../../../icons/profile.svg?vue-component';
 import Transfer from '../../../icons/invite.svg?vue-component';
 import Transactions from '../../../icons/hamburger.svg?vue-component';
-import DidIcon from '../../../icons/claim-icon.svg?vue-component';
+import DidIcon from '../../../icons/activity-icon.svg?vue-component';
 
 import Credential from '../../../icons/credential.svg?vue-component';
 import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
 import AccountInfo from '../components/AccountInfo';
+import BalanceInfo from '../components/BalanceInfo';
 import BoxButton from '../components/BoxButton';
 import axios from 'axios';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
@@ -86,6 +100,7 @@ export default {
     Transfer,
     Transactions,
     DidIcon,
+    BalanceInfo
   },
   data() {
     return {
@@ -376,5 +391,13 @@ export default {
   bottom: 0;
   width: 40%;
   border-radius: 49px;
+}
+
+.box-club{
+  padding: 1px;
+    border: 1px solid #80808052;
+    width: 100%;
+    border-radius: 5px;
+    margin-top: 1%;
 }
 </style>

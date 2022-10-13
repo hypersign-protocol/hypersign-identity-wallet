@@ -231,7 +231,7 @@
             "invite": "Invite",
             "profile": "Profile",
             "transactions": "My transactions",
-            "Did": "My Dids",
+            "Did": "DIDs",
             "DidsDetails": "Did Details",
             "transactionDetails": "Transaction Details",
             "transfer": "Transfer",
@@ -280,7 +280,7 @@
             "manageTokens": "Manage tokens",
             "invite": "Invite",
             "credential": "Credential",
-            "Did": "DID"
+            "Did": "DIDs"
         },
         "aboutSettings": {
             "heading": "About",

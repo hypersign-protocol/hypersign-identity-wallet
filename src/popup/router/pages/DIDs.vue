@@ -1,23 +1,31 @@
 <template>
   <div class="popup">
-    <!-- <button data-cy="copy" @click="copy">
-        + Create
-      </button> -->
-    <!-- <button class="back-button" @click="$router.push(to)">
-        <ae-icon name="left-more" class="back-icon" /> Create
-      </button> -->
-    <span class="altText" v-if="Object.keys(hypersign.dids).length == 0">No credential found. Scan QR to get
-      credentials.</span>
+    <Button  @click="generateNewDid" data-cy="generate-new-did"  style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;">
+      <CreateIcon></CreateIcon>
+    </Button>
+    <span class="altText" v-if="Object.keys(hypersign.dids).length == 0">No DID found. Create one for you.</span>
+    <!-- <div class=""  v-else>
+      <ul v-for="did in Object.keys(hypersign.dids)" :key="hypersign.dids[did].didDoc.id" style="color: white;text-align: left;background-color: black;border-radius: 5px;list-style-type: none;  margin-top: 10px;padding: 10px;">
+        <p>
+          <li><span>Default Name</span></li>
+          <li>{{did.substring(0, 25).toUpperCase()}}...</li>
+          <li>{{hypersign.dids[did].status}}</li>
+        </p>
+        <p>
+          <span>Edit | </span>
+          <span  @click="selectDid">Set Default | </span>
+          <span @click="register">Register |</span>
+          <span>Delete</span>
+        </p>
+      </ul>
+    </div> -->
     <Panel v-else>
       <PanelItem v-for="did in Object.keys(hypersign.dids)" :key="hypersign.dids[did].didDoc.id"
         :to="`/did/${hypersign.dids[did].didDoc.id}`"
-        :title="`ID: ${hypersign.dids[did].didDoc.id.substring(0, 25)}...`"
-        :info="`Type: ${hypersign.dids[did].status}`" />
-
+        :title="`${did.substring(0, 20).toUpperCase()}...`"
+        :info="`${hypersign.dids[did].status.toUpperCase()}`" />
     </Panel>
-    <Button @click="generateNewDid" data-cy="generate-new-did">
-      Create Another
-    </Button>
+
     <Loader v-if="loading" />
   </div>
 </template>
@@ -25,6 +33,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
+import CreateIcon from '../../../icons/topup-icon.svg?vue-component';
 import removeAccountMixin from '../../../mixins/removeAccount';
 import CheckBox from '../components/CheckBox';
 import Panel from '../components/Panel';
@@ -42,7 +51,7 @@ const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea },
+  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea, CreateIcon },
   data() {
     return {
       loading: false,
@@ -64,7 +73,6 @@ export default {
   },
 
   methods: {
-
     async generateNewDid() {
       try {
         this.loading = true;
@@ -207,6 +215,13 @@ export default {
 
   .text-center {
     text-align: center;
+  }
+  .smallBtn{
+    display: flex;
+    justify-content: center;
+    width: 14%;
+    padding: 6px;
+    margin-right: 1%;
   }
 }
 </style>
