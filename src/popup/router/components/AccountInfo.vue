@@ -2,7 +2,7 @@
   <div class="account-info">
     <div class="title">
       <div class="account-name" data-cy="account-name">
-        <UserAvatar :address="hypersign.did" :name="profile.name" class="avatar" size="small" />
+        <UserAvatar :address="profile.did" :name="profile.name" class="avatar" size="small" />
         <template v-if="profile.name!=''">{{ profile.name }}</template>
         <router-link to="/profile" v-else>{{ $t('pages.account.claim-name') }} </router-link>
       </div>
@@ -34,8 +34,9 @@ export default {
   }),
   computed: mapGetters(['hypersign']),
   async created() {
-    if(Object.keys(this.hypersign.profile).length == 0)
+    if(Object.keys(this.hypersign.profile).length > 0)
     {
+      this.profile = { ...this.hypersign.profile }
       this.profile.did  = this.hypersign.did
       
     }else{

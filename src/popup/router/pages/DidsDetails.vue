@@ -125,7 +125,7 @@ export default {
             const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
             await hsSdk.init();
             const verificationMethodId = this.didDoc.id + '#key-1';
-            const data = await hsSdk.did.register({
+            const tx = await hsSdk.did.register({
               didDocument: this.didDoc, privateKeyMultibase: this.key.privateKeyMultibase,
               verificationMethodId
             });

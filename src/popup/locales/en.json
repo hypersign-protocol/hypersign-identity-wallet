@@ -54,6 +54,12 @@
         "insufficient-balance": {
             "msg": "You do not have enough balance for this transaction."
         },
+        "changeDid":{
+            "msg": "This operation requires public did, select a public did from your did list. Are you sure you want to continue?",
+            "title":"Select a public did"
+        },
+        
+        
         "registerDid": {
             "msg": "This action will register you did on the blockchain. This action cannot be undone!",
             "title": "Are you sure you want to register this did?"

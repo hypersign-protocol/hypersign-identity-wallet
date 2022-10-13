@@ -108,7 +108,8 @@ export default {
 
             return await this.hsSDK.vc.getCredential({
                 schemaId,
-                subjectDidDocSigned:this.hypersign.didDoc ,
+                // subjectDidDocSigned:this.hypersign.didDoc ,
+                subjectDid,
                 issuerDid: this.hypersign.did,
                 expirationDate,
                 fields
@@ -118,12 +119,11 @@ export default {
             try{
                 this.loading = true;
                 const vc = await this.prepareCredential();
-                                
                 const result = await this.hsSDK.vc.issueCredential({
                     credential: vc,
                     issuerDid: this.hypersign.did,
                     privateKey: this.hypersign.keys.privateKeyMultibase,
-                    verificationMethodId:this.hypersign.did+'#Key-1'
+                    verificationMethodId:this.hypersign.didDoc.id+'#key-1'
                 })
 
                 if (result) {
