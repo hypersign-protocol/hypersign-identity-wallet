@@ -34,6 +34,10 @@
             <Settings slot="icon" />
           </BoxButton>
 
+          <BoxButton :text="$t('pages.appVUE.settings')" to="/did">
+            <Settings slot="icon" />
+          </BoxButton>
+
 
         </div>
         <!-- <RecentTransactions /> -->

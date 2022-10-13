@@ -182,7 +182,10 @@ export default {
         this.$store.commit('setHSkeys', {
           keys: kp,
           did,
-          didDoc
+          didDoc,
+          status: "private",
+          hdPathIndex: 0, // TODO remove hardcoded path index
+          selected: true // true/false
         });
 
         if(await this.setupProfile(this.isThridPartyAuth)){

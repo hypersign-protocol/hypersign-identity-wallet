@@ -63,7 +63,9 @@ const initialState = {
         credentialsTemp: [],
         requestingAppInfo: '',
         profile: {},
-        hsAuthDID: ""
+        hsAuthDID: "",
+        dids: {
+        }
     },
 };
 

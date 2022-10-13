@@ -92,10 +92,21 @@ export default {
         state.connectedAepps = {...state.connectedAepps, [host]: [account] };
     },
     setHSkeys(state, payload) {
+        const { status , hdPathIndex, didDoc, did, keys, selected } = payload; 
+
         ////HS_TODO
-        state.hypersign.keys = payload.keys;
-        state.hypersign.did = payload.did;
-        state.hypersign.didDoc = payload.didDoc;
+        if(selected == true){
+            state.hypersign.keys = payload.keys;
+            state.hypersign.did = payload.did;
+            state.hypersign.didDoc = payload.didDoc;
+        }
+        
+        state.hypersign.dids[did] = {
+            didDoc,
+            hdPathIndex,
+            status
+        }
+        
     },
     restoreHypersign(state, payload) {
         Object.assign(state.hypersign, payload);
