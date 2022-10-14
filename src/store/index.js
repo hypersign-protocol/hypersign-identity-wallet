@@ -64,7 +64,7 @@ const initialState = {
         requestingAppInfo: '',
         profile: {},
         hsAuthDID: "",
-        thridPartyAuths: []
+        thridPartyAuths: [],
         dids: {
         }
     },
