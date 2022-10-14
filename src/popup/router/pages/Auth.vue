@@ -13,12 +13,15 @@ export default {
 
       const accessToken = routeHash.split("&")[0].split("=")[1];
       const authToken = routeHash.split("&")[5].split("=")[1];
+      const payload = {
+        provider: 'Google',
+        accessToken,
+        authToken
+      }
+      
+      this.$store.commit('setThridPartyAuth', payload);
 
-      localStorage.setItem("accessToken", accessToken)
-      localStorage.setItem("authToken", authToken)
-      this.$router.push({path: "/", query: {
-        authToken: authToken, accessToken: accessToken
-      }})
+      this.$router.push({path: "/"})
 
     }
     

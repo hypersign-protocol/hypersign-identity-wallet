@@ -51,8 +51,10 @@ export default {
     isProviderPresent: false,
   }),
    created(){
-    const authToken = localStorage.getItem("authToken");
-    const accessToken = localStorage.getItem("accessToken"); 
+    const thridPartyAuthGetter = this.$store.getters.thirdPartyGoogleAuth;
+
+    const authToken = thridPartyAuthGetter? thridPartyAuthGetter.authToken: null;
+    const accessToken = thridPartyAuthGetter ? thridPartyAuthGetter.accessToken: null; 
     
     const that = this;
     
@@ -63,19 +65,17 @@ export default {
       this.loading = true;
        webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
-                this.loading = false;
-                this.$store.dispatch('modals/open', { name: 'default', msg:err });
+                that.loading = false;
+                that.$store.dispatch('modals/open', { name: 'default', msg:err });
                 return;
               }
                 const { email, name } = user;
                 that.profile.email = email;
                 that.profile.name = name;
                 that.isThridPartyAuth = true;
-
-                localStorage.removeItem("authToken")
-                localStorage.removeItem("accessToken")
+                // localStorage.removeItem("authToken")
+                // localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
-
                 that.createWallet();
         })      
     } else {
@@ -118,8 +118,6 @@ export default {
     },
 
     async createWallet() {
-
-      console.log('Inside createWallet')
       try{
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
@@ -129,6 +127,7 @@ export default {
         this.loading = false;
         return;
       }
+
       this.loading = true;
       /// Generate HID wallet and recharge it using faucet
       this.mnemonic = generateMnemonic(); 
@@ -144,7 +143,6 @@ export default {
       })
       const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
       await hsSdk.init();
-
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
       const address = await hidWalletInstance.getWalletAddress();  
       
