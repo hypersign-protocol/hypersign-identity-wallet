@@ -1,7 +1,7 @@
 {
     "name": "hypersign-wallet",
-    "version": "3.1.0",
-    "description": "Hypersign wallet",
+    "version": "4.0.0",
+    "description": "Hypersign Identity wallet for managing credentials and DIDs",
     "author": "Hypermine",
     "license": "MIT",
     "private": true,
