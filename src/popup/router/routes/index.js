@@ -17,11 +17,21 @@ import webIframePopups from './web-iframe-popups';
 
 // Hypersign related
 import Credentials from '../pages/Credentials';
+import Dids from '../pages/DIDs';
+
+import Transactions from '../pages/Transactions';
+import TransactionDetails from '../pages/TransactionDetails';
+import SignSchema from '../pages/SignSchema';
+import SignCredential from '../pages/SignCredential';
+import SignDid from '../pages/SignDid';
+
 import Profile from '../pages/Profile';
+import Transfer from '../pages/Transfer';
 import CredentialsDetails from '../pages/CredentialsDetails';
+import DidsDetails from '../pages/DidsDetails';
 import CredentialsDetailsTemp from '../pages/CredentialsDetailsTemp';
 import CredentialsDetailsAuthorize from '../pages/CredentialsDetailsAuthorize';
-import Deeplink  from '../pages/Deeplink';
+import Deeplink from '../pages/Deeplink';
 import Auth from "../pages/Auth";
 
 export default [{
@@ -38,7 +48,7 @@ export default [{
         path: '/account',
         name: 'account',
         component: Account,
-    },  
+    },
 
     {
         path: "/auth/:authType",
@@ -50,9 +60,32 @@ export default [{
             ifNotAuthOnly: true,
             notPersist: true,
         },
-      
+
     },
-   
+    {
+        path: "/schema", // sign schema
+        name: "IssueSchema",
+        component: SignSchema,
+        meta: {
+            title: 'IssueSchema',
+        },
+    },
+    {
+        path: "/signcredential", // sign schema
+        name: "SignCredential",
+        component: SignCredential,
+        meta: {
+            title: 'SignCredential',
+        },
+    },
+    {
+        path: "/signdid", // sign schema
+        name: "SignDid",
+        component: SignDid,
+        meta: {
+            title: 'SignDid',
+        },
+    },
     {
         path: '/deeplink',
         name: 'deeplink',
@@ -94,7 +127,8 @@ export default [{
         component: RestoreWallet,
         meta: {
             title: 'restore-wallet',
-            ifNotAuthOnly: true        },
+            ifNotAuthOnly: true
+        },
     },
     {
         path: '/aboutSettings',
@@ -169,12 +203,58 @@ export default [{
         },
     },
     {
+        name: 'transfer',
+        path: '/transfer',
+        component: Transfer,
+        props: true,
+        meta: {
+            title: 'transfer',
+        },
+    },
+    {
         name: 'credential',
         path: '/credential',
         component: Credentials,
         props: true,
         meta: {
             title: 'credential',
+        },
+    },
+    {
+        name: 'did',
+        path: '/did',
+        component: Dids,
+        props: true,
+        meta: {
+            title: 'Did',
+        },
+    },
+    {
+        name:'DidsDetails',
+        path:'/did/:did',
+        component:DidsDetails,
+        props:true,
+        meta:{
+            title:'DidsDetails',
+        }
+    }
+    ,
+    {
+        name: 'transactions',
+        path: '/transactions',
+        component: Transactions,
+        props: true,
+        meta: {
+            title: 'transactions',
+        },
+    },
+    {
+        name: 'transactionDetails',
+        path: '/transaction/:txhash',
+        component: TransactionDetails,
+        props: true,
+        meta: {
+            title: 'transactionDetails',
         },
     },
     {
@@ -195,7 +275,7 @@ export default [{
             title: 'credentialDetailsTemp'
         }
     },
-    
+
     {
         name: 'CredentialsDetailsAuthorize',
         path: '/credential/authorize/:credentialId',

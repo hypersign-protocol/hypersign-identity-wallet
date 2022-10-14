@@ -122,6 +122,15 @@ download the JDK version 1.8 from [this link](https://www.oracle.com/java/techno
 - Open up the android folder in your android studio, and run it in a emulator
 - Go to Build, and click on Build APK(s), to build the apk
 
+
+## Troubleshoot
+
+
+If you are getting the error  while running command `npm run watch:dev`, run these command from the project root:
+
+```bash
+node node_modules/node-sass/scripts/install.js
+npm rebuild node-sass
 ```
 
-```
+Then the dev server app should run on  

@@ -1,39 +1,34 @@
 <template>
   <div class="popup">
     <div class="mt-10"> 
-      
+      <Input
+        label="WALLET ADDRESS"
+        :value="walletAddress"
+        disabled
+        class="ae-address"
+      />
+
       <Input
         label="DID"
-        :value="profile.did"
+        :value="hypersign.did"
         disabled
-       />
-      <Input
-        placeholder="Enter name"
-        label="Name"
-        v-model="profile.name"
-        :disabled="ifAllDisabled"
+        class="ae-address"
       />
+
       <Input
-        placeholder="Enter email id"
-        label="Email Id"
+        label="NAME"
+        v-model="profile.name"
+        disabled
+        class="ae-address"
+      />
+
+      <Input
+        label="EMAIL"
         v-model="profile.email"
-        :disabled="ifAllDisabled"
+        disabled
+        class="ae-address"
       />
       
-      <Button half :to="{ name: 'account' }">
-        {{ $t('pages.tipPage.cancel') }}
-      </Button>
-
-      <Button half @click="setupProfileNow"
-      :disabled="!profile.name || !profile.did ||  !profile.email"
-      v-if ="ifCreate"
-      >
-        {{ $t('pages.tipPage.confirm') }}
-      </Button>
-
-      <Button half @click="edit" v-if="ifEdit" >
-        Edit
-      </Button>
       
       <Loader v-if="loading" />
     </div>
@@ -43,13 +38,25 @@
 <script>
 import Input from '../components/Input';
 import registration from '../../../mixins/registration';
+import hidWalletInstance from '../../utils/hidWallet';
+import { mapState } from 'vuex';
 
 export default {
   mixins: [registration],
   components: { Input },
+   computed: { 
+    ...mapState(['mnemonic', 'hypersign']),
+  },
   data: () => ({
-    loading:  false
+    loading:  false,
+    walletAddress: "",
+    walletBalance: ""
   }),
+  async created() {
+    await hidWalletInstance.generateWallet(this.mnemonic);
+    this.walletAddress = await hidWalletInstance.getWalletAddress()
+    this.walletBalance  = await hidWalletInstance.getBalance();
+  },
   methods: {
     async setupProfileNow(){
       try{
@@ -75,8 +82,9 @@ export default {
 
 
 .ae-address {
-    color: lightgray;
-    font-size: 20px;
+    color: black;
     letter-spacing: -0.2px;
 }
+
+
 </style>

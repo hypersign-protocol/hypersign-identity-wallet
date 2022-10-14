@@ -13,7 +13,8 @@ export default {
         profile: {
             email: "",
             name: "",
-            did: ""
+            did: "",
+            didDoc: "",
         },
         copied: false,
     }),
@@ -27,7 +28,7 @@ export default {
     async created() {
         if (Object.keys(this.hypersign.profile).length == 0) {
             this.profile.did = this.hypersign.did
-
+            this.profile.didDoc = this.hypersign.didDoc
         } else {
             this.profile = {...this.hypersign.profile }
             this.ifEdit = true;
@@ -41,7 +42,7 @@ export default {
             this.ifEdit = false;
             this.ifCreate = true;
         },
-        async setupProfile(isThridPartyAuth = false) {            
+        async setupProfile(isThridPartyAuth = false) {
             // try {
             //     this.loading = true;
             //// HS_TODO::
@@ -54,14 +55,18 @@ export default {
             const body = {
                 user: {
                     name: this.profile.name,
-                    email: this.profile.email
+                    email: this.profile.email,
+                    
                 },
-                isThridPartyAuth:  false
+                didDoc:this.profile.didDoc,
+                isThridPartyAuth: false,
+                expirationDate: "2030-12-31T00:00:00.000Z"
             }
 
             if(isThridPartyAuth){
                 const thridPartyAuthGetter = this.$store.getters.thirdPartyGoogleAuth;
                 body["user"]["did"] = this.profile.did;
+                body["didDoc"] = this.profile.didDoc;
                 body["isThridPartyAuth"] = true;
                 if(thridPartyAuthGetter){
                     body["thridPartyAuthProvider"] = thridPartyAuthGetter.provider;
@@ -70,18 +75,18 @@ export default {
             }
             
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
-            
+
             if (!res) throw new Error("Could not register the user");
             // console.log("After getting response")
             res = res.data;
             // console.log(res)
             // console.log(res.message)
             if (res && res.status != 200) throw new Error(res.error);
-        
-            
+
+
             // console.log(typeof(res.message))
-            // console.log(res.message)
-            if(isThridPartyAuth && res && res.message){
+            console.log(res.message)
+            if (isThridPartyAuth && res && res.message) {
                 // console.log("Before setting 3rdPartyAuthVC");
                 // only in case of 3rd party auth, verifiable credenital will come
                 localStorage.setItem("3rdPartyAuthVC", JSON.stringify(res.message));
@@ -93,7 +98,7 @@ export default {
             this.ifCreate = false;
             this.ifAllDisabled = true;
 
-            return  true;
+            return true;
         },
     },
 };

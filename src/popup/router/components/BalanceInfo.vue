@@ -2,13 +2,13 @@
   <div class="external-svg" data-cy="balance-info">
     <span class="title">{{ $t('pages.account.balance') }}</span>
     <div class="balance no-sign">
-      <div class="amount">
-        <!-- <span>{{ tokenBalance }}</span>
-        <span>{{ $t('pages.appVUE.aeid') }}</span> -->
-      </div>
+      <!-- <div class="amount">
+        <span>{{ tokenBalance }}</span>
+        <span>{{ $t('pages.appVUE.aeid') }}</span>
+      </div> -->
       <div class="currenciesgroup">
-        <!--eslint-disable-next-line vue-i18n/no-raw-text-->
-        <span class="approx-sign">~</span>
+        <!-- eslint-disable-next-line vue-i18n/no-raw-text -->
+        <!-- <span class="approx-sign">~</span> -->
         <!-- <li data-cy="currency-dropdown" class="dropdown-container" :class="dropdown ? 'show' : ''">
           <ae-button data-cy="toggle-currency-dropdown" @click="dropdown = !dropdown">
             {{ formatCurrency(balanceCurrency) }}
@@ -123,7 +123,7 @@ export default {
   position: relative;
   text-align: center;
   background-image: url('../../../icons/acc_balance.png');
-  border-bottom: 2px solid $transactions-bg;
+  border-bottom: 2px solid #12121b45;
   display: flex;
   padding: 0 20px 10px 20px;
   margin-top: 15px;

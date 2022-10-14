@@ -28,7 +28,7 @@ export default {
 @import '../../../common/variables';
 
 .button-container {
-  width: 33%;
+  width: 32%;
   display: inline-block;
   padding: 10px;
 

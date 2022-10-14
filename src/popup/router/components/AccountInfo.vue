@@ -34,8 +34,9 @@ export default {
   }),
   computed: mapGetters(['hypersign']),
   async created() {
-    if(Object.keys(this.hypersign.profile).length == 0)
+    if(Object.keys(this.hypersign.profile).length > 0)
     {
+      this.profile = { ...this.hypersign.profile }
       this.profile.did  = this.hypersign.did
       
     }else{

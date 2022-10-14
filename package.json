@@ -25,7 +25,8 @@
         "watch:dev:Testnet": "cross-env NETWORK=Testnet npm run watch:dev",
         "watch:dev:tests": "cross-env NETWORK=Testnet RUNNING_IN_TESTS=true npm run watch:dev",
         "build:tests": "cross-env NETWORK=Testnet RUNNING_IN_TESTS=true npm run build:dev",
-        "webserver": "cp -R dist/web/root/* web-server/public/ && node web-server/index.js"
+        "webserver": "cp -R dist/web/root/* web-server/public/ && node web-server/index.js",
+        "deploy": "gh-pages -d dist/web/root"
     },
     "dependencies": {
         "@aeternity/aepp-components": "git+https://github.com/aeternity/aepp-components.git#develop",
@@ -33,6 +34,9 @@
         "@aeternity/aepp-sdk": "^7.7.0",
         "@aeternity/bip39": "^0.1.0",
         "@aeternity/hd-wallet": "^0.2.0",
+        "@cosmjs/crypto": "^0.29.0",
+        "@cosmjs/proto-signing": "^0.28.4",
+        "@cosmjs/stargate": "^0.28.4",
         "@dicebear/avatars": "^4.2.5",
         "@dicebear/avatars-avataaars-sprites": "^4.2.5",
         "@stamp/it": "^1.1.0",
@@ -56,7 +60,8 @@
         "cordova-plugin-wkwebview-engine": "github:mwchambers/cordova-plugin-wkwebview-engine#da67d6bb6ce8597c38fc69e66b84566e34efea8d",
         "crypto-js": "^4.0.0",
         "detect-browser": "^4.8.0",
-        "hs-ssi-sdk": "^5.0.0",
+        "gh-pages": "^4.0.0",
+        "hs-ssi-sdk": "github:hypersign-protocol/hid-ssi-js-sdk#develop",
         "jdenticon": "^2.2.0",
         "lodash-es": "^4.17.15",
         "qrcode.vue": "^1.6.3",
@@ -98,7 +103,7 @@
         "cypress": "^4.12.1",
         "dotenv-webpack": "^7.0.3",
         "ejs": "^2.7.1",
-        "eslint": "^5.16.0",
+        "eslint": "^7.32.0",
         "eslint-config-airbnb-base": "^13.2.0",
         "eslint-config-prettier": "^3.1.0",
         "eslint-friendly-formatter": "^4.0.1",

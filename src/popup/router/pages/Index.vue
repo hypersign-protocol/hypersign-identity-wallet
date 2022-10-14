@@ -6,35 +6,8 @@
     
         <div v-else class="not-iframe">
           <img src="../../../icons/hypersign-logo.png" :class="{ logo: !IS_WEB }" />
-          <!-- <Component :is="IS_WEB ? 'SuperheroLogo' : 'Logo'" :class="{ logo: !IS_WEB }" /> -->
-          <!-- <span :class="{ blue: IS_WEB }" class="heading-color">
-            {{ $t('pages.index.heading') }}
-          </span>
-          <template v-if="IS_WEB">
-            <Platforms class="heading-color">
-              {{ $t('pages.index.platforms.heading') }}
-            </Platforms>
-            <span class="heading-color">{{ $t('pages.index.webVersion') }}</span>
-          </template> -->
         </div>
         
-        <!-- <div class="">
-          <Input
-            placeholder="Name"
-            label=""
-            v-model="profile.name"
-            :disabled="ifAllDisabled"
-          />
-          <Input
-            placeholder="Email"
-            label=""
-            v-model="profile.email"
-            :disabled="ifAllDisabled"
-          /></div>
-        <Button @click="createWallet" data-cy="generate-wallet">
-          {{ $t('pages.index.generateWallet') }}
-        </Button>
-        <label class="or-label">OR</label>-->
         <Button @click="loginWithGoogle" data-cy="login-with-google">
           Continue with Google
         </Button>
@@ -59,10 +32,12 @@ import Platforms from '../components/Platforms';
 import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import Input from '../components/Input-light';
 import registration from '../../../mixins/registration';
-import HypersignSsiSDK from 'hs-ssi-sdk';
-import { HS_NODE_BASE_URL, WALLET_TYPE, HYPERSIGN_AUTH_PROVIDER } from '../../utils/hsConstants'
+import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST,  HIDNODE_NAMESPACE} from '../../utils/hsConstants'
 import  webAuth from "../../utils/auth0Connection";
-
+import hidWalletInstance from '../../utils/hidWallet';
+import {generateMnemonicToHDSeed} from '../../utils/SSIWallet';
+// import HypersignSsiSDK  from 'hs-ssi-sdk'
+const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
   mixins: [registration],
@@ -87,6 +62,7 @@ export default {
     if(authToken && accessToken){
       const provider = localStorage.getItem("provider"); 
       if(provider) this.isProviderPresent = true;
+      this.loading = true;
        webAuth.client.userInfo(accessToken, function(err, user) {
               if(err){
                 that.loading = false;
@@ -97,13 +73,11 @@ export default {
                 that.profile.email = email;
                 that.profile.name = name;
                 that.isThridPartyAuth = true;
-
                 // localStorage.removeItem("authToken")
                 // localStorage.removeItem("accessToken")
                 localStorage.removeItem("isRoute")
                 that.createWallet();
-        })
-      
+        })      
     } else {
       const queryDataFromServiceProviderStr = localStorage.getItem("qrDataQueryUrl");
       if(queryDataFromServiceProviderStr){
@@ -131,7 +105,7 @@ export default {
         webAuth.authorize(
           {
             connection: "google-oauth2",  
-            redirectUri: window.location.origin + "/auth/google?"
+             redirectUri: window.location.origin + "/auth/google?"
           });
 
     },
@@ -148,80 +122,75 @@ export default {
         if(this.profile.name == "") throw new Error("Name can not be blank");
         if(this.profile.email == "") throw new Error("Email can not be blank");
         if(!this.isemail(this.profile.email)) throw new Error("Enter a valid email address");
-
-
       }catch(e){
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+        this.loading = false;
         return;
       }
+
+      this.loading = true;
+      /// Generate HID wallet and recharge it using faucet
+      this.mnemonic = generateMnemonic(); 
+      await hidWalletInstance.generateWallet(this.mnemonic);
+
       
-      const hsSdk = new HypersignSsiSDK({ nodeUrl: HS_NODE_BASE_URL }); 
-      this.mnemonic = generateMnemonic();
-    
+      // console.log('before rechargewallet')
+      //  await hidWalletInstance.rechargeWallet(); 
+
+      /// Use the HID wallet with SSI sdk
+      console.log({
+        HIDNODE_NAMESPACE
+      })
+      const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+      await hsSdk.init();
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
+      const address = await hidWalletInstance.getWalletAddress();  
       
-      const address = await this.$store.dispatch('generateWallet', { seed });
       this.$store.commit('setMnemonic', this.mnemonic);
       const keypair = {
         publicKey: address,
         privateKey: seed,
-      };
-      // console.log(keypair)
+      }
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
       try {
-        this.loading = true;
-        // We will not use native aeternity keys, instead will use hypersign keys.
-        // The reason to do this, because giving flexibility to use different algorithm for keys
-        // const newKeyPair = await hypersignSDK.did.generateKeys({seed});  
-        // if(!newKeyPair)       throw Error('Error: could not generate keypair');
-        // console.log(newKeyPair);
-        // const hskeys = {
-        //   publicKey: newKeyPair.publicKey.publicKeyBase58,
-        //   privateKey: newKeyPair.privateKeyBase58,
-        // };
-        // if(!hskeys.publicKey)  throw new Error('Error: Public key is empty')
-        // const HS_CORE_DID_REGISTER = `${HS_NODE_BASE_URL}${HS_NODE_DID_REGISTER_API}`;
-        // //console.log(HS_CORE_DID_REGISTER);
-        // let result = await axios.get(`${HS_CORE_DID_REGISTER}?publicKey=${hskeys.publicKey}`)//.then(result => result.json());
-        // console.log(result)
-        // result = result.data;
-        // if (!result) throw new Error('Could not fetch from hypersign');
-        // if (result && result.error) throw new Error(result.error);
-        
-        // const { keys, did } = result.message;
-        // keys['privateKeyBase58'] = hskeys.privateKey;
-        // console.log(this.profile)
-        // console.log('Before getting did')
-        // console.log(hsSdk.did)
-        const response1  = await hsSdk.did.getDid({user: { name: this.profile.name }});
-        // console.log(response1);
-        const {didDoc, keys, did} = response1
-        // console.log({didDoc, keys, did})
+        const seedHd=await generateMnemonicToHDSeed(this.mnemonic);
+        const kp=await hsSdk.did.generateKeys({seed:seedHd});
 
-        // console.log('Before calling register')
-        const res = await hsSdk.did.register(didDoc);
-        // console.log(2)
-        // console.log('After registration')
+        const privateKeyMultibase = kp.privateKeyMultibase
+        const publicKeyMultibase = kp.publicKeyMultibase
+
+        const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
+        // const didDoc = JSON.parse(didDocString);
+
+        const did  = didDoc.id;
+        const verificationMethodId = didDoc['verificationMethod'][0].id;        
+        // const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
+
+        // if(!result){
+        //   throw new Error("Could not register the did");
+        // }
+
+        // const { transactionHash } =  result;
+        // if(!transactionHash) {
+        //   throw new Error("Could not register the did");
+        // }
 
         this.profile.did = did;
-        // console.log(3)
         this.$store.commit('setHSkeys', {
-          keys,
+          keys: kp,
           did,
+          didDoc,
+          status: "private",
+          hdPathIndex: 0, // TODO remove hardcoded path index
+          selected: true // true/false
         });
 
-        
-        // this.$store.commit('switchLoggedIn', true);
-        // this.$store.commit('updateAccount', keypair);
-        // this.$store.commit('setActiveAccount', { publicKey: keypair.publicKey, index: 0 });
-        // console.log("Before setting profile")
         if(await this.setupProfile(this.isThridPartyAuth)){
-            // console.log("After setting profile");
-            // console.log("Calling setLogin")
             await this.$store.dispatch('setLogin', { keypair });
-            this.$store.commit('switchLoggedIn', true);
 
+            this.$store.commit('switchLoggedIn', true);
+            
             if(!this.isThridPartyAuth){
               const msg = 'An email with a QR code has been sent to the address you provided.\
               Scan the QR code to receieve the credential'
@@ -229,7 +198,6 @@ export default {
             }
 
             Object.assign(this.profile, {});
-            // console.log("Moving to next rout/e")
             this.$router.push(this.$store.state.loginTargetLocation);
         }else{
           throw new Error("Could not setup profile");
@@ -239,7 +207,7 @@ export default {
         console.log(e);
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
         this.loading = false;
-      }finally{
+      } finally {
         this.loading = false;
       }
       ////HYPERSIGN Related

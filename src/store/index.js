@@ -65,6 +65,8 @@ const initialState = {
         profile: {},
         hsAuthDID: "",
         thridPartyAuths: []
+        dids: {
+        }
     },
 };
 

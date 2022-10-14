@@ -54,6 +54,16 @@
         "insufficient-balance": {
             "msg": "You do not have enough balance for this transaction."
         },
+        "changeDid":{
+            "msg": "This operation requires public did, select a public did from your did list. Are you sure you want to continue?",
+            "title":"Select a public did"
+        },
+        
+        
+        "registerDid": {
+            "msg": "This action will register you did on the blockchain. This action cannot be undone!",
+            "title": "Are you sure you want to register this did?"
+        },
         "removeAccount": {
             "title": "Are you sure you want to remove this account?",
             "msg": "This action will remove your account from the wallet and will delete the extension storage. Make sure you have backed up your seed phrase before proceeding. This action cannot be undone!"
@@ -226,6 +236,11 @@
             "sign-message": "Sign Message",
             "invite": "Invite",
             "profile": "Profile",
+            "transactions": "My transactions",
+            "Did": "DIDs",
+            "DidsDetails": "Did Details",
+            "transactionDetails": "Transaction Details",
+            "transfer": "Transfer",
             "credential": "Credentials",
             "credentialDetails": "Credential Details",
             "credentialDetailsTemp": "Credential Offer",
@@ -244,10 +259,11 @@
             "settings": "Settings",
             "logout": "Logout",
             "profile": "Profile",
+            "transfer": "Transfer",
             "help": "Help",
             "topUp": "Top Up",
             "withdraw": "Withdraw",
-            "myTransactions": "My transactions",
+            "myTransactions": "Txns",
             "activity": "Activity",
             "dashboard": "Dashboard",
             "aeid": "AE",
@@ -269,7 +285,8 @@
             "tokens": "Fungible tokens",
             "manageTokens": "Manage tokens",
             "invite": "Invite",
-            "credential": "Credential"
+            "credential": "Credential",
+            "Did": "DIDs"
         },
         "aboutSettings": {
             "heading": "About",
@@ -1020,7 +1037,8 @@
     },
     "phishing": {
         "detection": "Hypersign Phishing Detection",
-        "sections": [{
+        "sections": [
+            {
                 "text": "This domain is currently on the Hypersign domain warning list. This means that based on information available to us, Hypersign believes this domain could currently compromise your security and, as an added safety feature, Hypersign has restricted access to the site. To override this, please read the rest of this warning for instructions on how to continue at your own risk."
             },
             {

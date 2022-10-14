@@ -24,7 +24,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import {toFormattedDate, toStringShorner} from '../../utils/helper'
+import {toFormattedDate, toStringShorner} from '../../utils/helper';
+import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
+
 export default {
   components: { QrIcon },
   data() {
@@ -49,8 +51,8 @@ export default {
           this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate) ;
           this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
           this.credDetials.formattedSchemaName =  this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
-          const credentialSchemaUrl = this.verifiableCredential['@context'][1].hsscheme;
-          this.credDetials.schemaId = toStringShorner(credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim(),32, 15);
+          const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
+          this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(),32, 15);
           this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
   },
@@ -102,7 +104,7 @@ max-height: 700px;
   border-radius: 14px;
   margin-top: 7%;
   text-align: left;
-  font-size: small;
+  font-size: 13px;
   color: gray;
   padding-top: 7%;
 }

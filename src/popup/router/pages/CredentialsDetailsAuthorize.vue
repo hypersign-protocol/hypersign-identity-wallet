@@ -33,19 +33,27 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
-import { hypersignSDK } from '../../utils/hypersign';
+import hidWalletInstance from '../../utils/hidWallet';
+import {  HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE  } from '../../utils/hsConstants'
+
+
+
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
+// import HypersignSSISdk from 'hs-ssi-sdk';
+const HypersignSSISdk = require('hs-ssi-sdk');
+import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 
 export default {
   components: { QrIcon,CloseIcon,VerifiedIcon },
   data() {
     return {
+      hsSDK: null,
       verifiableCredential: {},
       claims: [],
       loading: false,
@@ -61,10 +69,18 @@ export default {
   beforeDestroy() {
     this.reject()
   },
-  created() {
+  async created() {
+    await hidWalletInstance.generateWallet(this.mnemonic);
+    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+    await this.hsSDK.init();
+
     const credentialId = this.$route.params.credentialId;
+
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
+      if(!this.verifiableCredential){
+        throw new Error('No credenital foud with id - ' + credentialId)
+      }
       this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate) ;
       this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate) ;
       this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
@@ -80,12 +96,13 @@ export default {
   },
   computed: {
     ...mapGetters(['hypersign']),
+    ...mapState(['mnemonic'])
   },
   methods: {    
     async authorize() {
       try {
-        const credentialSchemaUrl = this.verifiableCredential['@context'][1].hsscheme;
-        const credentialSchemaId = credentialSchemaUrl.substr(credentialSchemaUrl.indexOf("sch_")).trim();
+        const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
+        const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);        
             let { serviceEndpoint, schemaId, challenge } = this.hypersign.requestingAppInfo;
             if(schemaId != credentialSchemaId) throw new Error('Invalid credential request: Requesting schema does not exist. Make sure you register first to get credential');
             const url = Url(serviceEndpoint, true);
@@ -95,22 +112,24 @@ export default {
             }
             this.loading= true;
             const verifyUrl = url.origin + url.pathname;
-            const vp_unsigned = await hypersignSDK.credential.generatePresentation(
-              this.verifiableCredential,
-              this.hypersign.did,
+            const vp_unsigned = await this.hsSDK.vp.getPresentation(
+              {verifiableCredentials: [this.verifiableCredential],
+              holderDid:  this.hypersign.did}
             );
-          
-            const vp_signed = await hypersignSDK.credential.signPresentation(
-              vp_unsigned,
-              this.hypersign.did,
-              this.hypersign.keys.privateKeyBase58,
-              challenge,
+            const verificationMethodId=this.hypersign.did + '#key-1';
+            const vp_signed = await this.hsSDK.vp.signPresentation(
+             { presentation: vp_unsigned,
+                holderDidDocSigned: this.hypersign.didDoc,
+               privateKey: this.hypersign.keys.privateKeyMultibase,
+               challenge,
+                verificationMethodId
+              }
             );
 
-            // console.log('Signed vp created..');
             const body = {
               challenge,
               vp: JSON.stringify(vp_signed),
+              holderDidDocSigned: JSON.stringify( this.hypersign.didDoc),
             };
 
             const response = await axios.post(verifyUrl, body);
@@ -174,7 +193,7 @@ export default {
   border-radius: 14px;
   margin-top: 7%;
   text-align: left;
-  font-size: small;
+  font-size: 13px;
   color: gray;
   padding-top: 7%;
 }

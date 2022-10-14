@@ -1,13 +1,8 @@
-const hsdk = require('hs-ssi-sdk');
-const { HS_NODE_BASE_URL } = require('./hsConstants')
-
-const options = { nodeUrl: HS_NODE_BASE_URL};
-const hsSSISdk =  new hsdk(options); 
-// console.log(hsSSISdk)
-
-
-export const hypersignSDK = {
-    did: hsSSISdk.did,
-    credential: hsSSISdk.credential
-};
+export function getSchemaIdFromSchemaUrl(schemaUrl) {
+    if (!schemaUrl) throw new Error('SchemaUrl must be passed')
+    const schUrl = new URL(schemaUrl)
+    const t = schUrl.pathname.split('/hypersign-protocol/hidnode/ssi/schema/');
+    const schemaID = schemaUrl.endsWith(':') ? t[1].substring(0, t[1].length - 1)  : t[1];
+    return schemaID
+}
 
