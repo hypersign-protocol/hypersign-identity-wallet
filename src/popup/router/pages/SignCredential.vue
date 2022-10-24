@@ -74,7 +74,7 @@ export default {
     "subjectDid": "did:hs:z7N1g3x7vHkwXPH8DjPoNyyQoxndhqXLjpwqARmQz9iW5"
   }
 }
-*/        
+*/
         this.credentialRaw = this.hypersign.requestingAppInfo.data;
         await hidWalletInstance.generateWallet(this.mnemonic);
         this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
@@ -97,7 +97,7 @@ export default {
             if(!subjectDid){
                 throw new Error('subject did is missing')
             }
-            
+
             if(!schemaId){
                 throw new Error('schemaId is missing')
             }
@@ -115,9 +115,87 @@ export default {
                 fields
             })
         },
-        async signAndSendToBlockchain(){
-            try{
+        async updateCredentialStatus() {
+            try {
+
+                /**
+                 * {
+                        "QRType":"ISSUE_CREDENTIAL",
+                        "serviceEndpoint":"https://stage.hypermine.in/studioserver/api/v1/credential/status/63565236c1d75e9aa41f7e59",
+                        "schemaId":"",
+                        "appDid":"",
+                        "appName":"Hypersign Studio",
+                        "challenge":"",
+                        "provider":"",
+                        "data":{
+                            "fields":{
+                                "tedst":"DOWN"
+                            },
+                            "schemaId":"sch:hid:testnet:zCdhEJ4bspo4DzzA9jm7bCVigQkKi2HFJ6C2VPsQqjvuE:1.0",
+                            "issuerDid":"did:hid:testnet:zCSBdntYoBUBkoJDwPzve2s6RjURZNNntJL4u7THtv6u9",
+                            "subjectDid":"did:hid:testnet:z4SozwovkEeQcxGbZhYmYydVTDHgodJKD7X2n7k3rVM3J",
+                            "expiryDate":"2022-10-26 11:28:00",
+                            "orgDid":"63494e0ba0195d49920b22bd",
+                            "expirationDate":"2022-10-26T11:28:00.000Z",
+                            "status": 'SUSPENDED',
+                            "vcId":'vc:test:.............'
+                            "credentialStatusUrl":'',
+    
+                        }
+                        }
+                */
+                if (!this.credentialRaw.data.vcId) {
+                    throw new Error('vcId is missing while updating credential status')
+                    return
+                }
+                if (!this.credentialRaw.data.credentialStatusUrl) {
+                    throw new Error('credentialStatusUrl is missing while updating credential status')
+                    return
+                }
+                if (this.hypersign.did.id !== this.credentialRaw.data.issuerDid) {
+                    throw new Error('You are not the issuer of this credential')
+                    return
+                }
+                let credential
+
+                if (this.credentialRaw.data.status === 'REVOKED' || this.credentialRaw.data.status === 'SUSPENDED') {
+                    credential = await axios.get(this.credentialRaw.data.credentialStatusUrl)
+                    // if vc is not found then throw error
+                    if (!credential || credential === undefined) {
+                        throw new Error('credential not found in the revocation registry')
+                        return
+                    }
+                } else {
+                    throw new Error('Invalid status while updating credential status')
+                const privateKey = this.hypersign.keys.privateKeyMultibase
+                const issuerDid = this.hypersign.did
+                const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id
+                // update the credential status
+                const updatedCredential = await this.hsSDK.vc.updateCredentialStatus({
+                    credential,
+                    privateKey,
+                    issuerDid,
+                    verificationMethodId,
+                    status: this.credentialRaw.data.status
+                })
+                if (updatedCredential) {
+                    this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Updated Credential' });
+                }
+                }
+            } catch (e) {
+                console.log(e)
+                this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
+            }
+        },
+        async signAndSendToBlockchain() {
+            try {
                 this.loading = true;
+                // chcek is status is passed here   in Credential Raw
+                if (this.credentialRaw.status) {
+                    // update the status of the credential
+                    await this.updateCredentialStatus();
+                    return
+                }
                 const vc = await this.prepareCredential();
                 const result = await this.hsSDK.vc.issueCredential({
                     credential: vc,
