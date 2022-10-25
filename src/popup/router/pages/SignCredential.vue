@@ -1,34 +1,39 @@
 
 <template>
-  <div class="popup">
-    <div>
-      <div class="">
-        <div class="appInfo">
-          <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
-            is requesting to sign the following</p>
-          <p>{{ JSON.stringify(this.credentialRaw) }}</p>
+    <div class="popup">
+        <div>
+            <div class="">
+                <div class="appInfo">
+                    <p>This organisation <span style="font-style:oblique">{{ hypersign.requestingAppInfo.appName
+                    }}</span>
+                        is requesting to sign the following</p>
+                    <p>{{ JSON.stringify(this.credentialRaw) }}</p>
+                </div>
+            </div>
+            <div class="scanner d-flex">
+                <Button class="scan" data-cy="scan-button" @click="signAndSendToBlockchain()">
+                    <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
+                            $t('pages.credential.authorize')
+                    }}</span>
+                </Button>
+            </div>
+            <div class="scanner d-flex">
+                <Button class="scan" data-cy="scan-button" @click="reject()">
+                    <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
+                            $t('pages.credential.decline')
+                    }}</span>
+                </Button>
+            </div>
         </div>
-      </div>
-      <div class="scanner d-flex">
-        <Button class="scan"  data-cy="scan-button" @click="signAndSendToBlockchain()">
-          <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
-        </Button>
-      </div>
-      <div class="scanner d-flex">
-        <Button class="scan"  data-cy="scan-button" @click="reject()">
-          <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
-        </Button>
-      </div>
+        <Loader v-if="loading" />
     </div>
-    <Loader v-if="loading" />    
-  </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
 import hidWalletInstance from '../../utils/hidWallet';
 const HypersignSSISdk = require('hs-ssi-sdk');
-import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE  } from '../../utils/hsConstants';
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
@@ -41,18 +46,18 @@ export default {
         ...mapGetters(['hypersign']),
         ...mapState(['mnemonic'])
     },
-    components: { QrIcon,CloseIcon,VerifiedIcon },
+    components: { QrIcon, CloseIcon, VerifiedIcon },
     beforeDestroy() {
         this.reject()
     },
     data() {
         return {
             hsSDK: null,
-            loading:  false,
+            loading: false,
             credentialRaw: ''
         }
     },
-    async created(){
+    async created() {
         // get the schemadata to sign from route
         /*
 {
@@ -82,27 +87,27 @@ export default {
         // await this.signAndSendToBlockchain();
     },
     methods: {
-        async reject () {
+        async reject() {
             this.$store.commit('clearRequestingAppInfo');
             this.$router.push('/account');
         },
-        async prepareCredential(){
+        async prepareCredential() {
             // using hs-ssi-sdk to g
-            const schemaOptions = this.credentialRaw; 
-            const { fields,  subjectDid, schemaId, expirationDate } = this.credentialRaw;
-            if(!fields){
+            const schemaOptions = this.credentialRaw;
+            const { fields, subjectDid, schemaId, expirationDate } = this.credentialRaw;
+            if (!fields) {
                 throw new Error('field is missing')
             }
 
-            if(!subjectDid){
+            if (!subjectDid) {
                 throw new Error('subject did is missing')
             }
 
-            if(!schemaId){
+            if (!schemaId) {
                 throw new Error('schemaId is missing')
             }
 
-            if(!expirationDate){
+            if (!expirationDate) {
                 throw new Error('expirationDate is missing')
             }
 
@@ -144,49 +149,52 @@ export default {
                         }
                         }
                 */
-                if (!this.credentialRaw.data.vcId) {
+                if (!this.credentialRaw.vcId) {
                     throw new Error('vcId is missing while updating credential status')
-                    return
+
                 }
-                if (!this.credentialRaw.data.credentialStatusUrl) {
+                if (!this.credentialRaw.credentialStatusUrl) {
                     throw new Error('credentialStatusUrl is missing while updating credential status')
-                    return
+
                 }
-                if (this.hypersign.did.id !== this.credentialRaw.data.issuerDid) {
+                if (this.hypersign.did.id !== this.credentialRaw.issuerDid) {
                     throw new Error('You are not the issuer of this credential')
-                    return
                 }
                 let credential
 
-                if (this.credentialRaw.data.status === 'REVOKED' || this.credentialRaw.data.status === 'SUSPENDED') {
-                    credential = await axios.get(this.credentialRaw.data.credentialStatusUrl)
+                if (this.credentialRaw.status === 'REVOKED' || this.credentialRaw.status === 'SUSPENDED') {
+                    credential = await axios.get(this.credentialRaw.credentialStatusUrl)
+                    credential = credential.data    
                     // if vc is not found then throw error
                     if (!credential || credential === undefined) {
                         throw new Error('credential not found in the revocation registry')
-                        return
+
                     }
-                } else {
-                    throw new Error('Invalid status while updating credential status')
-                const privateKey = this.hypersign.keys.privateKeyMultibase
-                const issuerDid = this.hypersign.did
-                const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id
-                // update the credential status
-                const updatedCredential = await this.hsSDK.vc.updateCredentialStatus({
-                    credential,
-                    privateKey,
-                    issuerDid,
-                    verificationMethodId,
-                    status: this.credentialRaw.data.status
-                })
-                if (updatedCredential) {
-                    this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Updated Credential' });
-                }
+                    else {
+                        const privateKey = this.hypersign.keys.privateKeyMultibase
+                        const issuerDid = this.hypersign.did
+                        const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id
+                        // update the credential status
+                        const updatedCredential = await this.hsSDK.vc.updateCredentialStatus({
+                            credStatus:credential.credStatus,
+                            privateKey,
+                            issuerDid,
+                            verificationMethodId,
+                            status: this.credentialRaw.status
+                        })
+
+                        if (updatedCredential) {
+                            this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Updated Credential' });
+                        }
+                    }
                 }
             } catch (e) {
                 console.log(e)
                 this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
             }
+
         },
+
         async signAndSendToBlockchain() {
             try {
                 this.loading = true;
@@ -201,39 +209,39 @@ export default {
                     credential: vc,
                     issuerDid: this.hypersign.did,
                     privateKey: this.hypersign.keys.privateKeyMultibase,
-                    verificationMethodId:this.hypersign.didDoc.id+'#key-1'
+                    verificationMethodId: this.hypersign.didDoc.id + '#key-1'
                 })
 
                 if (result) {
                     this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Issued Credential' });
                     /// call the sutatus API of the studio/dappp server to for updating the status in db.
                     const { serviceEndpoint } = this.hypersign.requestingAppInfo;
-                    if(serviceEndpoint){
-                        try{
+                    if (serviceEndpoint) {
+                        try {
                             const body = {
-                                transactionHash:  result.transactionHash,
+                                transactionHash: result.transactionHash,
                                 vc,
                             }
                             axios.post(serviceEndpoint, body).then(response => {
-                                if(response && response.status === 200){
+                                if (response && response.status === 200) {
                                     console.log('Successfully sent result to serviceEndpoint')
                                 } else {
                                     console.log("Could not sent result to serviceEndpoint")
                                 }
                             }).catch(e => {
-                                console.error(e)    
+                                console.error(e)
                             })
-                            
-                        }catch(e){
+
+                        } catch (e) {
                             console.error(e)
                             this.loading = false;
                         }
-                        
-                    }else{
+
+                    } else {
                         console.log('No serviceEndpoint available.')
                     }
                 }
-            }catch(e){
+            } catch (e) {
                 console.log(e)
                 this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
             } finally {
