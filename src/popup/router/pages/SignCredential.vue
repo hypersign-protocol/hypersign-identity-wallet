@@ -7,7 +7,7 @@
                     <p>This organisation <span style="font-style:oblique">{{ hypersign.requestingAppInfo.appName
                     }}</span>
                         is requesting to sign the following</p>
-                    <p>{{ JSON.stringify(this.credentialRaw) }}</p>
+                    <textarea>{{ JSON.stringify(this.credentialRaw,null,2) }}</textarea>
                 </div>
             </div>
             <div class="scanner d-flex">
@@ -28,6 +28,13 @@
         <Loader v-if="loading" />
     </div>
 </template>
+<style>
+textarea{        
+    overflow-y: scroll;
+    height: 40vh;
+    width: 100%;
+    resize: none;
+}</style>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
@@ -120,6 +127,9 @@ export default {
                 fields
             })
         },
+        async checkCredentialStatus(url){
+            return await axios.get(url);
+        },
         async updateCredentialStatus() {
             try {
 
@@ -163,7 +173,7 @@ export default {
                 let credential
 
                 if (this.credentialRaw.status === 'REVOKED' || this.credentialRaw.status === 'SUSPENDED') {
-                    credential = await axios.get(this.credentialRaw.credentialStatusUrl)
+                    credential = await this.checkCredentialStatus(this.credentialRaw.credentialStatusUrl);  
                     credential = credential.data    
                     // if vc is not found then throw error
                     if (!credential || credential === undefined) {
@@ -175,7 +185,7 @@ export default {
                         const issuerDid = this.hypersign.did
                         const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id
                         // update the credential status
-                        const updatedCredential = await this.hsSDK.vc.updateCredentialStatus({
+                        const result = await this.hsSDK.vc.updateCredentialStatus({
                             credStatus:credential.credStatus,
                             privateKey,
                             issuerDid,
@@ -183,8 +193,34 @@ export default {
                             status: this.credentialRaw.status
                         })
 
-                        if (updatedCredential) {
+                        if (result) {
                             this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully Updated Credential' });
+                            const { serviceEndpoint } = this.hypersign.requestingAppInfo;
+                                if (serviceEndpoint) {
+                                    try {
+                                        const credentialStatus= await this.checkCredentialStatus(this.credentialRaw.credentialStatusUrl);
+                                        const body = {
+                                            transactionHash: result.transactionHash,
+                                            credStatus:credentialStatus.data.credStatus,
+                                        }
+                                        axios.post(serviceEndpoint, body).then(response => {
+                                            if (response && response.status === 200) {
+                                                console.log('Successfully sent result to serviceEndpoint')
+                                            } else {
+                                                console.log("Could not sent result to serviceEndpoint")
+                                            }
+                                        }).catch(e => {
+                                            console.error(e)
+                                        })
+
+                                    } catch (e) {
+                                        console.error(e)
+                                        this.loading = false;
+                                    }
+
+                                } else {
+                                    console.log('No serviceEndpoint available.')
+                                }
                         }
                     }
                 }
