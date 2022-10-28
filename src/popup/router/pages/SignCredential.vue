@@ -167,14 +167,26 @@ export default {
                     throw new Error('credentialStatusUrl is missing while updating credential status')
 
                 }
-                if (this.hypersign.did.id !== this.credentialRaw.issuerDid) {
+                if (this.hypersign.did !== this.credentialRaw.issuerDid) {
                     throw new Error('You are not the issuer of this credential')
                 }
                 let credential
 
-                if (this.credentialRaw.status === 'REVOKED' || this.credentialRaw.status === 'SUSPENDED') {
+                if (this.credentialRaw.status === 'REVOKED' || this.credentialRaw.status === 'SUSPENDED'||this.credentialRaw.status === 'LIVE') {
                     credential = await this.checkCredentialStatus(this.credentialRaw.credentialStatusUrl);  
                     credential = credential.data    
+                    const status=credential.credStatus.claim.currentStatus.toUpperCase();
+                    console.log('status',status);
+                    if(status === 'REVOKED' || status==="EXPIRED"){
+                        throw new Error('Credential is already '+status.toLowerCase())
+                    }
+                    if(status === 'SUSPENDED' && this.credentialRaw.status === 'SUSPENDED'){
+                        throw new Error('Credential is already '+status.toLowerCase())
+                    }
+                    
+                    if(status === 'LIVE' && this.credentialRaw.status === 'LIVE'){
+                        throw new Error('Credential is already '+status.toLowerCase())
+                    }
                     // if vc is not found then throw error
                     if (!credential || credential === undefined) {
                         throw new Error('credential not found in the revocation registry')
@@ -223,6 +235,8 @@ export default {
                                 }
                         }
                     }
+                }else{
+                    throw new Error('Invalid status')
                 }
             } catch (e) {
                 console.log(e)
