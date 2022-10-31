@@ -202,7 +202,8 @@ export default {
                             privateKey,
                             issuerDid,
                             verificationMethodId,
-                            status: this.credentialRaw.status
+                            status: this.credentialRaw.status,
+                            statusReason: this.credentialRaw.statusReason
                         })
 
                         if (result) {
