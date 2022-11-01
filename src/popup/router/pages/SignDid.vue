@@ -111,9 +111,9 @@ export default {
                 }
 
                 //// If the issuer DID is not present then add issue DID as well.
-                if(!controllers.find(x => x === this.hypersign.did)){
-                    controllers.unshift(this.hypersign.did)
-                }
+                // if(!controllers.find(x => x === this.hypersign.did)){
+                //     controllers.unshift(this.hypersign.did)
+                // }
 
                 // Assigning issuer as controller of this DID
                 // This sohuld have been done at SDK, issue created for this.
