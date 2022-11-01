@@ -85,7 +85,7 @@ class HIDWallet {
         }
         const walletAddress = await this.getWalletAddress();
         const client = await SigningStargateClient.connectWithSigner(HIDNODE_RPC, this.offlineSigner, {
-            gasPrice: "0.0001uhid"
+            gasPrice: "0.1uhid"
         });
 
 
