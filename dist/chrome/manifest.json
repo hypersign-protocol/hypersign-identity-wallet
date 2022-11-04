@@ -1,7 +1,7 @@
 {
   "name": "Hypersign",
   "description": "Hypersign Wallet",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "manifest_version": 2,
   "permissions": [
     "storage",
@@ -26,7 +26,7 @@
     "48": "./icons/icon_48.png",
     "128": "./icons/icon_128.png"
   },
-  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "browser_action": {
     "default_title": "Hypersign",
     "default_popup": "popup/popup.html"

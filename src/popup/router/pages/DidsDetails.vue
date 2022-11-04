@@ -109,7 +109,14 @@ export default {
     },
     async register() {
       try {
-        
+          await hidWalletInstance.generateWallet(this.mnemonic);
+            const balance= await hidWalletInstance.getBalance()
+            console.log(balance);
+            if(balance<49999){
+              this.$store.dispatch('modals/open', { name: 'default', msg: 'Insufficient balance. Buy HID and try again' });
+              this.loading = false;
+              return;
+            }
           const register = await this.$store
             .dispatch('modals/open', {
               name: 'confirm',
@@ -118,10 +125,7 @@ export default {
             }).catch(() => false);
           if (register) {
             this.$emit('closeMenu');
-
-            this.loading = true;
-
-            await hidWalletInstance.generateWallet(this.mnemonic);
+            this.loading = true;            
             const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
             await hsSdk.init();
             const verificationMethodId = this.didDoc.id + '#key-1';

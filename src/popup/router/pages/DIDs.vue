@@ -73,11 +73,13 @@ export default {
   },
 
   methods: {
-    async generateNewDid() {
+    async generateNewDid(index = -1) {
       try {
         this.loading = true;
-        const hdIndex=Object.keys(this.hypersign.dids).length
-        
+        let hdIndex=this.hypersign.dids[Object.keys(this.hypersign.dids).at(-1)].hdPathIndex!==undefined?(this.hypersign.dids[Object.keys(this.hypersign.dids).at(-1)].hdPathIndex) + 1:0;
+        if(index!==-1){
+          hdIndex=index;
+        }        
         await hidWalletInstance.generateWallet(this.mnemonic);
         const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
         await hsSdk.init();
@@ -87,6 +89,10 @@ export default {
         const publicKeyMultibase = kp.publicKeyMultibase
 
         const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
+        if(didDoc.id.split(":").at(-1).length!==45){
+          console.log("DID length is not 45. Trying again with index "+ (hdIndex+1));
+          return this.generateNewDid(hdIndex+1);
+        }
         this.$store.commit('setHSkeys', {
           keys: kp,
           did: didDoc.id,

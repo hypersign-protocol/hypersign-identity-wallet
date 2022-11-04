@@ -6,7 +6,7 @@
         <div class="appInfo">
           <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
           is requesting to sign the following</p>
-          <p>{{ JSON.stringify(this.didRaw) }}</p>
+          <textarea>{{ JSON.stringify(this.didRaw,null,2) }}</textarea>
         </div>
       </div>
       <div class="scanner d-flex">
@@ -23,6 +23,13 @@
     <Loader v-if="loading" />    
   </div>
 </template>
+<style>
+ textarea{        
+        overflow-y: scroll;
+        height: 40vh;
+        width: 100%;
+        resize: none;
+    }</style>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
@@ -104,9 +111,9 @@ export default {
                 }
 
                 //// If the issuer DID is not present then add issue DID as well.
-                if(!controllers.find(x => x === this.hypersign.did)){
-                    controllers.unshift(this.hypersign.did)
-                }
+                // if(!controllers.find(x => x === this.hypersign.did)){
+                //     controllers.unshift(this.hypersign.did)
+                // }
 
                 // Assigning issuer as controller of this DID
                 // This sohuld have been done at SDK, issue created for this.
