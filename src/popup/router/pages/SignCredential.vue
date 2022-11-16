@@ -168,7 +168,8 @@ export default {
                     throw new Error('credentialStatusUrl is missing while updating credential status')
 
                 }
-                if (this.hypersign.did !== this.credentialRaw.issuerDid) {
+                const orgDid=await this.hsSDK.did.resolve({did: this.credentialRaw.issuerDid})
+                if (orgDid.didDocument.controller.includes(this.credentialRaw.orgDid)) {
                     throw new Error('You are not the issuer of this credential')
                 }
                 let credential
