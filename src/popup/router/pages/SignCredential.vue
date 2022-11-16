@@ -101,7 +101,8 @@ export default {
         async prepareCredential() {
             // using hs-ssi-sdk to g
             const schemaOptions = this.credentialRaw;
-            const { fields, subjectDid, schemaId, expirationDate } = this.credentialRaw;
+            const { fields, subjectDid, schemaId, expirationDate ,issuerDid } = this.credentialRaw;
+            console.log("Credential to sign",  this.credentialRaw);
             if (!fields) {
                 throw new Error('field is missing')
             }
@@ -122,7 +123,7 @@ export default {
                 schemaId,
                 // subjectDidDocSigned:this.hypersign.didDoc ,
                 subjectDid,
-                issuerDid: this.hypersign.did,
+                issuerDid,
                 expirationDate,
                 fields
             })

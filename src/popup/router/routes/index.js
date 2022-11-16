@@ -24,6 +24,7 @@ import TransactionDetails from '../pages/TransactionDetails';
 import SignSchema from '../pages/SignSchema';
 import SignCredential from '../pages/SignCredential';
 import SignDid from '../pages/SignDid';
+import UpdateDid from '../pages/UpdateDid';
 
 import Profile from '../pages/Profile';
 import Transfer from '../pages/Transfer';
@@ -82,6 +83,13 @@ export default [{
         path: "/signdid", // sign schema
         name: "SignDid",
         component: SignDid,
+        meta: {
+            title: 'SignDid',
+        },
+    }, {
+        path: "/updatedid", // sign schema
+        name: "UpdateDid",
+        component: UpdateDid,
         meta: {
             title: 'SignDid',
         },

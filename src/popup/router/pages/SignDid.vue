@@ -128,14 +128,13 @@ export default {
                 didDoc.alsoKnownAs = [];
                 didDoc.service = []
 
-                console.log(controllers)
                 for(let i=0; i < controllers.length; i++){
 
                     const controllerDid = controllers[i]
-                    if(controllerDid){
-                        console.log('Resolve did controllerDid = ' + controllerDid);
-                        // const { didDocument } = await this.hsSDK.did.resolve({did: controllerDid})
-                        const didDocument = this.hypersign.didDoc;
+                    if(controllerDid !==undefined && controllerDid !== null && controllerDid !== ''){
+                        const { didDocument } = await this.hsSDK.did.resolve({did: controllerDid})
+                        // const didDocument = this.hypersign.didDoc;
+
                         didDoc.controller.push(didDocument.id);
                         didDoc.verificationMethod.push(didDocument.verificationMethod[0])
                         didDoc.authentication.push(didDocument.authentication[0]);
@@ -145,6 +144,7 @@ export default {
                         didDoc.capabilityDelegation.push(didDocument.capabilityDelegation[0]);
                     }
                 }
+
                 // https://www.w3.org/TR/did-core/#assigning-dids-to-existing-web-resources
                 if(alsoKnownAs){
                     didDoc.alsoKnownAs.push(alsoKnownAs);
@@ -157,11 +157,11 @@ export default {
                         "serviceEndpoint": serviceEndpoint + didDoc.id
                     })
                 }                
-
-                const verificationMethodId = didDoc['verificationMethod'][0].id;        
+                const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id;
+                
                 const result = await this.hsSDK.did.register({  didDocument: didDoc, privateKeyMultibase: this.hypersign.keys.privateKeyMultibase, verificationMethodId })
 
-                console.log(result);
+                
                 if(!result){
                     throw new Error("Could not register the did");
                 }

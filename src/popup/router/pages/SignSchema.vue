@@ -77,11 +77,10 @@ export default {
         async prepareSchema(){
             // using hs-ssi-sdk to g
             const schemaOptions = this.schemaRaw// JSON.parse(this.schemaRaw)
-
             return await this.hsSDK.schema.getSchema({
                 name: schemaOptions.name,
                 description: schemaOptions.description,
-                author: this.hypersign.did, //take it from wallet
+                author: schemaOptions.author, //orgDid
                 additionalProperties: schemaOptions.additionalProperties,
                 fields: schemaOptions.fields,
             })
@@ -91,6 +90,7 @@ export default {
             try{
                 this.loading = true;
                 const schemaToSign = await this.prepareSchema();
+                console.log(schemaToSign);
                 const signature = await this.hsSDK.schema.signSchema({ privateKey: this.hypersign.keys.privateKeyMultibase, schema: schemaToSign })
                 const { assertionMethod }  = this.hypersign.didDoc;
                 // TODO: This should go into hs-ssi-sdk
