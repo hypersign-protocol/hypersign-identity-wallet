@@ -84,6 +84,7 @@ import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
 import AccountInfo from '../components/AccountInfo';
 import BalanceInfo from '../components/BalanceInfo';
 import BoxButton from '../components/BoxButton';
+import {didResolver} from '../../utils/resolver'
 import axios from 'axios';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
@@ -242,6 +243,13 @@ export default {
                 throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Schema') 
               }
             }
+            const orgDid=data.data.author
+            const resolvedDidDoc = await didResolver(orgDid)
+            const {didDocument}=resolvedDidDoc
+            const {controller}=didDocument
+            if(!controller.includes(this.hypersign.did)){
+              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue Schema') 
+            }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push(`/schema`);
             break;
@@ -263,12 +271,25 @@ export default {
                 throw new Error('Sorry, Selected DID is private. Please select a public DID to issue credential') 
               }
             }
+            const orgDid=data.data.issuerDid
+            const resolvedDidDoc = await didResolver(orgDid)
+            const {didDocument}=resolvedDidDoc
+            if (didDocument===null) {
+              throw new Error('Sorry, Issuer DID is not registered on blockchain. Please select a DID which is registered on blockchain to issue credential') 
+            }
+            const {controller}=didDocument
+            if(!controller.includes(this.hypersign.did)){
+              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue credential') 
+            }
+
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push(`/signcredential`);
             break;
           }
           case 'ISSUE_DID': { // sign did and send to blockchain
+
             if (this.isPrivateDid()) {
+
               const selection = await this.$store
                 .dispatch('modals/open', {
                   name: 'confirm',
@@ -286,6 +307,27 @@ export default {
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push('/signdid');
+            break;
+          }
+          case 'UPDATE_DID':{ // sign did and send to blockchain
+            if (this.isPrivateDid()) {
+              const selection = await this.$store
+                .dispatch('modals/open', {
+                  name: 'confirm',
+                  title: this.$t('modals.changeDid.title'),
+                  msg: this.$t('modals.changeDid.msg'),
+
+                }).catch(() => false);
+              if (selection) {
+                this.$emit('closeMenu');
+                this.$router.push(`/did`);
+                  return
+              }else{
+                throw new Error('Sorry, Selected DID is private. Please select a public DID to update Did') 
+              }
+            }
+            this.$store.commit('addRequestingAppInfo', data);
+            this.$router.push('/updatedid');
             break;
           }
           default: {
