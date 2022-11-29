@@ -1,6 +1,7 @@
 export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://stage.hypermine.in/authserver/";
 //export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "http://localhost:8001/";
-
+export const WALLET_URL=process.env.VUE_APP_WALLET_URL || "https://wallet-stage.hypersign.id";
+// export const WALLET_URL=process.env.VUE_APP_WALLET_URL || "http://localhost:4999/chrome/popup/popup#";
 export const SUPERHERO_HS_AUTH_CREDENTIAL_ISSUE_API = "hs/api/v2/register"; // change supero to hypersign later
 export const HS_AUTH_DID_URL = SUPERHERO_HS_AUTH_BASE_URL + "hs/api/v2/authdid"
 
