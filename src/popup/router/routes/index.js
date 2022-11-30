@@ -17,6 +17,7 @@ import webIframePopups from './web-iframe-popups';
 
 // Hypersign related
 import Credentials from '../pages/Credentials';
+import CredentialIssue from '../pages/CredentialIssue';
 import Dids from '../pages/DIDs';
 
 import Transactions from '../pages/Transactions';
@@ -226,6 +227,15 @@ export default [{
     props: true,
     meta: {
         title: 'credential',
+    },
+},
+{
+    name: 'credential',
+    path: '/credential/issue',
+    component: CredentialIssue,
+    props: true,
+    meta: {
+        title: 'issueCredential',
     },
 },
 {

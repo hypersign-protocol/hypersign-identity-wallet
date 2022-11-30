@@ -1,7 +1,11 @@
 <template>
     <div class="popup">
+      <Button   data-cy="generate-new-did" :to="`/credential/issue/`"  style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;">
+      <CreateIcon ></CreateIcon>
+    </Button>
       <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get credentials.</span>
       <Panel v-else>
+        
         <PanelItem
           v-for="credential in hypersign.credentials"
           :key="credential.id"
@@ -24,11 +28,13 @@ import PanelItem from '../components/PanelItem';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
 import axios from 'axios';
+import CreateIcon from '../../../icons/topup-icon.svg?vue-component';
+
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
 
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel,Button, PanelItem, QrIcon, Textarea },
+  components: { CheckBox, Panel,Button, PanelItem, QrIcon, Textarea ,CreateIcon},
   data() {
     return {
       form: {
