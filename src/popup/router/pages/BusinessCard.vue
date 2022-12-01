@@ -10,7 +10,7 @@
             {{ (vcard.title + ' @ ' + vcard.organization) }}
           </span><br />
           <span class="fullTitle">
-            {{ vcard.workEmail.toString() }}
+            {{ vcard.workUrl }}
           </span><br />
         </div>
 
@@ -22,7 +22,7 @@
 
         <div class="cred-card-body" style="    margin-top: 10%;">
           <span class="sub-sub-heading">
-            {{ vcard.workPhone.toString() }}
+            {{ vcard.workEmail.toString() }}
           </span><br />
           <span class="sub-sub-heading">
             {{ vcard.id }}
@@ -249,7 +249,7 @@ export default {
 
 
     this.short_link = toStringShorner(this.link, 32, 15)
-
+    this.vcard.id=toStringShorner(vcard.id,32,15)
 
   },
 
