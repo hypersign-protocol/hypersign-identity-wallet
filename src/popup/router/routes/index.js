@@ -14,6 +14,7 @@ import Networks from '../pages/Networks';
 import NotFound from '../pages/NotFound';
 import Address from '../pages/Address';
 import webIframePopups from './web-iframe-popups';
+import BusinessCard from '../pages/BusinessCard';
 
 // Hypersign related
 import Credentials from '../pages/Credentials';
@@ -287,7 +288,7 @@ export default [{
 {
     name: 'sharedCredential',
     path: '/businessCard/:vp',
-    component: SharedCredential,
+    component: BusinessCard,
     props: true,
     meta: {
         title: 'sharedCredential',

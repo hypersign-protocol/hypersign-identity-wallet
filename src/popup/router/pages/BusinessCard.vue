@@ -4,58 +4,70 @@
       <div class="cred-card">
         <div class="cred-card-body">
           <span class="fullName">
-            Vishwas Anand
+            {{ vcard.firstName + ' ' + vcard.middleName + ' ' + vcard.lastName }}
           </span><br />
           <span class="fullTitle">
-            VP of Engineering @ Hypermine
+            {{ (vcard.title + ' @ ' + vcard.organization) }}
           </span><br />
           <span class="fullTitle">
-            www.hypersign.id
+            {{ vcard.workEmail.toString() }}
           </span><br />
         </div>
-        
+
         <div class="avatar">
           <div class="img">
-            <img src="https://avatars.githubusercontent.com/u/15328561?v=4" alt="">
-          </div>          
+            <img v-bind:src="vcard.photo.url" alt="image">
+          </div>
         </div>
 
         <div class="cred-card-body" style="    margin-top: 10%;">
           <span class="sub-sub-heading">
-            vishwas@hypermine.in
+            {{ vcard.workPhone.toString() }}
           </span><br />
-          <span class="sub-sub-heading"> 
-            did:hid:testnet:zA9qEAQ438awyBHV69hCFnTivrZ
+          <span class="sub-sub-heading">
+            {{ vcard.id }}
           </span><br />
         </div>
       </div>
-    
+
       <div class="submenu-bg">
         <div class="box-club">
-          <BoxButton text="Twitter" to="/" class="tour__step9">
-            <TwitterIcon width="30" height="30" slot="icon" />
-          </BoxButton>
-          <BoxButton text="Telegram" to="/">
-            <TelegramIcon width="30" height="30" slot="icon" />
-          </BoxButton>
+          <span @click="externalLink(vcard.socialUrls.twitter)">
+            <BoxButton v-if="vcard.socialUrls.twitter" text="Twitter" class="tour__step9">
+              <TwitterIcon width="30" height="30" slot="icon" />
+            </BoxButton>
+          </span>
+          <span @click="externalLink(vcard.socialUrls.telegram)">
+
+            <BoxButton v-if="vcard.socialUrls.telegram" text="Telegram">
+              <TelegramIcon width="30" height="30" slot="icon" />
+            </BoxButton>
+          </span>
+
           <span @click="saveAs()">
             <BoxButton text="Save Contact" class="tour__step10">
               <PhoneIcon width="30" height="30" slot="icon" color="white" />
             </BoxButton>
           </span>
-          <BoxButton text="Discord" to="/" class="tour__step9">
-            <DiscordIcon width="30" height="30" slot="icon" />
-          </BoxButton>
-          <BoxButton text="LinkedIn" to="/">
-            <LinkedInIcon width="30" height="30" slot="icon" />
-          </BoxButton>
-          <BoxButton text="Facebook" to="/" class="tour__step10">
-            <FacebookIcon width="30" height="30" slot="icon" color="white" />
-          </BoxButton>
+          <span @click="externalLink(vcard.socialUrls.discord)">
+            <BoxButton v-if="vcard.socialUrls.discord" text="Discord" class="tour__step9">
+              <DiscordIcon width="30" height="30" slot="icon" />
+            </BoxButton>
+          </span>
+          <span @click="externalLink(vcard.socialUrls.linkedIn)">
+            <BoxButton v-if="vcard.socialUrls.linkedIn" text="LinkedIn">
+              <LinkedInIcon width="30" height="30" slot="icon" />
+            </BoxButton>
+          </span>
+          <span @click="externalLink(vcard.socialUrls.facebook)">
+            <BoxButton v-if="vcard.socialUrls.facebook" text="Facebook" class="tour__step10">
+              <FacebookIcon width="30" height="30" slot="icon" color="white" />
+            </BoxButton>
+          </span>
         </div>
         <Button @click="share()">Share Via QR/Link</Button>
       </div>
-    
+
       <!-- <ul class="list-group">
                 <li class="list-group-item" v-for="claim in claims" :key="claim">
                     <div class="list-title">{{ toUpper(claim) }}: </div>
@@ -66,27 +78,21 @@
     </div>
 
     <div class="box overlay" v-if="showMenu">
-        <SmallModal  @close="showMenu = false">
+      <SmallModal @close="showMenu = false">
         <div v-if="qrdata != ''" class="qrPopup">
-            <div if="showQr">
-              <VueQr
-                  v-if="qrdata != ''"
-                  :text="qrdata"
-                  :size="250"
-                  :logoSrc="logo"
-                  logoBackgroundColor="white"
-              >
-              </VueQr>
-            </div>
-            <div>
+          <div if="showQr">
+            <VueQr v-if="qrdata != ''" :text="qrdata" :size="250" :logoSrc="logo" logoBackgroundColor="white">
+            </VueQr>
+          </div>
+          <div>
             <div class="copied-alert" v-if="copied">{{ $t('pages.account.copied') }}</div>
             <code class="copyicon" @click="copy">{{ short_link }}</code>
             <CopyIcon class="copyicon" slot="icon" @click="copy"></CopyIcon>
-            </div>
+          </div>
         </div>
-        </SmallModal>
+      </SmallModal>
     </div>
-    
+
   </div>
 </template>
 <script>
@@ -101,17 +107,17 @@ import DiscordIcon from '../../../icons/discord-svgrepo-com.svg?vue-component';
 import LinkedInIcon from '../../../icons/linkedin-svgrepo-com.svg?vue-component';
 import FacebookIcon from '../../../icons/facebook-svgrepo-com.svg?vue-component';
 
-import { mapGetters, mapState } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VueQr from 'vue-qr';
 
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import hidWalletInstance from '../../utils/hidWallet';
-import { WALLET_URL } from '../../utils/hsConstants';
 import CopyIcon from '../../../icons/copy.svg?vue-component';
 
 import SmallModal from '../components/SmallModal.vue';
+
+import { WALLET_URL, SUPERHERO_HS_AUTH_BASE_URL } from '../../utils/hsConstants'
+import Axios from 'axios';
 
 export default {
   components: {
@@ -141,6 +147,7 @@ export default {
       showQr: false,
       vp: {},
       vcf: {},
+      vcard: {},
       credDetials: {
         formattedIssuer: '',
         formattedExpirationDate: '',
@@ -150,65 +157,109 @@ export default {
       },
     };
   },
-  created() {
+  async created() {
+
     try {
-      this.vp = JSON.parse(this.$route.params.vp);
+      this.loading = true;
+      this.vp = this.$route.params.vp;
+
+      const fetcedVp = await Axios.get(SUPERHERO_HS_AUTH_BASE_URL + 'shared/vp/' + this.vp);
+
+      this.vp = fetcedVp.data.vp
+      this.sortUrl = fetcedVp.data._id
     } catch (error) {
+
       this.vp = JSON.parse(Buffer.from(this.$route.params.vp, 'base64').toString('utf8'));
+      this.loading = false;
+      return
     }
-    // console.log(this.vp);
 
     //   console.log("credentialId", credentialId);
 
     if (this.vp) {
       this.verifiableCredential = this.vp.verifiableCredential[0];
-      this.credDetials.formattedExpirationDate = toFormattedDate(
-        this.verifiableCredential.expirationDate,
-      );
-      this.credDetials.formattedIssuanceDate = toFormattedDate(
-        this.verifiableCredential.issuanceDate,
-      );
+      this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate);
+      this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate);
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
       this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-      this.credDetials.schemaId = toStringShorner(
-        getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(),
-        32,
-        15,
-      );
+      this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 32, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
-    const credSub = this.vp.verifiableCredential[0].credentialSubject;
+    const credSub = this.vp.verifiableCredential[0].credentialSubject
     // console.log("credSub", credSub);
-    const arr = Object.keys(credSub).map(key => [key, credSub[key]]);
+    const arr = Object.keys(credSub).map((key) => [key, credSub[key]]);
     var vcard = vCardsJS();
     arr.forEach(element => {
       switch (element[0]) {
-        case 'socialUrls':
-          vcard.socialUrls['custom'] = element[1];
+        case "facebook":
+          vcard.socialUrls['facebook'] = element[1]
           break;
-        case 'photo':
+        case "twitter":
+          vcard.socialUrls['twitter'] = element[1]
+          break;
+        case "linkedIn":
+          vcard.socialUrls['linkedIn'] = element[1]
+          break;
+        case "telegram":
+          vcard.socialUrls['telegram'] = element[1]
+          break;
+        case "discord":
+          vcard.socialUrls['discord'] = element[1]
+          break;
+        case "workAddresslabel":
+          vcard.workAddress.label = element[1]
+          break;
+        case "workAddressstreet":
+          vcard.workAddress.street = element[1]
+          break;
+        case "workAddresscity":
+          vcard.workAddress.city = element[1]
+          break;
+        case "workAddressstateProvince":
+          vcard.workAddress.stateProvince = element[1]
+          break;
+        case "workAddresspostalCode":
+          vcard.workAddress.postalCode = element[1]
+          break;
+        case "workAddresscountryRegion":
+          vcard.workAddress.countryRegion = element[1]
+          break;
+        case "logo":
+          vcard.logo.attachFromUrl(element[1], 'JPEG');
+          break;
+        case "photo":
           vcard.photo.attachFromUrl(element[1], 'JPEG');
           break;
         default:
-          vcard[element[0]] = element[1];
+          vcard[element[0]] = element[1]
           break;
       }
     });
 
-    this.vcf = vcard.getFormattedString();
-    this.qrdata = this.vcf;
-    this.showQr = true;
-    // console.log("vcf", this.vcf);
 
-    this.link =
-      WALLET_URL +
-      'sharedcredential/' +
-      Buffer.from(JSON.stringify(this.vp), 'utf-8').toString('base64');
-    this.short_link = toStringShorner(this.link, 20, 15);
+    this.vcard = vcard
+    this.vcf = vcard.getFormattedString()       // console.log("vcf", this.vcf);
+    this.loading = false;
+
+    this.link = WALLET_URL + "businessCard/" + this.sortUrl
+    this.qrdata = this.link
+    console.log(this.vcf);
+    this.showQr = true
+
+
+    this.short_link = toStringShorner(this.link, 32, 15)
+
+
   },
 
   methods: {
+    externalLink(link) {
+      // window.location.assign(link, '_blank');
+      window.open(link, '_blank');
+
+    }
+    ,
     share() {
       console.log('Clicked...');
       this.showMenu = true;
@@ -241,9 +292,10 @@ export default {
 <style lang="scss" scoped>
 @import '../../../common/variables';
 
-.button-text{
+.button-text {
   font-size: 10px;
 }
+
 .submenu-bg {
   background: $submenu-bg;
   padding: 10px;
@@ -253,34 +305,35 @@ export default {
 }
 
 
-.qrPopup{
-    background: whitesmoke;
-    padding-bottom: 18px;
-    box-shadow: 5px 5px 5px 0px #80808087;
-    border-radius: 2px;
+.qrPopup {
+  background: whitesmoke;
+  padding-bottom: 18px;
+  box-shadow: 5px 5px 5px 0px #80808087;
+  border-radius: 2px;
 }
 
 .box {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
-      .overlayBackground{
-        -webkit-filter: blur(5px);
-        -moz-filter: blur(5px);
-        -o-filter: blur(5px);
-        -ms-filter: blur(5px);
-        filter: blur(5px);
-        background-color: #ccc;
-      }
-      .overlay {
-        z-index: 9;
-        margin-top: 50%;
-        margin-left: 15%;
-      }
+.overlayBackground {
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+  background-color: #ccc;
+}
+
+.overlay {
+  z-index: 9;
+  margin-top: 50%;
+  margin-left: 15%;
+}
 
 .box-club {
   padding: 1px;
@@ -289,18 +342,20 @@ export default {
   border-radius: 5px;
   margin-top: 1%;
 }
+
 .cred-card-body {
   padding: 12px;
-    color: lightgrey;
-    font-size: small;
+  color: lightgrey;
+  font-size: small;
 }
 
 
-.fullName{
+.fullName {
   color: whitesmoke;
-    font-size: larger;
-    font-weight: 600;
+  font-size: larger;
+  font-weight: 600;
 }
+
 .scan-text {
   margin-left: 20px;
   margin-bottom: 2px;
@@ -412,7 +467,7 @@ export default {
     color: $text-color;
   }
 
-  p > svg {
+  p>svg {
     margin-right: 10px;
   }
 
@@ -470,9 +525,8 @@ export default {
 }
 
 
- .img {
+.img {
   background-color: #bfc2c7;
-  padding: 10px;
   box-sizing: border-box;
   border-radius: 50%;
   border: 6px solid var(--dark);
@@ -483,10 +537,10 @@ export default {
 }
 
 .img img {
-  width: 80%;
-  padding: 10px 0;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
-
 </style>
 
 
