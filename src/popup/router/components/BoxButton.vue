@@ -1,9 +1,13 @@
 <template>
   <div class="button-container">
-    <RouterLink :to="to" class="button-content" :class="{ disabled }">
+    <RouterLink :to="to" class="button-content" :class="{ disabled }" v-if="to">
       <slot name="icon" />
       <span class="button-text" :class="accent ? 'button-text-accent' : ''">{{ text }}</span>
     </RouterLink>
+    <a class="button-content"  :class="{ disabled }" v-else>
+      <slot name="icon" />
+      <span class="button-text" :class="accent ? 'button-text-accent' : ''">{{ text }}</span>
+    </a>
   </div>
 </template>
 
@@ -51,7 +55,7 @@ export default {
     }
 
     .button-text {
-      font-size: 13px;
+      font-size: 10px;
       display: block;
       font-weight: bold;
       margin-top: 5px;
