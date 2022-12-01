@@ -20,7 +20,7 @@
       <Loader v-if="loading" />
     </div>
     <div>
-      <Button v-on:click="shareCredential" >Share Credential</Button> 
+      <Button v-if="share" v-on:click="shareCredential" >Share Credential</Button> 
       <Loader v-if="loading" />
 
     </div>
@@ -34,12 +34,14 @@ import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import hidWalletInstance from '../../utils/hidWallet';
-import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants'
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE,SUPERHERO_HS_AUTH_BASE_URL,BUSINESSCARD_SCHEMA } from '../../utils/hsConstants'
+import Axios from 'axios';
 
 export default {
   components: { QrIcon },
   data() {
     return {
+      share: false,
       verifiableCredential: {},
       claims: [],
       loading: false,
@@ -61,6 +63,10 @@ export default {
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
       this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
+      const credentialSchema=this.verifiableCredential.credentialSchema.id
+      if(credentialSchema === BUSINESSCARD_SCHEMA){
+        this.share=true
+      }
       this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 32, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
@@ -96,8 +102,18 @@ export default {
         }
       );
 
+      const result=await Axios({
+        method: 'post',
+        url: SUPERHERO_HS_AUTH_BASE_URL+'share',
+        data: {
+          vp: vp_signed
+        }
+      });
+      
+      console.log(result.data.record);
+      const id=result.data.record._id;
       this.loading = false;
-     return this.$router.push({name:'sharedCredential',params: {vp:JSON.stringify( vp_signed)}});
+      return this.$router.push({name:'sharedCredential',params: {vp:id}});
 
     }
     ,
