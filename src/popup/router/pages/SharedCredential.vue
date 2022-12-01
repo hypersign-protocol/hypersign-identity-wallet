@@ -52,8 +52,9 @@ import VueQr from "vue-qr";
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import hidWalletInstance from '../../utils/hidWallet';
-import { WALLET_URL } from '../../utils/hsConstants'
+import { WALLET_URL ,SUPERHERO_HS_AUTH_BASE_URL} from '../../utils/hsConstants'
 import CopyIcon from '../../../icons/copy.svg?vue-component';
+import Axios from 'axios';
 
 export default {
     components: { QrIcon, VueQr, CopyIcon },
@@ -69,6 +70,7 @@ export default {
             logo: require("../../../icons/hypersign-icon.png"),
             showQr: false,
             vp: {},
+            sortUrl: "",
             vcf: {},
             credDetials: {
                 formattedIssuer: "",
@@ -79,17 +81,20 @@ export default {
             }
         };
     },
-    created() {
+   async created() {
 
         try {
-            this.vp = JSON.parse(this.$route.params.vp);
+            this.loading=true;
+            this.vp = this.$route.params.vp;
 
+            const fetcedVp=await Axios.get(SUPERHERO_HS_AUTH_BASE_URL+'shared/vp/'+this.vp);
+            this.vp=fetcedVp.data.vp
+            this.sortUrl=fetcedVp.data._id
         } catch (error) {
 
             this.vp = JSON.parse(Buffer.from(this.$route.params.vp, 'base64').toString('utf8'));
 
         }
-        // console.log(this.vp);
 
         //   console.log("credentialId", credentialId);
 
@@ -109,8 +114,41 @@ export default {
         var vcard = vCardsJS();
         arr.forEach(element => {
             switch (element[0]) {
-                case "socialUrls":
-                    vcard.socialUrls['custom'] = element[1]
+                case "facebook":
+                    vcard.socialUrls['facebook'] = element[1]
+                    break;
+                case "twitter":
+                    vcard.socialUrls['twitter'] = element[1]
+                    break;
+                case "linkedIn":
+                    vcard.socialUrls['linkedIn'] = element[1]
+                    break;
+                case "telegram":
+                    vcard.socialUrls['telegram'] = element[1]
+                    break;
+                case "discord":
+                    vcard.socialUrls['discord'] = element[1]
+                    break;
+                case "workAddresslabel":
+                    vcard.workAddress.label = element[1]
+                    break;
+                case "workAddressstreet":
+                    vcard.workAddress.street = element[1]
+                    break;
+                case "workAddresscity":
+                    vcard.workAddress.city = element[1]
+                    break;
+                case "workAddressstateProvince":
+                    vcard.workAddress.stateProvince = element[1]
+                    break;
+                case "workAddresspostalCode":
+                    vcard.workAddress.postalCode = element[1]
+                    break;
+                case "workAddresscountryRegion":
+                    vcard.workAddress.countryRegion = element[1]
+                    break;
+                case "logo":
+                    vcard.logo.attachFromUrl(element[1], 'JPEG');
                     break;
                 case "photo":
                     vcard.photo.attachFromUrl(element[1], 'JPEG');
@@ -123,12 +161,15 @@ export default {
 
 
 
-        this.vcf = vcard.getFormattedString()
-        this.qrdata = this.vcf
-        this.showQr = true
-        // console.log("vcf", this.vcf);
+        this.vcf = vcard.getFormattedString()       // console.log("vcf", this.vcf);
+        this.loading=false;
 
-        this.link = WALLET_URL + "sharedcredential/" + Buffer.from(JSON.stringify(this.vp), 'utf-8').toString('base64')
+        this.link = WALLET_URL + "businessCard/" + this.sortUrl
+        this.qrdata = this.vcf
+        console.log(this.vcf);
+        this.showQr = true
+
+
         this.short_link = toStringShorner(this.link, 32, 15)
 
 

@@ -286,7 +286,7 @@ export default [{
 },
 {
     name: 'sharedCredential',
-    path: '/sharedcredential/:vp',
+    path: '/businessCard/:vp',
     component: SharedCredential,
     props: true,
     meta: {

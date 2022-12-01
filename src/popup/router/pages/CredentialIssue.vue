@@ -37,7 +37,7 @@ import vSelect from "vue-select";
 import registration from '../../../mixins/registration';
 import hidWalletInstance from '../../utils/hidWallet';
 import { mapState } from 'vuex';
-import { HIDNODE_REST  ,HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_NAMESPACE} from '../../utils/hsConstants';
+import { HIDNODE_REST  ,HYPERSIGN_AUTH_PROVIDER,BUSINESSCARD_SCHEMA, HIDNODE_RPC, HIDNODE_NAMESPACE} from '../../utils/hsConstants';
 import Axios from "axios";
 const HypersignSsiSDK = require('hs-ssi-sdk');
 
@@ -58,7 +58,7 @@ export default {
         schemaProps: [],
         options: [
             {
-                value: "sch:hid:testnet:z5w63sEZxTrpk4YxMoJhRndbwBe6jRuDc1kzZzhGccV64:1.0", label: "Business Card"
+                value: BUSINESSCARD_SCHEMA, label: "Business Card"
             },
 
             {
