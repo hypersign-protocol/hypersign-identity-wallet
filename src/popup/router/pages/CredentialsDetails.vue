@@ -20,7 +20,8 @@
       <Loader v-if="loading" />
     </div>
     <div>
-      <Button v-if="share" v-on:click="shareCredential" >Share Credential</Button> 
+      <Button v-if="share" v-on:click="shareCredential">Share Credential</Button>
+      <Button v-on:click="deleteCredential">Delete Credential</Button>
       <Loader v-if="loading" />
 
     </div>
@@ -29,12 +30,12 @@
 <script>
 const HypersignSSISdk = require('hs-ssi-sdk');
 
-import { mapGetters,mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import hidWalletInstance from '../../utils/hidWallet';
-import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE,SUPERHERO_HS_AUTH_BASE_URL,BUSINESSCARD_SCHEMA } from '../../utils/hsConstants'
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE, SUPERHERO_HS_AUTH_BASE_URL, BUSINESSCARD_SCHEMA } from '../../utils/hsConstants'
 import Axios from 'axios';
 
 export default {
@@ -63,9 +64,9 @@ export default {
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
       this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-      const credentialSchema=this.verifiableCredential.credentialSchema.id
-      if(credentialSchema === BUSINESSCARD_SCHEMA){
-        this.share=true
+      const credentialSchema = this.verifiableCredential.credentialSchema.id
+      if (credentialSchema === BUSINESSCARD_SCHEMA) {
+        this.share = true
       }
       this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 32, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
@@ -77,6 +78,19 @@ export default {
 
   },
   methods: {
+     deleteCredential() {
+      console.log("deleteCredential");
+      try {
+        this.loading = true
+        this.$store.commit('removeHSVerifiableCredential', this.verifiableCredential)
+        this.$store.dispatch('modals/open', { name: 'default', msg: 'Credential deleted successfully' });
+        this.$router.push({ name: 'credential' })
+        this.loading = false
+      } catch (error) {
+        this.loading = false
+
+      }
+    },
     async shareCredential() {
       this.loading = true;
 
@@ -97,23 +111,23 @@ export default {
           presentation: vp_unsigned,
           holderDidDocSigned: this.hypersign.didDoc,
           privateKey: this.hypersign.keys.privateKeyMultibase,
-          challenge:"123",
+          challenge: "123",
           verificationMethodId
         }
       );
 
-      const result=await Axios({
+      const result = await Axios({
         method: 'post',
-        url: SUPERHERO_HS_AUTH_BASE_URL+'share',
+        url: SUPERHERO_HS_AUTH_BASE_URL + 'share',
         data: {
           vp: vp_signed
         }
       });
-      
+
       console.log(result.data.record);
-      const id=result.data.record._id;
+      const id = result.data.record._id;
       this.loading = false;
-      return this.$router.push({name:'sharedCredential',params: {vp:id}});
+      return this.$router.push({ name: 'sharedCredential', params: { vp: id } });
 
     }
     ,

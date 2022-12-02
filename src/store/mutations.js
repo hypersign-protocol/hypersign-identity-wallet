@@ -117,6 +117,10 @@ export default {
         ////HS_TODO
         state.hypersign.credentials.push(payload)
     },
+    removeHSVerifiableCredential(state, payload) {
+        ////HS_TODO
+        state.hypersign.credentials = state.hypersign.credentials.filter((el) => el.id !== payload.id);
+    },
     setThridPartyAuth(state, payload) {
         const thridPartyAuth = state.hypersign.thridPartyAuths.find(x => x.provider === payload.provider)
         if(!thridPartyAuth){
@@ -141,6 +145,10 @@ export default {
     addHSVerifiableCredentialTemp(state, payload) {
         ////HS_TODO
         state.hypersign.credentialsTemp.push(payload)
+    },
+    removeHSVerifiableCredentialTemp(state, payload) {
+        ////HS_TODO
+        state.hypersign.credentialsTemp = state.hypersign.credentialsTemp.filter((el) => el.id !== payload.id);
     },
     clearHSVerifiableCredentialTemp(state, payload) {
         ////HS_TODO

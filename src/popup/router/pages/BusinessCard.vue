@@ -16,7 +16,8 @@
 
         <div class="avatar">
           <div class="img">
-            <img v-bind:src="vcard.photo.url" alt="image">
+            <img v-bind:src="vcard.photo.url ? vcard.photo.url : require('../../../icons/abstract-user-flat-4.png')"
+              alt="image">
           </div>
         </div>
 
@@ -171,6 +172,7 @@ export default {
 
       this.vp = JSON.parse(Buffer.from(this.$route.params.vp, 'base64').toString('utf8'));
       this.loading = false;
+      this.$router.push({ name: 'account' });
       return
     }
 
@@ -190,7 +192,7 @@ export default {
     // console.log("credSub", credSub);
     const arr = Object.keys(credSub).map((key) => [key, credSub[key]]);
     var vcard = vCardsJS();
-    arr.forEach(element => {
+    arr.forEach(async element => {
       switch (element[0]) {
         case "facebook":
           vcard.socialUrls['facebook'] = element[1]
@@ -225,12 +227,27 @@ export default {
         case "workAddresscountryRegion":
           vcard.workAddress.countryRegion = element[1]
           break;
-        case "logo":
-          vcard.logo.attachFromUrl(element[1], 'JPEG');
+        case "logo": {
+          const resp = await fetch(element[1])
+          const blob = await resp.blob()
+          if (blob.type.includes("image")) {
+            vcard.logo.attachFromUrl(element[1], blob.type);
+          } else {
+            vcard.logo.attachFromUrl(undefined);
+          }
+
           break;
-        case "photo":
-          vcard.photo.attachFromUrl(element[1], 'JPEG');
+        }
+        case "photo": {
+          vcard.photo.attachFromUrl(element[1], 'JPEG'); const resp = await fetch(element[1])
+          const blob = await resp.blob()
+          if (blob.type.includes("image")) {
+            vcard.photo.attachFromUrl(element[1], blob.type);
+          } else {
+            vcard.photo.attachFromUrl(undefined);
+          }
           break;
+        }
         default:
           vcard[element[0]] = element[1]
           break;
@@ -243,13 +260,13 @@ export default {
     this.loading = false;
 
     this.link = WALLET_URL + "businessCard/" + this.sortUrl
-    this.qrdata = this.link
+    this.qrdata = this.vcf
     console.log(this.vcf);
     this.showQr = true
 
 
-    this.short_link = toStringShorner(this.link, 32, 15)
-    this.vcard.id=toStringShorner(vcard.id,32,15)
+    this.short_link = toStringShorner(this.link, 32, 10)
+    this.vcard.id = toStringShorner(vcard.id, 32, 15)
 
   },
 
@@ -265,7 +282,7 @@ export default {
       this.showMenu = true;
     },
     saveAs() {
-      const blob = new Blob([this.vcf], { type: 'text/plain;charset=utf-8' });
+      const blob = new Blob([this.vcf], { type: 'data:text/x-vcard;charset=utf-8' });
       const link = document.createElement('a');
       link.href = window.webkitURL.createObjectURL(blob);
       link.download = 'contact.vcf';
@@ -332,7 +349,7 @@ export default {
 .overlay {
   z-index: 9;
   margin-top: 50%;
-  margin-left: 15%;
+  margin-left: 6.7%; 
 }
 
 .box-club {
@@ -341,6 +358,7 @@ export default {
   width: 100%;
   border-radius: 5px;
   margin-top: 1%;
+  text-align: justify;
 }
 
 .cred-card-body {
@@ -362,7 +380,11 @@ export default {
   // float: right;
 }
 
-.copyicon,
+.copyicon{
+  color: #33343e;
+
+  cursor: pointer;
+}
 .copied-alert {
   color: #21222a;
 }
@@ -456,6 +478,9 @@ export default {
   }
 }
 
+
+
+
 .withdraw.step2 {
   p {
     display: flex;
@@ -526,10 +551,8 @@ export default {
 
 
 .img {
-  background-color: #bfc2c7;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 6px solid var(--dark);
   height: 100%;
   display: flex;
   align-items: center;

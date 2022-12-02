@@ -37,6 +37,7 @@ export default {
   padding: 10px;
 
   .button-content {
+    text-align: center;
     background: $box-button-color;
     border-radius: 5px;
     padding: 15px 10px;
