@@ -272,7 +272,7 @@ export default {
     this.loading = false;
 
     this.link = WALLET_URL + "businessCard/" + this.sortUrl
-    this.qrdata = this.vcf
+    this.qrdata = this.link
     console.log(this.vcf);
     this.showQr = true
 
