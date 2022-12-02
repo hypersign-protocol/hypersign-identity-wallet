@@ -228,24 +228,36 @@ export default {
           vcard.workAddress.countryRegion = element[1]
           break;
         case "logo": {
-          const resp = await fetch(element[1])
-          const blob = await resp.blob()
-          if (blob.type.includes("image")) {
-            vcard.logo.attachFromUrl(element[1], blob.type);
-          } else {
+          try {
+            const resp = await fetch(element[1])
+            const blob = await resp.blob()
+            if (blob.type.includes("image")) {
+              vcard.logo.attachFromUrl(element[1], blob.type);
+            } else {
+              vcard.logo.attachFromUrl(undefined);
+            }
+          } catch (error) {
             vcard.logo.attachFromUrl(undefined);
+
           }
+
 
           break;
         }
         case "photo": {
-          vcard.photo.attachFromUrl(element[1], 'JPEG'); const resp = await fetch(element[1])
-          const blob = await resp.blob()
-          if (blob.type.includes("image")) {
-            vcard.photo.attachFromUrl(element[1], blob.type);
-          } else {
+          try {
+            vcard.photo.attachFromUrl(element[1], 'JPEG'); const resp = await fetch(element[1])
+            const blob = await resp.blob()
+            if (blob.type.includes("image")) {
+              vcard.photo.attachFromUrl(element[1], blob.type);
+            } else {
+              vcard.photo.attachFromUrl(undefined);
+            }
+          } catch (error) {
             vcard.photo.attachFromUrl(undefined);
+
           }
+
           break;
         }
         default:
@@ -349,7 +361,7 @@ export default {
 .overlay {
   z-index: 9;
   margin-top: 50%;
-  margin-left: 6.7%; 
+  margin-left: 6.7%;
 }
 
 .box-club {
@@ -380,11 +392,12 @@ export default {
   // float: right;
 }
 
-.copyicon{
+.copyicon {
   color: #33343e;
 
   cursor: pointer;
 }
+
 .copied-alert {
   color: #21222a;
 }
