@@ -294,7 +294,7 @@ export default {
       this.showMenu = true;
     },
     saveAs() {
-      const blob = new Blob([this.vcf], { type: 'data:text/x-vcard;charset=utf-8' });
+      const blob = new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
       const link = document.createElement('a');
       link.href = window.webkitURL.createObjectURL(blob);
       link.download = 'contact.vcf';
