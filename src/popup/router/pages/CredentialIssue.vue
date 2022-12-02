@@ -5,15 +5,14 @@
                 :value="selected.label" />
         </div>
         <div class="mt-10">
-            <div v-for="prop in schemaProps">                
+            <div v-for="prop in schemaProps">
                 <br>
-                <label class="ae-address">{{ prop.key }}</label>
-                <Input v-if="prop.value.type == 'string'"  type="text" :placeholder="prop.value.placeholder" name="prop.key" v-model="prop.value.data"
-                    class="ae-address" />
-                <Input v-if="prop.value.type == 'date'" type="date" name="prop.key" :placeholder="prop.value.placeholder" v-model="prop.value.data"
-                    class="ae-address" />
-                <Input v-if="prop.value.type == 'number'" type="number" name="prop.key" :placeholder="prop.value.placeholder" v-model="prop.value.data"
-                    class="ae-address" />
+                <Input v-if="prop.value.type == 'string'" type="text"  :label="prop.key.toLocaleUpperCase()" :placeholder="prop.value.placeholder"
+                    name="prop.key" v-model="prop.value.data" class="ae-address" />
+                <Input v-if="prop.value.type == 'date'" type="date"  :label="prop.key" name="prop.key"
+                    :placeholder="prop.value.placeholder" v-model="prop.value.data" class="ae-address" />
+                <Input v-if="prop.value.type == 'number'" type="number" :label="prop.key" name="prop.key"
+                    :placeholder="prop.value.placeholder" v-model="prop.value.data" class="ae-address" />
 
             </div>
             <div v-if="showBtn" class="mt-10">
@@ -190,68 +189,74 @@ export default {
                     const resp = await Axios.get(url)
                     this.schemaId = resp.data.schema[0].id
                     this.schema = resp.data.schema[0].schema
-                    this.schemaProps = Object.entries(JSON.parse(this.schema.properties)).map(([key, value]) => { 
-                        
+                    this.schemaProps = Object.entries(JSON.parse(this.schema.properties)).map(([key, value]) => {
+
                         switch (key) {
                             case 'photo':
-                                value.placeholder='https://www.example.com/photo.png'
+                                value.placeholder = 'https://www.example.com/photo.png'
                                 break;
                             case 'workUrl':
-                                value.placeholder='https://www.example.com'
+                                value.placeholder = 'https://www.example.com'
                                 break;
                             case 'facebook':
-                                value.placeholder='https://www.facebook.com/username'
+                                value.placeholder = 'https://www.facebook.com/username'
                                 break;
                             case 'twitter':
-                                value.placeholder='https://www.twitter.com/username'
+                                value.placeholder = 'https://www.twitter.com/username'
                                 break;
                             case 'linkedIn':
-                                value.placeholder='https://www.linkedin.com/in/username'
+                                value.placeholder = 'https://www.linkedin.com/in/username'
                                 break;
                             case 'telegram':
-                                value.placeholder='https://t.me/username'
+                                value.placeholder = 'https://t.me/username'
                                 break;
                             case 'discord':
-                                value.placeholder='https://discord.com/username'
+                               value.placeholder = 'https://discord.com/username'
                                 break;
-                            
+
                             case 'workAddresslabel':
-                                value.placeholder='Work Address'
+                                value.placeholder = 'Work Address'
                                 break;
                             case 'workAddressstreet':
-                                value.placeholder='Street'
+                                value.placeholder = 'Street'
                                 break;
                             case 'workAddresscity':
-                                value.placeholder='City'
+                                value.placeholder = 'City'
                                 break;
                             case 'workAddressstateProvince':
-                                value.placeholder='State/Province'
+                                value.placeholder = 'State/Province'
                                 break;
                             case 'workAddresspostalCode':
-                                value.placeholder='Postal Code'
+                                value.placeholder = 'Postal Code'
                                 break;
                             case 'workAddresscountryRegion':
-                                value.placeholder='Country'
+                                
+                                value.placeholder = 'Country'
                                 break;
                             case 'logo':
-                                value.placeholder='https://www.example.com/logo.png'
+                                
+                                value.placeholder = 'https://www.example.com/logo.png'
                                 break;
                             case 'url':
-                                value.placeholder='https://www.example.com'
+                                
+                                value.placeholder = 'https://www.example.com'
                                 break;
                             case 'title':
-                                value.placeholder='Software Engineer'
+                                
+                                value.placeholder = 'Software Engineer'
                                 break;
                             case 'role':
-                                value.placeholder='Software Development'
+                                
+                                value.placeholder = 'Software Development'
                                 break;
-                            
+
                             default:
-                                value.placeholder='Enter ' + key.toLowerCase()
+                                
+                                value.placeholder = 'Enter ' + key.toLowerCase()
                                 break;
                         }
-                        return {key, value} 
-                    
+                        return { key, value }
+
                     });
                     this.showBtn = true;
                 } else {
