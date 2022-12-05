@@ -293,8 +293,35 @@ export default {
       console.log('Clicked...');
       this.showMenu = true;
     },
+    iOS() {
+      return [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod',
+
+      ].includes(navigator.platform)
+
+        // iPad on iOS 13 detection
+        || (navigator.userAgent.includes("Mac") && "ontouchend" in document) && !window.MSStream
+
+
+
+    },
     saveAs() {
-      const blob = new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
+      let blob = ''
+      if (this.iOS() === true) {
+        blob = new Blob([this.vcf], { type: "text/vcard;charset=utf-8" });
+        console.log("iOS:: Detected");
+
+      } else {
+        blob = new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
+        console.log("Not IOS");
+
+
+      }
       const link = document.createElement('a');
       link.href = window.webkitURL.createObjectURL(blob);
       link.download = 'contact.vcf';
