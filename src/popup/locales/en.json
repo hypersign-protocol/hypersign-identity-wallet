@@ -238,6 +238,7 @@
             "profile": "Profile",
             "transactions": "My transactions",
             "Did": "DIDs",
+            "issueCredential":"Issue Credential",
             "DidsDetails": "Did Details",
             "SignCredential": "Sign Transaction",
             "SignDid":"Sign Transaction",
@@ -289,7 +290,9 @@
             "manageTokens": "Manage tokens",
             "invite": "Invite",
             "credential": "Credential",
-            "Did": "DIDs"
+            "Did": "DIDs",
+            "issueCredential":"Issue Credential"
+
         },
         "aboutSettings": {
             "heading": "About",
