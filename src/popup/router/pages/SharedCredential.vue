@@ -183,15 +183,20 @@ export default {
                 'iPod Simulator',
                 'iPad',
                 'iPhone',
-                'iPod'
+                'iPod',
+
             ].includes(navigator.platform)
+
             // iPad on iOS 13 detection
-            || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-    },
+            || (navigator.userAgent.includes("Mac") && "ontouchend" in document) && !window.MSStream
+
+
+    
+        },
         saveAs() {
             let blob=''
-            if(this.iOS()){
-                 blob = new Blob([this.vcf], { type: "text/x-vcard;charset=utf-8" });
+            if(this.iOS()===true){
+                 blob = new Blob([this.vcf], { type: "text/vcard;charset=utf-8" });
 
             }else{
                 blob =new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
