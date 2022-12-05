@@ -176,8 +176,27 @@ export default {
     },
 
     methods: {
+            iOS() {
+            return [
+                'iPad Simulator',
+                'iPhone Simulator',
+                'iPod Simulator',
+                'iPad',
+                'iPhone',
+                'iPod'
+            ].includes(navigator.platform)
+            // iPad on iOS 13 detection
+            || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+    },
         saveAs() {
-            const blob = new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
+            let blob=''
+            if(this.iOS()){
+                 blob = new Blob([this.vcf], { type: "text/x-vcard;charset=utf-8" });
+
+            }else{
+                blob =new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
+
+            }
             const link = document.createElement("a");
             link.href = window.webkitURL.createObjectURL(blob);
             link.download = "contact.vcf";
