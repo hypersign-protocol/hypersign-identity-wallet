@@ -1,17 +1,13 @@
 <template>
-    <div class="popup">
-      <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get credentials.</span>
-      <Panel v-else>
-        <PanelItem
-          v-for="credential in hypersign.credentials"
-          :key="credential.id"
-          :to="`/credential/${credential.id}`"
-          :title="credential.type[1]"
-          :info="toFormattedDate(credential.issuanceDate)"
-        />
-      </Panel>
-      <Loader v-if="loading" />
-    </div>
+  <div class="popup">
+    <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get
+      credentials.</span>
+    <Panel v-else>
+      <PanelItem v-for="credential in hypersign.credentials" :key="credential.id" :to="`/credential/${credential.id}`"
+        :title="credential.type[1]" :info="toFormattedDate(credential.issuanceDate)" />
+    </Panel>
+    <Loader v-if="loading" />
+  </div>
 </template>
 
 <script>
@@ -24,11 +20,12 @@ import PanelItem from '../components/PanelItem';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
 import axios from 'axios';
-import {toFormattedDate, toStringShorner} from '../../utils/helper'
+import { toFormattedDate, toStringShorner } from '../../utils/helper'
+import { HS_VC_STATUS_PATH } from '../../utils/hsConstants'
 
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel,Button, PanelItem, QrIcon, Textarea },
+  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea },
   data() {
     return {
       form: {
@@ -50,16 +47,39 @@ export default {
       return this.form.url != '';
     },
   },
-  created() {
+  async created() {
     //Only for deeplinking
-    if(this.$route.query.url && this.$route.query.url !='')
+    if (localStorage.getItem("3rdPartyAuthVCUnregistred")) {
+      this.verifiableCredential = JSON.parse(localStorage.getItem("3rdPartyAuthVCUnregistred"));
+      localStorage.removeItem("3rdPartyAuthVCUnregistred");
+      // localStorage.setItem("3rdPartyAuthVC", JSON.stringify(this.verifiableCredential));
+      try {
+        this.loading = true;
+        this.credStatus = await axios.get(`${HS_VC_STATUS_PATH}/${this.verifiableCredential.id}`);
+        this.loading = false;
+        if (this.credStatus.data.vc.credStatus.claim.currentStatus == "Live") {
+          console.log("inside if");
+          this.$store.commit('addHSVerifiableCredentialTemp', this.verifiableCredential);
+          this.$router.push(`/credential/temp/${this.verifiableCredential.id}`);
+        }
+        return
+      } catch (error) {
+        this.loading = false;
+        localStorage.setItem("3rdPartyAuthVCUnregistred", JSON.stringify(this.verifiableCredential));
+        localStorage.removeItem("3rdPartyAuthVC");
+        return
+      }
+
+      
+    }
+    if (this.$route.query.url && this.$route.query.url != '')
       this.deeplink(this.$route.query.url)
   },
 
-  methods: {  
+  methods: {
     toFormattedDate(dateStr) {
-    const d = new Date(dateStr);
-    return d.toDateString();
+      const d = new Date(dateStr);
+      return d.toDateString();
     },
     async scan() {
       try {
@@ -71,52 +91,52 @@ export default {
         await this.fetchCredential();
       } catch (e) {
         this.loading = false;
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }
     },
 
-    async fetchCredential(){
+    async fetchCredential() {
       //console.log('fetchCredential...')
-        this.form.url = this.form.url + '&did=' + this.hypersign.did;
-        this.loading = true;
-        let response = await axios.get(this.form.url);
-        response = response.data;
-        if (!response) throw new Error('Can not accept credential');
-        if (response && response.status != 200) throw new Error(response.error);
-        if (!response.message) throw new Error('Can not accept credential');
-        await this.acceptCredential(response.message)
-        this.loading =false;
+      this.form.url = this.form.url + '&did=' + this.hypersign.did;
+      this.loading = true;
+      let response = await axios.get(this.form.url);
+      response = response.data;
+      if (!response) throw new Error('Can not accept credential');
+      if (response && response.status != 200) throw new Error(response.error);
+      if (!response.message) throw new Error('Can not accept credential');
+      await this.acceptCredential(response.message)
+      this.loading = false;
     },
 
     async deeplink(url) {
       try {
         //console.log('deeplink...')
-        this.form.url = url; 
+        this.form.url = url;
         await this.fetchCredential();
       } catch (e) {
         this.loading = false;
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
+        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }
     },
 
-    async acceptCredential(credential){
+    async acceptCredential(credential) {
       //console.log('acceptCredential...')
-          if(this.hypersign.did != credential.credentialSubject.id) throw new Error('This credential is not being issued to you');
-          const confirmed = await this.$store.dispatch('modals/open', {
-                    name: 'confirm',
-                    title: 'Credential Acceptance',
-                    msg: `You are receiving credential: '${credential.type[1]}' \
+      if (this.hypersign.did != credential.credentialSubject.id) throw new Error('This credential is not being issued to you');
+      const confirmed = await this.$store.dispatch('modals/open', {
+        name: 'confirm',
+        title: 'Credential Acceptance',
+        msg: `You are receiving credential: '${credential.type[1]}' \
                     from an issuer: '${credential.issuer}'. \
                     Do you want to accept?`,
-                  })
-                  .catch(() => false);
-        if(confirmed){
-          credential.expirationDate = toFormattedDate(credential.expirationDate) ;
-          credential.issuanceDate = toFormattedDate(credential.issuanceDate) ;
-          credential.formattedIssuer =  toStringShorner(credential.issuer, 32, 15);
-          credential.formattedSchemaName =  toStringShorner(credential.type[1], 26, 15);
-          this.$store.commit('addHSVerifiableCredential', credential);
-        }
+      })
+        .catch(() => false);
+      if (confirmed) {
+        credential.expirationDate = toFormattedDate(credential.expirationDate);
+        credential.issuanceDate = toFormattedDate(credential.issuanceDate);
+        credential.formattedIssuer = toStringShorner(credential.issuer, 32, 15);
+        credential.formattedSchemaName = toStringShorner(credential.type[1], 26, 15);
+        this.$store.commit('addHSVerifiableCredential', credential);
+      }
     }
 
   },
@@ -126,17 +146,19 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
-.altText{
+
+.altText {
   color: #80808091;
   font-size: larger;
 }
+
 .d-flex {
   display: flex;
   float: right;
   padding: 5px;
 }
 
-.scan-text{
+.scan-text {
   margin-left: 20px;
   margin-bottom: 2px;
   // float: right;
@@ -179,7 +201,7 @@ export default {
     color: $text-color;
   }
 
-  p > svg {
+  p>svg {
     margin-right: 10px;
   }
 

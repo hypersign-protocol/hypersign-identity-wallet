@@ -21,13 +21,16 @@
         <Loader v-if="loading" />
       </div>
       <div class="scanner d-flex">
-        <Button class="scan"  data-cy="scan-button" @click="acceptCredential">
-          <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.accept') }}</span>
+        <Button class="scan" data-cy="scan-button" @click="acceptCredential">
+          <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
+              $t('pages.credential.accept')
+          }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
-        <Button class="scan"  data-cy="scan-button" @click="rejectCredential">
-          <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.reject') }}</span>
+        <Button class="scan" data-cy="scan-button" @click="rejectCredential">
+          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{ $t('pages.credential.reject')
+          }}</span>
         </Button>
       </div>
     </div>
@@ -42,13 +45,17 @@ import { mapGetters } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
-import {toFormattedDate, toStringShorner} from '../../utils/helper'
+import { toFormattedDate, toStringShorner } from '../../utils/helper'
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
+import { HS_VC_STATUS_PATH , HS_VC_STATUS_CHECK_ATTEMPT,HS_VC_STATUS_CHECK_INTERVAL} from '../../utils/hsConstants';
+import Axios from 'axios';
 
 export default {
-  components: { QrIcon,CloseIcon,VerifiedIcon },
+  components: { QrIcon, CloseIcon, VerifiedIcon },
   data() {
     return {
+      count: 0,
+      iteration: 0,
       verifiableCredential: {},
       claims: [],
       loading: false,
@@ -64,66 +71,121 @@ export default {
     };
   },
   beforeDestroy() {
-    if(!this.accepted) this.rejectCredential()
+    if (!this.accepted) this.rejectCredential()
   },
   created() {
-   
 
+    this.count = HS_VC_STATUS_CHECK_ATTEMPT
+    this.iteration = 0
     const credentialId = this.$route.params.credentialId;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentialsTemp.find(x => x.id == credentialId);
-      if(!this.verifiableCredential) this.rejectCredential()
-      this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate) ;
-      this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate) ;
-      this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName =  this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      if (!this.verifiableCredential) this.rejectCredential()
+      this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate);
+      this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate);
+      this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-      this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(),32, 15);
+      this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 32, 15);
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
 
-     const isRegisterFlow = localStorage.getItem("isRegisterFlow")
-      if(isRegisterFlow){
-        this.isProviderPresent = true;
-        this.acceptCredential();
-      }  
+    const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+    if (isRegisterFlow) {
+      this.isProviderPresent = true;
+      this.acceptCredential();
+    }
   },
   computed: {
     ...mapGetters(['hypersign']),
   },
-  methods: {    
-    toUpper(t){
-      if(t)
+  methods: {
+    toUpper(t) {
+      if (t)
         return t.toString().toUpperCase();
-      else 
+      else
         return t;
-    },   
-    async acceptCredential(){
+    },
+    async delay(delayInms) {
+      return new Promise(resolve => setTimeout(resolve, delayInms));
+    }
+    ,
+    async checkStatus(verifiableCredential) {
+      if (this.iteration > this.count) {
+        this.loading = false;
+        this.$router.push('/account');
+        return;
+      }
+      this.iteration += 1;
+      let res
+      try {
+        res = await Axios.get(`${HS_VC_STATUS_PATH}/${verifiableCredential.id}`);
+
+
+      } catch (error) {
+        console.log(error);
+        await this.delay(HS_VC_STATUS_CHECK_INTERVAL);
+        return await this.checkStatus(verifiableCredential);
+
+      }
+      if (res.data.vc.credStatus.claim.currentStatus == "Live") {
+
+        this.accepted = true;
+
+      }
+      return res
+
+    },
+    async acceptCredential() {
+
+
+      this.loading = true;
+      try {
+
+        console.log("here");
+        this.credStatus = await this.checkStatus(this.verifiableCredential);
+        console.log(this.credStatus);
+        if (this.credStatus == undefined) {
+          this.$store.dispatch('modals/open', { name: 'default', msg: "Credential Status not found." })
+          const vc = JSON.stringify(this.verifiableCredential)
+          localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
+          return
+        }
+        this.loading = false;
+      } catch (error) {
+        this.loading = false;
+        this.$store.dispatch('modals/open', { name: 'default', msg: "Credential Status not found." })
+        const vc = localStorage.getItem("3rdPartyAuthVC")
+        localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
+        return this.$router.push("/account");
+      }
       this.$store.commit('addHSVerifiableCredential', this.verifiableCredential);
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       this.accepted = true;
 
 
       // here 
-        /// decide if the 3rd party auth is enabled or not
-        /// if no, then go to /credential page
-        /// if yes, the go to /account page
-        // if(!localStorage.getItem("3rdPartyAuthVC")){
-        //   this.$router.push('/credential');
-        // }else{
-        //   localStorage.removeItem("3rdPartyAuthVC");
-        //   this.$router.push(this.$store.state.loginTargetLocation);
-        // }
-        this.rejectCredential();
+      /// decide if the 3rd party auth is enabled or not
+      /// if no, then go to /credential page
+      /// if yes, the go to /account page
+      // if(!localStorage.getItem("3rdPartyAuthVC")){
+      //   this.$router.push('/credential');
+      // }else{
+      //   localStorage.removeItem("3rdPartyAuthVC");
+      //   this.$router.push(this.$store.state.loginTargetLocation);
+      // }
+      this.rejectCredential();
+
+
     },
-    async rejectCredential(){
+    async rejectCredential() {
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       // console.log('rejectCredential:: Moving to account page')
-      
+
       const url = localStorage.getItem("qrDataQueryUrl");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
-      if(url){
+      if (url) {
         // console.log('rejectCredential:: url found');        
         this.$router.push('/account?url=' + url);
         // if(isFromThridParty){
@@ -133,7 +195,7 @@ export default {
         //   console.log('rejectCredential:: isFromThridParty not found')
         //   this.$router.push("/account");
         // }
-      }else{
+      } else {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
       }
@@ -144,21 +206,24 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
+
 .cred-card-body {
   padding-left: 10px;
   margin-top: 27%;
   padding-bottom: 5%;
 }
 
-.scan { 
+.scan {
   border-radius: 49px;
   text-align: center;
 }
+
 .scanner {
-  bottom:15px;
+  bottom: 15px;
   width: 50%;
   border-radius: 49px;
 }
+
 .cred-card {
   background: #21222a !important;
   box-shadow: 0 0 8px rgba(0, 33, 87, 0.15);
@@ -169,6 +234,7 @@ export default {
   color: gray;
   padding-top: 7%;
 }
+
 .cred-card-header {
   color: #fff;
 
@@ -181,6 +247,7 @@ export default {
   text-align: right;
   padding-right: 8px;
 }
+
 // .list-title{
 //     color: black;
 //     font-weight: bolder;
@@ -188,7 +255,7 @@ export default {
 .list-title {
   color: $text-color;
   font-size: 12px;
-  text-transform:capitalize;
+  text-transform: capitalize;
 }
 
 .list-group {
@@ -209,6 +276,7 @@ export default {
   border-left: 2px solid transparent;
   color: gray;
 }
+
 .d-flex {
   display: flex;
   float: right;
@@ -243,7 +311,7 @@ export default {
     color: $text-color;
   }
 
-  p > svg {
+  p>svg {
     margin-right: 10px;
   }
 
