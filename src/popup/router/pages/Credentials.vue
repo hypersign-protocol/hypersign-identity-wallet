@@ -1,13 +1,22 @@
 <template>
-  <div class="popup">
-    <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get
-      credentials.</span>
-    <Panel v-else>
-      <PanelItem v-for="credential in hypersign.credentials" :key="credential.id" :to="`/credential/${credential.id}`"
-        :title="credential.type[1]" :info="toFormattedDate(credential.issuanceDate)" />
-    </Panel>
-    <Loader v-if="loading" />
-  </div>
+
+    <div class="popup">
+      <Button   data-cy="generate-new-did" :to="`/credential/issue/`"  style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;">
+      <CreateIcon ></CreateIcon>
+    </Button>
+      <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get credentials.</span>
+      <Panel v-else>
+        
+        <PanelItem
+          v-for="credential in hypersign.credentials"
+          :key="credential.id"
+          :to="`/credential/${credential.id}`"
+          :title="credential.type[1]"
+          :info="toFormattedDate(credential.issuanceDate)"
+        />
+      </Panel>
+      <Loader v-if="loading" />
+    </div>
 </template>
 
 <script>
@@ -23,9 +32,14 @@ import axios from 'axios';
 import { toFormattedDate, toStringShorner } from '../../utils/helper'
 import { HS_VC_STATUS_PATH } from '../../utils/hsConstants'
 
+
+import CreateIcon from '../../../icons/topup-icon.svg?vue-component';
+
+import {toFormattedDate, toStringShorner} from '../../utils/helper'
+
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea },
+  components: { CheckBox, Panel,Button, PanelItem, QrIcon, Textarea ,CreateIcon},
   data() {
     return {
       form: {
