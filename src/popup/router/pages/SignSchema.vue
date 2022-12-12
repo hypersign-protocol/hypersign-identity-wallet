@@ -95,7 +95,7 @@ export default {
                 const { assertionMethod }  = this.hypersign.didDoc;
                 // TODO: This should go into hs-ssi-sdk
                 let proof = {
-                    "type": "Ed25519VerificationKey2020",
+                    "type": "Ed25519Signature2020",
                     "created": schemaToSign.authored,
                     "verificationMethod": assertionMethod[0],
                     "proofValue": signature,
