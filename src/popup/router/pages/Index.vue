@@ -164,7 +164,6 @@ export default {
         // const didDoc = JSON.parse(didDocString);
 
         const did  = didDoc.id;
-        const verificationMethodId = didDoc['verificationMethod'][0].id;        
         // const result = await hsSdk.did.register({ didDocString, privateKeyMultibase, verificationMethodId })
 
         // if(!result){
