@@ -123,9 +123,8 @@ export default {
 
 
       } catch (error) {
-        console.log( error.response.data );
         if(error.response.data.error !== null){
-          this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.message })
+          this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.error })
           this.$router.push('/account');
           return;
         }
