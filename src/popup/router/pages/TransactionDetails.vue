@@ -28,7 +28,7 @@
         </li>
 
         <li class="list-group-item">
-          <div><a :href="`https://hid-explorer.netlify.app/explorer/txdetails?hash=0x${tx.txhash}`" target="_blank">View
+          <div><a :href="`https://explorer.hypersign.id/hypersign-testnet/tx/${tx.txhash}`" target="_blank">View
               Full Details</a>
           </div>
         </li>

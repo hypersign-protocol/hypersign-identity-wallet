@@ -61,7 +61,7 @@ export default {
             },
 
             {
-                value: null, label: "Comming Soon",
+                value: null, label: "Coming Soon",
             }
         ],
         selected: {
