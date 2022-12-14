@@ -164,7 +164,7 @@ export default {
         this.vcf = vcard.getFormattedString()       // console.log("vcf", this.vcf);
         this.loading=false;
 
-        this.link = WALLET_URL + "businessCard/" + this.sortUrl
+        this.link = WALLET_URL + "businesscard/" + this.sortUrl
         this.qrdata = this.vcf
         console.log(this.vcf);
         this.showQr = true
