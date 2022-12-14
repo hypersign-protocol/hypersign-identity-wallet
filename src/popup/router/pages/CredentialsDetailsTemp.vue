@@ -123,7 +123,11 @@ export default {
 
 
       } catch (error) {
-        console.log(error);
+        if(error.response.data.error !== null){
+          this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.error })
+          this.$router.push('/account');
+          return;
+        }
         await this.delay(HS_VC_STATUS_CHECK_INTERVAL);
         return await this.checkStatus(verifiableCredential);
 
