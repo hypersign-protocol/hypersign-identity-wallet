@@ -96,11 +96,11 @@ export default {
 
         ////HS_TODO
         if(selected == true){
-            state.hypersign.keys = payload.keys;
             state.hypersign.did = payload.did;
             state.hypersign.didDoc = payload.didDoc;
             state.hypersign.keys= payload.keys;
         }
+        
         
         state.hypersign.dids[did] = {
             didDoc,

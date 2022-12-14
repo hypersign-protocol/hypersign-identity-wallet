@@ -89,10 +89,10 @@ export default {
         const publicKeyMultibase = kp.publicKeyMultibase
 
         const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
-        if(didDoc.id.split(":").at(-1).length!==45){
-          console.log("DID length is not 45. Trying again with index "+ (hdIndex+1));
-          return this.generateNewDid(hdIndex+1);
-        }
+        // if(didDoc.id.split(":").at(-1).length!==45){
+        //   console.log("DID length is not 45. Trying again with index "+ (hdIndex+1));
+        //   return this.generateNewDid(hdIndex+1);
+        // }
         this.$store.commit('setHSkeys', {
           keys: kp,
           did: didDoc.id,
