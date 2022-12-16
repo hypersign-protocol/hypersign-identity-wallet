@@ -99,7 +99,7 @@ export default {
                 let didDoc = await this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase});
                 // let didDoc = JSON.parse(didDocString);
 
-                const { controllers, alsoKnownAs, serviceEndpoint } = this.didRaw;
+                const { controllers, alsoKnownAs, serviceEndpoint , serviceData} = this.didRaw;
 
                 if(!Array.isArray(controllers)){
                     throw new Error('controllers should be an array')
@@ -145,9 +145,20 @@ export default {
                     }
                 }
 
+               
+
                 // https://www.w3.org/TR/did-core/#assigning-dids-to-existing-web-resources
                 if(alsoKnownAs){
                     didDoc.alsoKnownAs.push(alsoKnownAs);
+                }
+
+                if(serviceData){
+                    serviceData.type ="LinkedImages"
+                    didDoc.service.push({
+                        "id": didDoc.id + "#linked-image",
+                        "type": "LinkedDomains", 
+                        "serviceEndpoint": serviceData.data.imageRaw
+                    })
                 }
 
                 if(serviceEndpoint){
