@@ -61,7 +61,7 @@
         "crypto-js": "^4.0.0",
         "detect-browser": "^4.8.0",
         "gh-pages": "^4.0.0",
-        "hs-ssi-sdk": "github:hypersign-protocol/hs-ssi-sdk#credential-revocation",
+        "hs-ssi-sdk": "github:hypersign-protocol/hs-ssi-sdk#develop",
         "jdenticon": "^2.2.0",
         "lodash-es": "^4.17.15",
         "qrcode.vue": "^1.6.3",
