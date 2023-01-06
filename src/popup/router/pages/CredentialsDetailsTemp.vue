@@ -23,13 +23,14 @@
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="acceptCredential">
           <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-              $t('pages.credential.accept')
+            $t('pages.credential.accept')
           }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="rejectCredential">
-          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{ $t('pages.credential.reject')
+          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
+            $t('pages.credential.reject')
           }}</span>
         </Button>
       </div>
@@ -47,7 +48,8 @@ import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import { toFormattedDate, toStringShorner } from '../../utils/helper'
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import { HS_VC_STATUS_PATH , HS_VC_STATUS_CHECK_ATTEMPT,HS_VC_STATUS_CHECK_INTERVAL} from '../../utils/hsConstants';
+import edvService from '../../utils/edvService';
+import { HS_VC_STATUS_PATH, HS_VC_STATUS_CHECK_ATTEMPT, HS_VC_STATUS_CHECK_INTERVAL } from '../../utils/hsConstants';
 import Axios from 'axios';
 
 export default {
@@ -98,6 +100,8 @@ export default {
   },
   computed: {
     ...mapGetters(['hypersign']),
+
+
   },
   methods: {
     toUpper(t) {
@@ -123,7 +127,7 @@ export default {
 
 
       } catch (error) {
-        if(error.response.data.error !== null){
+        if (error.response.data.error !== null) {
           this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.error })
           this.$router.push('/account');
           return;
@@ -135,11 +139,13 @@ export default {
       if (res.data.vc.credStatus.claim.currentStatus == "Live") {
 
         this.accepted = true;
-
+     
       }
       return res
 
     },
+
+
     async acceptCredential() {
 
 
@@ -189,6 +195,7 @@ export default {
       const url = localStorage.getItem("qrDataQueryUrl");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
+
       if (url) {
         // console.log('rejectCredential:: url found');        
         this.$router.push('/account?url=' + url);
@@ -203,6 +210,15 @@ export default {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
       }
+      const edvServiceInstance = new edvService();
+      const documentId = 'randomId'
+        const userData = {
+          userId: this.hypersign.profile.email,
+          sequenceNo: 0,
+          docId: documentId,
+        }
+      const data = localStorage.getItem("state")
+      edvServiceInstance.sync(userData, JSON.parse(data))
     }
   },
 };

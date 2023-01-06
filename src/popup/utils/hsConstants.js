@@ -1,5 +1,5 @@
-export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://stage.hypermine.in/authserver/";
-//export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "http://localhost:8001/";
+// export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://stage.hypermine.in/authserver/";
+export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "http://localhost:8001/";
 // export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://api.fyre.hypersign.id/auth/";
 
 export const HS_VC_STATUS_CHECK_ATTEMPT=process.env.VUE_APP_HS_VC_STATUS_CHECK_ATTEMPT  || 15;
@@ -20,6 +20,6 @@ export const HYPERSIGN_AUTH_PROVIDER = {
     FACEBOOK: 'facebook'
 }
 
-export const HIDNODE_RPC = "https://jagrat.hypersign.id/rpc/"
-export const HIDNODE_REST = "https://jagrat.hypersign.id/rest/"
+export const HIDNODE_RPC = "https://rpc.jagrat.hypersign.id/"
+export const HIDNODE_REST = "https://api.jagrat.hypersign.id/"
 export const HIDNODE_NAMESPACE = 'testnet'

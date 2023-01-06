@@ -81,6 +81,7 @@ export default {
             res = res.data;
             // console.log(res)
             // console.log(res.message)
+           
             if (res && res.status != 200) throw new Error(res.error);
 
 
