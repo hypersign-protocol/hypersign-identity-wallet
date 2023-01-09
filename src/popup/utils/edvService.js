@@ -28,9 +28,17 @@ export default class edvService {
 
     async resync(userId){
         let url = this.endPoint + "hs/api/v2/sync";
-        const res = await Axios.get(url+'/'+userId
-        )
+        const res = await Axios.get(url+'/'+userId)
 
         return res.data;
     }
+
+
+    async getWalletDataEncrypted(userId) {
+        const data = await this.resync(userId)  
+        return data
+      }
+
+
+
 }

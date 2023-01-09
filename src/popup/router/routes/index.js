@@ -7,7 +7,8 @@ import BackupWallet from '../pages/BackupWallet';
 import BackupWalletEdv from '../pages/BackupWalletEdv';
 import RestoreWallet from '../pages/RestoreWallet';
 import RestoreWalletEdv from '../pages/RestoreWalletEdv';
-
+import AskPinBackUp from '../pages/AskPinBackUp'
+import AskPinLockRecover from '../pages/AskPinLockRecover'
 import AboutSettings from '../pages/AboutSettings';
 import TermsOfService from '../pages/TermsOfService';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
@@ -132,6 +133,25 @@ export default [{
     component: BackupWallet,
     meta: {
         title: 'backup-wallet',
+    },
+},
+
+{
+    path: '/askpinbackup',
+    name: 'ask-pin',
+    component: AskPinBackUp,
+    meta: {
+        title: 'ask-pin',
+        ifNotAuthOnly:true
+    },
+},
+{
+    path: '/askpinrecover',
+    name: 'ask-pin-recover-lock',
+    component: AskPinLockRecover,
+    meta: {
+        title: 'ask-pin',
+        ifNotAuthOnly:true
     },
 },
 {

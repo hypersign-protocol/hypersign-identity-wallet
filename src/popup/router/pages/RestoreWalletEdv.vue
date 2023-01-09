@@ -88,6 +88,7 @@ export default {
     };
   },
   created() {
+    this.$store.commit('setDontGoBack', true)
 
     this.userId = this.$route.query.userId
   },
@@ -154,12 +155,13 @@ export default {
       const edvServiceInstance = new edvService();
       const data = await edvServiceInstance.resync(this.userId)
 
-      this.walletJson=data.encryptedMessage
+      this.walletJson = data.encryptedMessage
     },
 
     async restore() {
       try {
         this.loading = true;
+
         // Check the password
         if (this.password === "") throw new Error("Please enter a password")
         if (this.activeNetwork === "") throw new Error('Please choose a backup type.')
@@ -170,6 +172,7 @@ export default {
           try {
             const walletData = await decrypt(this.walletJson, this.password);
             const { hypersign, mnemonic } = JSON.parse(walletData);
+
             // console.log(walletData)
 
             this.$store.commit('restoreHypersign', hypersign);
@@ -178,13 +181,21 @@ export default {
             this.mnemonic = mnemonic;
             await this.importAccount();
 
+            this.$store.commit('setPassword',this.password)
+
             this.loading = false;
+            this.$store.commit('setDontGoBack', false)
             this.$store.dispatch('modals/open', { name: 'default', msg: 'Restore successful' });
             this.$router.push('/account');
           } catch (e) {
             this.loading = false;
+            this.$store.commit('setDontGoBack', false)
+
             this.password = "";
-            if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: "Incorrect password" });
+            if (e.message) {
+              this.$store.dispatch('modals/open', { name: 'default', msg: "Incorrect password" });
+              this.$store.commit('setPassword', null)
+            }
           }
 
         }, 1000)
@@ -193,6 +204,8 @@ export default {
       } catch (e) {
         this.loading = false;
         this.password = "";
+        this.$store.commit('setDontGoBack', false)
+
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }
     }

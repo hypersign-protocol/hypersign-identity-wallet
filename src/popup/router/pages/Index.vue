@@ -72,7 +72,9 @@ export default {
         const { email, name } = user;
         that.profile.email = email;
         that.profile.name = name;
+        that.profile.did=''
         that.isThridPartyAuth = true;
+        that.$store.commit('setProfile',that.profile)
         // localStorage.removeItem("authToken")
         // localStorage.removeItem("accessToken")
         localStorage.removeItem("isRoute")
@@ -207,7 +209,16 @@ export default {
         if (e.response.status === 403) {
           const data = e.response.data.data;      
           this.isloading = false;
-          return this.$router.push('/restoreWalletEdv?'+'&userId='+data.userId     );
+          // this.$router.push('/askpinrecover')
+         return   this.$router.push('/askpinrecover') 
+
+      //  const password=  await this.askPinBackup()
+       
+          
+      //     const cryptoS=new cryptoService()
+      //     console.log(cryptoS);
+          // useUserId to get the encryptedData
+          // return this.$router.push('/restoreWalletEdv?'+'&userId='+data.userId     );
 
         }
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
@@ -218,7 +229,7 @@ export default {
       ////HYPERSIGN Related
       ////////////////////////////////////////////////
     }
-  }
+  },
 
 };
 </script>
