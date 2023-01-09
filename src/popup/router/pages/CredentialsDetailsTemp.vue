@@ -139,7 +139,7 @@ export default {
       if (res.data.vc.credStatus.claim.currentStatus == "Live") {
 
         this.accepted = true;
-     
+
       }
       return res
 
@@ -210,15 +210,11 @@ export default {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
       }
-      const edvServiceInstance = new edvService();
-      const documentId = 'randomId'
-        const userData = {
-          userId: this.hypersign.profile.email,
-          sequenceNo: 0,
-          docId: documentId,
-        }
-      const data = localStorage.getItem("state")
-      edvServiceInstance.sync(userData, JSON.parse(data))
+
+      //  backup wallet here
+      this.$router.push('/backupWalletEdv')
+
+
     }
   },
 };

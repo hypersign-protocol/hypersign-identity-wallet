@@ -36,7 +36,6 @@ import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE }
 import webAuth from "../../utils/auth0Connection";
 import hidWalletInstance from '../../utils/hidWallet';
 import { generateMnemonicToHDSeed } from '../../utils/SSIWallet';
-import { restoreState, resetState } from '../../utils/store'
 // import HypersignSsiSDK  from 'hs-ssi-sdk'
 const HypersignSsiSDK = require('hs-ssi-sdk');
 
@@ -206,14 +205,9 @@ export default {
       } catch (e) {
         console.log({ ...e });
         if (e.response.status === 403) {
-          const encData = e.response.data.encData;
-          resetState()
-          await this.$store.dispatch('setLogin', { keypair });
-          this.$store.commit('switchLoggedIn', true);
-
-          restoreState(JSON.stringify(encData))
+          const data = e.response.data.data;      
           this.isloading = false;
-          return this.$router.push(this.$store.state.loginTargetLocation);
+          return this.$router.push('/restoreWalletEdv?'+'&userId='+data.userId     );
 
         }
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
