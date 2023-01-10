@@ -89,8 +89,8 @@ import axios from 'axios';
 import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-
-
+import syncMixin from '../../../mixins/syncSwMixin'
+import '../registerServiceWorker'
 export default {
   name: 'Account',
   components: {
@@ -118,12 +118,12 @@ export default {
       isProviderPresent: false,
     };
   },
-  mixins: [verifyTokenMixin],
+  mixins: [syncMixin,verifyTokenMixin],
   computed: {
-    ...mapState(['tourRunning', 'backedUpSeed']),
+    ...mapState([,'tourRunning','updateCount', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
   },
- 
+
   async created() {
     try {
 
@@ -156,10 +156,14 @@ export default {
         } else {
           console.log('Inside else  check')
         }
+       
+        if (this.updateCount > 0) {
+         await this.syncSW()
+        
 
-        navigator.serviceWorker.getRegistrations().then(registration => {
-        registration[0].sync.register('myFirstSync').then(()=> console.log("Sync registered"))
-    })
+        }
+
+
 
       } catch (e) {
         console.log(e.message)
@@ -213,6 +217,7 @@ export default {
     }
   },
   methods: {
+
     async scan() {
       localStorage.setItem("isMobileWallet", true)
       const QRData = await this.$store.dispatch('modals/open', {

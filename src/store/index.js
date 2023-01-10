@@ -19,6 +19,7 @@ Vue.use(Vuex);
 Vue.use(VueRx);
 
 const initialState = {
+    updateCount: 0,
     isRestored: false,
     account: {},
     mnemonic: null,
@@ -53,12 +54,12 @@ const initialState = {
     migrations: {},
     backedUpSeed: null,
     tourRunning: false,
-    dontGoBack:false,
+    dontGoBack: false,
     tourStartBar: true,
     saveErrorLog: true,
     loginTargetLocation: { name: 'account' },
-    profile:{},
-    password:null,
+    profile: {},
+    password: null,
     hypersign: {
         did: "",
         keys: {},
@@ -73,17 +74,17 @@ const initialState = {
     },
 };
 
-export default new Vuex.Store({
-    state: {...initialState },
+const store = new Vuex.Store({
+    state: { ...initialState },
     getters,
     mutations: {
         setState(state, newState) {
-            Object.entries({...state, ...newState }).forEach(([name, value]) =>
+            Object.entries({ ...state, ...newState }).forEach(([name, value]) =>
                 Vue.set(state, name, value),
             );
         },
         resetState(state) {
-            Object.entries({...initialState, isRestored: true }).forEach(([name, value]) =>
+            Object.entries({ ...initialState, isRestored: true }).forEach(([name, value]) =>
                 Vue.set(state, name, value),
             );
         },
@@ -150,3 +151,44 @@ export default new Vuex.Store({
         invites: invitesModule,
     },
 });
+
+
+store.watch(
+    state => state.hypersign.credentials,
+    (newValue, oldValue) => {
+
+        store.commit("storeupdated",)
+    }
+)
+store.watch(
+    state => state.hypersign.credentialsTemp,
+    (newValue, oldValue) => {
+
+        store.commit("storeupdated")
+    }
+)
+store.watch(
+    state => state.hypersign.dids,
+    (newValue, oldValue) => {
+
+        store.commit("storeupdated")
+    }
+)
+store.watch(
+    state => state.hypersign.profile,
+    (newValue, oldValue) => {
+
+        store.commit("storeupdated")
+    }
+)
+
+
+store.subscribe((mutations, state) => {
+    if (mutations.type == "storeupdated") {
+        
+    }
+})
+
+
+
+export default store

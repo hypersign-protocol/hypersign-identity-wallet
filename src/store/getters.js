@@ -18,7 +18,9 @@ export default {
     return state.profile
   }
   ,
-
+  countUpdate(state){
+    return state.updateCount
+  },
   password(state) {
     return state.password;
   },

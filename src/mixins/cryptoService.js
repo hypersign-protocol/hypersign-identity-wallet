@@ -26,6 +26,18 @@ export default {
 
             }
         },
+        async encryptWalletNoPopUP(mnemonic, hypersign, password){
+            const dataToEncrypt = {
+                mnemonic: mnemonic,
+                hypersign: hypersign,
+            };
+
+
+            const walletDataJson = JSON.stringify(dataToEncrypt);
+            if (walletDataJson == '') throw new Error('Invalid data');
+            const encryptedMessage = await encrypt(walletDataJson, password);
+            return encryptedMessage
+        },
 
 
 

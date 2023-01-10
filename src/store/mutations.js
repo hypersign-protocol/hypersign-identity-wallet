@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from '.';
 import { defaultNetwork } from '../popup/utils/constants';
 
 export default {
@@ -13,6 +14,12 @@ export default {
     },
     switchLoggedIn(state, payload) {
         state.isLoggedIn = payload;
+    },
+    storeupdated(state,payload){
+        state.updateCount+=1
+    },
+    storeupdatedRest(state,payload){
+        state.updateCount=0
     },
     updateLatestTransactions(state, payload) {
         state.transactions.latest = payload;
@@ -109,6 +116,8 @@ export default {
             keys,
         }
 
+        store.commit('storeupdated')
+    
     },
     restoreHypersign(state, payload) {
         Object.assign(state.hypersign, payload);
