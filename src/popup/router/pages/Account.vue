@@ -86,6 +86,7 @@ import BalanceInfo from '../components/BalanceInfo';
 import BoxButton from '../components/BoxButton';
 import {didResolver} from '../../utils/resolver'
 import axios from 'axios';
+import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 
@@ -117,6 +118,7 @@ export default {
       isProviderPresent: false,
     };
   },
+  mixins:[verifyTokenMixin],
   computed: {
     ...mapState(['tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
@@ -125,12 +127,29 @@ export default {
     try {
 
       try {
+
+       const data= await this.verifyToken()
+        if(data!==undefined ){
+          const response=data.response
+          if(response.status===401){
+            await this.$store.dispatch('reset');
+            localStorage.removeItem('authToken')
+          await this.$router.push('/');
+          this.$store.commit('setMainLoading', false);
+          this.$store.commit('switchLoggedIn', false);
+
+          }
+        }
         // For backward compatiblity
         // Make users loging if they have old did wallet. [did:hs]. So that they can create a new DID for our testnet, 
+
+        
         if (this.hypersign.did.includes('did:hs')) {
           console.log('Inside if check')
           await this.$store.dispatch('reset');
           await this.$router.push('/');
+          localStorage.removeItem('authToken')
+
           this.$store.commit('setMainLoading', false);
           this.$store.commit('switchLoggedIn', false);
         } else {

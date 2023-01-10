@@ -26,6 +26,7 @@ export default {
           });
         }
         await this.$store.dispatch('reset');
+        localStorage.removeItem('authToken')
         await this.$router.push('/');
         this.$store.commit('setMainLoading', false);
         if (process.env.IS_EXTENSION) postMessage({ type: AEX2_METHODS.LOGOUT });

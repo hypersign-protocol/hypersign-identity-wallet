@@ -207,7 +207,8 @@ export default {
       } catch (e) {
         console.log({ ...e });
         if (e.response.status === 403) {
-          const data = e.response.data.data;      
+          const data = e.response.data.authToken;
+          localStorage.setItem('authToken',data)      
           this.isloading = false;
           // this.$router.push('/askpinrecover')
          return   this.$router.push('/askpinrecover') 
