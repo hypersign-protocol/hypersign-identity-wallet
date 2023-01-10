@@ -12,6 +12,7 @@ import AmountInput from './components/AmountInput';
 import AddressInput from './components/AddressInput';
 import Button from './components/Button';
 import ModalComponent from './components/Modal';
+import './registerServiceWorker'
 
 import * as helper from '../utils/helper';
 import store from '../../store';
