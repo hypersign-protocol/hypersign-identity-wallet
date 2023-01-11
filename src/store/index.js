@@ -185,7 +185,7 @@ store.watch(
 
 store.subscribe((mutations, state) => {
     if (mutations.type == "storeupdated") {
-        
+        console.log('updated');
     }
 })
 

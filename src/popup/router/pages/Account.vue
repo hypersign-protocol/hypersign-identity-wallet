@@ -107,7 +107,7 @@ export default {
   },
   data() {
     return {
-      worker:undefined,
+      worker: undefined,
       form: {
         url: '',
         amount: '',
@@ -119,9 +119,9 @@ export default {
       isProviderPresent: false,
     };
   },
-  mixins: [syncMixin,verifyTokenMixin],
+  mixins: [syncMixin, verifyTokenMixin],
   computed: {
-    ...mapState([,'tourRunning','updateCount', 'backedUpSeed']),
+    ...mapState([, 'tourRunning', 'updateCount', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
   },
 
@@ -130,18 +130,7 @@ export default {
 
       try {
 
-        const data = await this.verifyToken()
-        if (data !== undefined) {
-          const response = data.response
-          if (response.status === 401) {
-            await this.$store.dispatch('reset');
-            localStorage.removeItem('authToken')
-            await this.$router.push('/');
-            this.$store.commit('setMainLoading', false);
-            this.$store.commit('switchLoggedIn', false);
 
-          }
-        }
         // For backward compatiblity
         // Make users loging if they have old did wallet. [did:hs]. So that they can create a new DID for our testnet, 
 
@@ -157,14 +146,28 @@ export default {
         } else {
           console.log('Inside else  check')
         }
-       
-        if (this.updateCount > 0) {
-          
+        console.log(this.updateCount);
 
-         
-        this.worker=initiateWorker()
-        await this.syncSW(this.worker)
-       
+        if (this.updateCount > 0) {
+          this.verifyToken()
+            .then(data => {
+              if (data !== undefined) {
+                const response = data.response
+                if (response.status === 401) {
+                  this.$store.dispatch('reset');
+                  localStorage.removeItem('authToken')
+                  this.$router.push('/');
+                  this.$store.commit('setMainLoading', false);
+                  this.$store.commit('switchLoggedIn', false);
+
+                }
+              }
+
+              this.worker = initiateWorker()
+              this.syncSW(this.worker)
+            })
+
+
 
 
         }
