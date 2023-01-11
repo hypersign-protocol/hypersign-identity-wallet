@@ -121,7 +121,7 @@ export default {
   },
   mixins: [syncMixin, verifyTokenMixin],
   computed: {
-    ...mapState([, 'tourRunning', 'updateCount', 'backedUpSeed']),
+    ...mapState([, 'tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
   },
 
@@ -146,7 +146,6 @@ export default {
         } else {
           console.log('Inside else  check')
         }
-        console.log(this.updateCount);
 
         this.verifyToken()
           .then(data => {

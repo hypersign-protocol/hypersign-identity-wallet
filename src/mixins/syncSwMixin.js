@@ -53,7 +53,6 @@ export default {
 
 
 
-                store.commit('storeupdatedRest')
                 localStorage.setItem('time', Date.now())
             }
         }
