@@ -150,23 +150,23 @@ export default {
 
         if (this.updateCount > 0) {
           this.verifyToken()
-            .then(data => {
-              if (data !== undefined) {
-                const response = data.response
-                if (response.status === 401) {
-                  this.$store.dispatch('reset');
-                  localStorage.removeItem('authToken')
-                  this.$router.push('/');
-                  this.$store.commit('setMainLoading', false);
-                  this.$store.commit('switchLoggedIn', false);
+          .then(data=>{
+            if (data !== undefined) {
+            const response = data.response
+            if (response.status === 401) {
+               this.$store.dispatch('reset');
+              localStorage.removeItem('authToken')
+               this.$router.push('/');
+              this.$store.commit('setMainLoading', false);
+              this.$store.commit('switchLoggedIn', false);
 
-                }
-              }
+            }
+          }
 
-              this.worker = initiateWorker()
-              this.syncSW(this.worker)
-            })
-
+          this.worker = initiateWorker()
+           this.syncSW(this.worker)
+          })
+          
 
 
 

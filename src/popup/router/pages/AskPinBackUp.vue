@@ -36,7 +36,7 @@
           </ListItem>
         </div> -->
 
-        <Button @click="askPinBkUP()">
+        <Button @click="backup()">
           {{ $t('pages.backup-wallet.button') }}
         </Button>
       </div>
@@ -48,11 +48,12 @@
 <script>
 import ListItem from '../components/ListItem';
 import CheckBox from '../components/CheckBox';
-import cryptoService from '../../../mixins/cryptoService'
-import edvService from '../../utils/edvService'
-
+const { encrypt } = require('../../../lib/symmericCrypto');
 import { mapGetters, mapState } from 'vuex';
 import Input from '../components/Input';
+import saveFile from '../../utils/saveFile';
+import edvService from '../../utils/edvService';
+
 
 export default {
   components: {
@@ -63,17 +64,18 @@ export default {
   data() {
     return {
       loading: false,
-      activeBackup: 'local',
+      queryURL:undefined,
+      activeBackup: 'cloud',
       modal: {
         visible: false,
         title: '',
       },
       seedPhrase: '',
-      password: '',
+      password: undefined,
       repassword: '',
       options: [
         {
-          text: this.$t('pages.backup-wallet.setelct-option-ask-pin'),
+          text: this.$t('pages.backup-wallet.select-option-1'),
           value: 'local',
           disabled: false,
         },
@@ -95,26 +97,65 @@ export default {
   computed: {
     ...mapState(['mnemonic']),
     ...mapGetters(['hypersign']),
-
   },
-  mixins: [cryptoService],
 
-  mounted() {
-    this.$store.commit('setDontGoBack', true)
+
+  mounted(){
+    this.$store.commit('setDontGoBack',true)
+    this.queryURL=this.$route.query.url
 
   },
   methods: {
-    async askPinBkUP() {
-
+    selectBackupType(backupType) {
+      if (!backupType.disabled) {
+        this.activeBackup = backupType.value;
+      } else {
+        this.$store.dispatch('modals/open', { name: 'default', msg: 'Feature coming soon...' });
+      }
+    },
+    async backup() {
       try {
-        this.loading = true
+        // Check the password
+      
+        if(!this.password) throw new Error('Please enter a password.');
         if (this.password === '') throw new Error('Please enter a password.');
+
         if (this.password != this.repassword) throw new Error('Password mismatch');
-        this.$store.commit('setPassword', this.password);      // encrypt Wallet
 
+        if (this.activeBackup === '') throw new Error('Please choose a backup type.');
 
-        const encryptedMessage = await this.encryptWallet(this.mnemonic, this.hypersign, this.password)
-        const edvServiceInstance = new edvService();
+        // Give notificaiton and ask for confirmation
+        const confirmed = await this.$store
+          .dispatch('modals/open', {
+            name: 'confirm',
+            title: 'Backup Confirmation',
+            msg:
+              this.activeBackup == 'cloud'
+                ? this.$t('pages.backup-wallet.select-option-2-msg')
+                : this.$t('pages.backup-wallet.select-option-1-msg'),
+          })
+          .catch(() => false);
+
+        // Encrypt everything
+        if (confirmed) {
+          this.loading = true;
+
+          const dataToEncrypt = {
+            mnemonic: this.mnemonic,
+            hypersign: this.hypersign,
+          };
+
+          const walletDataJson = JSON.stringify(dataToEncrypt);
+          if (walletDataJson == '') throw new Error('Invalid data');
+          console.log("Password", this.password);
+          const encryptedMessage = await encrypt(walletDataJson, this.password);
+          
+          // const fileName = 'hypersign-identity-wallet-backup.txt';
+
+          // cloud
+          if (this.activeBackup == 'cloud') {
+
+            const edvServiceInstance = new edvService();
             const documentId = 'randomId'
             const userData = {
               userId: this.hypersign.profile.email,
@@ -125,22 +166,38 @@ export default {
               encryptedMessage
             }
             await edvServiceInstance.sync(userData, data)
-        this.$store.commit('setDontGoBack', false)
-        this.loading = false
+
+
+            // sync with edv
+
+            // await saveFile(fileName, encryptedMessage);
+          } else {
+            // send the file to server...
+            // TODO Backup on cloud
+          }
+          this.$store.commit('setPassword',this.password)
+          this.$store.commit('setDontGoBack',false)
+
+          // this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
+         if(this.queryURL){
+          this.$router.push('/account?url='+this.queryURL);
+         }else{
+          this.$router.push('/account')
+         }
+          this.loading = false;
+
+        }
+        // save into a file
       } catch (e) {
-        console.log(e);
-        this.loading = false
-        this.$store.commit('setDontGoBack', true)
+        this.$store.commit('setDontGoBack',false)
 
-
+        this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
-      }
-      finally {
-        this.loading = false
-      }
+      } finally {
+        this.$store.commit('setDontGoBack',false)
 
-
-    }
+      }
+    },
   },
 };
 </script>

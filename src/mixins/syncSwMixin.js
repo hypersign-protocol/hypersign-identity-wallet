@@ -14,6 +14,11 @@ export default {
                 const mnemonic = this.$store.state.mnemonic
                 const hypersign = this.$store.getters.hypersign
                 const profile = hypersign.profile
+
+                if(password===null || mnemonic===null  || hypersign===null|| profile===null ){
+                    return
+                }
+
                 const documentId = 'randomId'
 
                 const userData = {

@@ -64,13 +64,14 @@ export default {
   data() {
     return {
       loading: false,
+      queryURL:undefined,
       activeBackup: 'cloud',
       modal: {
         visible: false,
         title: '',
       },
       seedPhrase: '',
-      password: '',
+      password: undefined,
       repassword: '',
       options: [
         {
@@ -101,6 +102,7 @@ export default {
 
   mounted(){
     this.$store.commit('setDontGoBack',true)
+    this.queryURL=this.$route.query.url
 
   },
   methods: {
@@ -114,6 +116,8 @@ export default {
     async backup() {
       try {
         // Check the password
+      
+        if(!this.password) throw new Error('Please enter a password.');
         if (this.password === '') throw new Error('Please enter a password.');
 
         if (this.password != this.repassword) throw new Error('Password mismatch');
@@ -174,8 +178,8 @@ export default {
           this.$store.commit('setPassword',this.password)
           this.$store.commit('setDontGoBack',false)
 
-          this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
-          this.$router.push('/account');
+          // this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
+          this.$router.push('/account?url='+this.queryURL);
 
           this.loading = false;
 

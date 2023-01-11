@@ -142,7 +142,6 @@ export default [{
     component: AskPinBackUp,
     meta: {
         title: 'ask-pin',
-        ifNotAuthOnly:true
     },
 },
 {

@@ -152,7 +152,6 @@ export default {
       this.loading = true;
       try {
 
-        console.log("here");
         this.credStatus = await this.checkStatus(this.verifiableCredential);
         console.log(this.credStatus);
         if (this.credStatus == undefined) {
@@ -198,7 +197,8 @@ export default {
 
       if (url) {
         // console.log('rejectCredential:: url found');        
-        this.$router.push('/account?url=' + url);
+        // this.$router.push('/account?url=' + url);
+        this.$router.push('/askpinbackup?url='+url)
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')
         //   this.$router.push('/account?url=' + url);
@@ -209,10 +209,10 @@ export default {
       } else {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
+        this.$router.push('/askpinbackup')
       }
 
       //  backup wallet here
-      this.$router.push('/backupWalletEdv')
 
 
     }
