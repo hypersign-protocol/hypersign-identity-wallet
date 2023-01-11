@@ -90,7 +90,7 @@ import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import syncMixin from '../../../mixins/syncSwMixin'
-import '../registerServiceWorker'
+import initiateWorker from '../registerServiceWorker'; '../registerServiceWorker'
 export default {
   name: 'Account',
   components: {
@@ -107,6 +107,7 @@ export default {
   },
   data() {
     return {
+      worker:undefined,
       form: {
         url: '',
         amount: '',
@@ -158,8 +159,13 @@ export default {
         }
        
         if (this.updateCount > 0) {
-         await this.syncSW()
-        
+          
+
+         
+        this.worker=initiateWorker()
+        await this.syncSW(this.worker)
+       
+
 
         }
 
