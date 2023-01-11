@@ -116,7 +116,6 @@ export default {
             keys,
         }
 
-        store.commit('storeupdated')
     
     },
     restoreHypersign(state, payload) {
@@ -129,6 +128,7 @@ export default {
     removeHSVerifiableCredential(state, payload) {
         ////HS_TODO
         state.hypersign.credentials = state.hypersign.credentials.filter((el) => el.id !== payload.id);
+  
     },
     setThridPartyAuth(state, payload) {
         const thridPartyAuth = state.hypersign.thridPartyAuths.find(x => x.provider === payload.provider)

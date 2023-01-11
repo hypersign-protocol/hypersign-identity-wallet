@@ -2,7 +2,7 @@ import cryptoService from "./cryptoService"
 import {SUPERHERO_HS_AUTH_BASE_URL} from "../popup/utils/hsConstants"
 export default {
     methods: {
-        async syncSW(worker) {
+        async syncSW(worker,store) {
 
             if (localStorage.getItem('time') === null) {
                 localStorage.setItem('time', Date.now())
@@ -10,9 +10,9 @@ export default {
             }
             if (((Date.now() - localStorage.getItem('time')) / 1000) > 5) {
 
-                const password = this.$store.getters.password
-                const mnemonic = this.$store.state.mnemonic
-                const hypersign = this.$store.getters.hypersign
+                const password = store.getters.password
+                const mnemonic = store.state.mnemonic
+                const hypersign = store.getters.hypersign
                 const profile = hypersign.profile
 
                 if(password===null || mnemonic===null  || hypersign===null|| profile===null ){
@@ -53,7 +53,7 @@ export default {
 
 
 
-                this.$store.commit('storeupdatedRest')
+                store.commit('storeupdatedRest')
                 localStorage.setItem('time', Date.now())
             }
         }

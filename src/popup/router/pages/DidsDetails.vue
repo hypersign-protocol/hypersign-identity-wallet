@@ -91,7 +91,7 @@ export default {
     ,
     selectDid() {
       try {
-        this.$store.commit('setHSkeys', {
+        this.$store.dispatch('setHSkeys', {
           keys: this.key,
           did: this.didDoc.id,
           didDoc: this.didDoc,

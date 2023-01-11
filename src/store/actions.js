@@ -9,6 +9,8 @@ import {
 import { postMessage, postMessageToContent } from '../popup/utils/connection';
 import { BACKEND_URL, AEX2_METHODS } from '../popup/utils/constants';
 
+import initiateWorker from '../popup/router/registerServiceWorker';
+import syncSwMixin from '../mixins/syncSwMixin';
 export default {
   setAccount({ commit }, payload) {
     commit('updateAccount', payload);
@@ -80,7 +82,42 @@ export default {
   },
   async setPendingTx({ commit, state: { transactions } }, tx) {
     commit('setPendingTxs', [...transactions.pending, tx]);
+
+
+    
   },
+ async setHSkeys(store,payload){
+    store.commit('setHSkeys',payload)
+
+    //
+    const worker=initiateWorker()
+    syncSwMixin.methods.syncSW(worker,store)
+
+  }
+  ,
+ async addHSVerifiableCredential(store,payload){
+    store.commit('addHSVerifiableCredential',payload)
+    const worker=initiateWorker()
+    syncSwMixin.methods.syncSW(worker,store)
+  },
+ async removeHSVerifiableCredential(store,payload){
+    store.commit('removeHSVerifiableCredential',payload)
+    const worker=initiateWorker()
+    syncSwMixin.methods.syncSW(worker,store)
+  },
+
+  async addHSVerifiableCredentialTemp(store,payload){
+    store.commit('addHSVerifiableCredentialTemp',payload)
+    const worker=initiateWorker()
+    syncSwMixin.methods.syncSW(worker,store)
+  },
+  async removeHSVerifiableCredentialTemp(store,payload){
+    store.commit('removeHSVerifiableCredentialTemp',payload)
+    const worker=initiateWorker()
+    syncSwMixin.methods.syncSW(worker,store)
+  },
+
+
   async getCurrencies({ state: { nextCurrenciesFetch }, commit }) {
     if (!nextCurrenciesFetch || nextCurrenciesFetch <= new Date().getTime()) {
       try {

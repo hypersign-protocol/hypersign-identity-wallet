@@ -153,41 +153,41 @@ const store = new Vuex.Store({
 });
 
 
-store.watch(
-    state => state.hypersign.credentials,
-    (newValue, oldValue) => {
+// store.watch(
+//     state => state.hypersign.credentials,
+//     (newValue, oldValue) => {
 
-        store.commit("storeupdated",)
-    }
-)
-store.watch(
-    state => state.hypersign.credentialsTemp,
-    (newValue, oldValue) => {
+//         store.commit("storeupdated",)
+//     }
+// )
+// store.watch(
+//     state => state.hypersign.credentialsTemp,
+//     (newValue, oldValue) => {
 
-        store.commit("storeupdated")
-    }
-)
-store.watch(
-    state => state.hypersign.dids,
-    (newValue, oldValue) => {
+//         store.commit("storeupdated")
+//     }
+// )
+// store.watch(
+//     state => state.hypersign.dids,
+//     (newValue, oldValue) => {
 
-        store.commit("storeupdated")
-    }
-)
-store.watch(
-    state => state.hypersign.profile,
-    (newValue, oldValue) => {
+//         store.commit("storeupdated")
+//     }
+// )
+// store.watch(
+//     state => state.hypersign.profile,
+//     (newValue, oldValue) => {
 
-        store.commit("storeupdated")
-    }
-)
+//         store.commit("storeupdated")
+//     }
+// )
 
 
-store.subscribe((mutations, state) => {
-    if (mutations.type == "storeupdated") {
-        console.log('updated');
-    }
-})
+// store.subscribe((mutations, state) => {
+//     if (mutations.type == "storeupdated") {
+//         console.log('updated');
+//     }
+// })
 
 
 

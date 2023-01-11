@@ -82,7 +82,7 @@ export default {
       console.log("deleteCredential");
       try {
         this.loading = true
-        this.$store.commit('removeHSVerifiableCredential', this.verifiableCredential)
+        this.$store.dispatch('removeHSVerifiableCredential', this.verifiableCredential)
         this.$store.dispatch('modals/open', { name: 'default', msg: 'Credential deleted successfully' });
         this.$router.push({ name: 'credential' })
         this.loading = false

@@ -148,29 +148,28 @@ export default {
         }
         console.log(this.updateCount);
 
-        if (this.updateCount > 0) {
-          this.verifyToken()
-          .then(data=>{
+        this.verifyToken()
+          .then(data => {
             if (data !== undefined) {
-            const response = data.response
-            if (response.status === 401) {
-               this.$store.dispatch('reset');
-              localStorage.removeItem('authToken')
-               this.$router.push('/');
-              this.$store.commit('setMainLoading', false);
-              this.$store.commit('switchLoggedIn', false);
+              const response = data.response
+              if (response.status === 401) {
+                this.$store.dispatch('reset');
+                localStorage.removeItem('authToken')
+                this.$router.push('/');
+                this.$store.commit('setMainLoading', false);
+                this.$store.commit('switchLoggedIn', false);
 
+              }
             }
-          }
 
-          this.worker = initiateWorker()
-           this.syncSW(this.worker)
+            // this.worker = initiateWorker()
+            // this.syncSW(this.worker)
           })
-          
 
 
 
-        }
+
+
 
 
 
@@ -421,7 +420,7 @@ export default {
           throw new Error('The credential is not issued to you');
         }
 
-        this.$store.commit('addHSVerifiableCredentialTemp', cred);
+        this.$store.dispatch('addHSVerifiableCredentialTemp', cred);
         this.$router.push(`/credential/temp/${cred.id}`);
         // localStorage.removeItem("3rdPartyAuthVC");
       } catch (e) {

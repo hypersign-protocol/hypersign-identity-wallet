@@ -168,7 +168,7 @@ export default {
         localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
         return this.$router.push("/account");
       }
-      this.$store.commit('addHSVerifiableCredential', this.verifiableCredential);
+      this.$store.dispatch('addHSVerifiableCredential', this.verifiableCredential);
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       this.accepted = true;
 
