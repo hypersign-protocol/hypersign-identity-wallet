@@ -7,11 +7,13 @@ self.addEventListener('message',async event => {
         headers,
         body:JSON.stringify(body)
     }
-    const resp=await fetch(url,options)
-    const data=await resp.json()
+     fetch(url,options).then(resp=> resp.json())
+     .then(data=>{
+        self.postMessage(data);
+
+     })
     // Send result back to the main thread
 
-    self.postMessage(data);
     
   });
 
