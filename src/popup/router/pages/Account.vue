@@ -89,8 +89,7 @@ import axios from 'axios';
 import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import syncMixin from '../../../mixins/syncSwMixin'
-import initiateWorker from '../registerServiceWorker'; '../registerServiceWorker'
+import syncMixin from '../../../mixins/syncMixin'
 export default {
   name: 'Account',
   components: {

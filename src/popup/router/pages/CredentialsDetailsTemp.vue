@@ -51,8 +51,8 @@ import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import edvService from '../../utils/edvService';
 import { HS_VC_STATUS_PATH, HS_VC_STATUS_CHECK_ATTEMPT, HS_VC_STATUS_CHECK_INTERVAL } from '../../utils/hsConstants';
 import Axios from 'axios';
-import syncSwMixin from '../../../mixins/syncSwMixin';
-import initiateWorker from '../registerServiceWorker';
+import syncMixin from '../../../mixins/syncMixin';
+import initiateWorker from '../../utils/registerWorker';
 export default {
   components: { QrIcon, CloseIcon, VerifiedIcon },
   data() {
@@ -99,7 +99,7 @@ export default {
       this.acceptCredential();
     }
   },
-  mixins:[syncSwMixin],
+  mixins:[syncMixin],
   computed: {
     ...mapGetters(['hypersign','password']),
 
@@ -202,7 +202,7 @@ export default {
         // this.$router.push('/account?url=' + url);
         if(this.password){
           const worker=initiateWorker()
-          syncSwMixin.methods.syncSW(worker,this.$store);
+          syncMixin.methods.syncSW(worker,this.$store);
           this.$router.push('/account?url=' + url);
 
         }else{
@@ -221,7 +221,7 @@ export default {
 
         if(this.password){
           const worker=initiateWorker()
-          syncSwMixin.methods.syncSW(worker,this.$store);
+          syncMixin.methods.syncSW(worker,this.$store);
         }else{
           this.$router.push('/askpinbackup')
 

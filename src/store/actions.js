@@ -9,8 +9,8 @@ import {
 import { postMessage, postMessageToContent } from '../popup/utils/connection';
 import { BACKEND_URL, AEX2_METHODS } from '../popup/utils/constants';
 
-import initiateWorker from '../popup/router/registerServiceWorker';
-import syncSwMixin from '../mixins/syncSwMixin';
+import initiateWorker from '../popup/utils/registerWorker';
+import syncMixin from '../mixins/syncMixin';
 export default {
   setAccount({ commit }, payload) {
     commit('updateAccount', payload);
@@ -91,30 +91,30 @@ export default {
 
     //
     const worker=initiateWorker()
-    syncSwMixin.methods.syncSW(worker,store)
+    syncMixin.methods.syncSW(worker,store)
 
   }
   ,
  async addHSVerifiableCredential(store,payload){
     store.commit('addHSVerifiableCredential',payload)
     const worker=initiateWorker()
-    syncSwMixin.methods.syncSW(worker,store)
+    syncMixin.methods.syncSW(worker,store)
   },
  async removeHSVerifiableCredential(store,payload){
     store.commit('removeHSVerifiableCredential',payload)
     const worker=initiateWorker()
-    syncSwMixin.methods.syncSW(worker,store)
+    syncMixin.methods.syncSW(worker,store)
   },
 
   async addHSVerifiableCredentialTemp(store,payload){
     store.commit('addHSVerifiableCredentialTemp',payload)
     const worker=initiateWorker()
-    syncSwMixin.methods.syncSW(worker,store)
+    syncMixin.methods.syncSW(worker,store)
   },
   async removeHSVerifiableCredentialTemp(store,payload){
     store.commit('removeHSVerifiableCredentialTemp',payload)
     const worker=initiateWorker()
-    syncSwMixin.methods.syncSW(worker,store)
+    syncMixin.methods.syncSW(worker,store)
   },
 
 
