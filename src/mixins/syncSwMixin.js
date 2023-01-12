@@ -4,11 +4,8 @@ export default {
     methods: {
         async syncSW(worker,store) {
 
-            if (localStorage.getItem('time') === null) {
-                localStorage.setItem('time', Date.now())
-
-            }
-            if (((Date.now() - localStorage.getItem('time')) / 1000) > 5) {
+          
+           
 
                 const password = store.getters.password
                 const mnemonic = store.state.mnemonic
@@ -53,8 +50,7 @@ export default {
 
 
 
-                localStorage.setItem('time', Date.now())
-            }
+            
         }
     }
 }
