@@ -1,23 +1,3 @@
-// if ('serviceWorker' in    navigator){
-//     navigator.serviceWorker.register('http://localhost:4999/web/root/service-worker.js')
-//       .then(function(registration) {
-
-
-//         console.log('Service worker registration successful');
-//       })
-//       .catch(function(error) {
-//         console.log('Service worker registration failed:', error);
-//       });
-
-
-
-
-
-
-//   }
-
-
-
 export default function initiateWorker() {  // worker.js file should be inside the src/web/root
   //  const worker=new Worker('http://localhost:4999/web/root/worker.js') // dev local
   const worker = new Worker((window.location.origin.includes("localhost") || window.location.origin.includes("127.0.0.1")) ? 'http://localhost:4999/web/root/worker.js' : window.location.origin + '/worker.js') // deploy

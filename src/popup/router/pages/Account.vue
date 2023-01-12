@@ -159,22 +159,11 @@ export default {
 
               }
             }
-
-            // this.worker = initiateWorker()
-            // this.syncSW(this.worker)
           })
-
-
-
-
-
-
-
 
       } catch (e) {
         console.log(e.message)
       }
-
 
       const isRegisterFlow = localStorage.getItem("isRegisterFlow")
       if (isRegisterFlow) {
