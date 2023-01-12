@@ -77,11 +77,11 @@ export default {
     ...mapState(['mnemonic']),
   },
   methods: {
-    async resolveDid() {
+    async resolveDid(did_id) {
       await hidWalletInstance.generateWallet(this.mnemonic);
       const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
       await hsSdk.init();
-      const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({ did: this.did });
+      const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({ did: did_id?did_id: this.did });
       if (didDocumentMetadata === null) {
         this.status = 'Unregistred'
       } else {
@@ -89,8 +89,9 @@ export default {
       }
     }
     ,
-    selectDid() {
+   async selectDid() {
       try {
+        await this.resolveDid(this.didDoc.id)
         this.$store.dispatch('setHSkeys', {
           keys: this.key,
           did: this.didDoc.id,

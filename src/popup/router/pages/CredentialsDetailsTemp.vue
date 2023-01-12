@@ -51,7 +51,8 @@ import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import edvService from '../../utils/edvService';
 import { HS_VC_STATUS_PATH, HS_VC_STATUS_CHECK_ATTEMPT, HS_VC_STATUS_CHECK_INTERVAL } from '../../utils/hsConstants';
 import Axios from 'axios';
-
+import syncSwMixin from '../../../mixins/syncSwMixin';
+import initiateWorker from '../registerServiceWorker';
 export default {
   components: { QrIcon, CloseIcon, VerifiedIcon },
   data() {
@@ -98,8 +99,9 @@ export default {
       this.acceptCredential();
     }
   },
+  mixins:[syncSwMixin],
   computed: {
-    ...mapGetters(['hypersign']),
+    ...mapGetters(['hypersign','password']),
 
 
   },
@@ -198,7 +200,14 @@ export default {
       if (url) {
         // console.log('rejectCredential:: url found');        
         // this.$router.push('/account?url=' + url);
+        if(this.password){
+          const worker=initiateWorker()
+          syncSwMixin.methods.syncSW(worker,this.$store);
+          this.$router.push('/account?url=' + url);
+
+        }else{
         this.$router.push('/askpinbackup?url='+url)
+        }
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')
         //   this.$router.push('/account?url=' + url);
@@ -209,7 +218,15 @@ export default {
       } else {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
-        this.$router.push('/askpinbackup')
+
+        if(this.password){
+          const worker=initiateWorker()
+          syncSwMixin.methods.syncSW(worker,this.$store);
+        }else{
+          this.$router.push('/askpinbackup')
+
+        }
+
       }
 
       //  backup wallet here
