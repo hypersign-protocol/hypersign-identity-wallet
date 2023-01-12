@@ -20,6 +20,6 @@
 
 export default function initiateWorker(){
   //  const worker=new Worker('http://localhost:4999/web/root/worker.js') // dev local
-  const worker=new Worker(window.location.origin+'worker.js') // deploy
+  const worker=new Worker(window.location.origin+'/worker.js') // deploy
   return worker;
 }
