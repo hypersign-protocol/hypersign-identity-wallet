@@ -79,8 +79,10 @@ export default {
             if (!res) throw new Error("Could not register the user");
             // console.log("After getting response")
             res = res.data;
+            localStorage.setItem('authToken',res.authToken)
             // console.log(res)
             // console.log(res.message)
+           
             if (res && res.status != 200) throw new Error(res.error);
 
 

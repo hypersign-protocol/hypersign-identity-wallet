@@ -93,7 +93,7 @@ export default {
         //   console.log("DID length is not 45. Trying again with index "+ (hdIndex+1));
         //   return this.generateNewDid(hdIndex+1);
         // }
-        this.$store.commit('setHSkeys', {
+        this.$store.dispatch('setHSkeys', {
           keys: kp,
           did: didDoc.id,
           didDoc,

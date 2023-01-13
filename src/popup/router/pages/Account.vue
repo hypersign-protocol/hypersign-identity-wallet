@@ -10,49 +10,49 @@
           <!-- <BalanceInfo /> -->
         </div>
         <div class="submenu-bg">
-            <div class="box-club">
+          <div class="box-club">
 
-              <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
+            <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
               class="tour__step9">
               <Profile width="24.5" height="24.5" slot="icon" />
-              </BoxButton>
+            </BoxButton>
 
-              <BoxButton :text="$t('pages.appVUE.Did')" to="/did">
-                <DidIcon slot="icon" />
-              </BoxButton>
+            <BoxButton :text="$t('pages.appVUE.Did')" to="/did">
+              <DidIcon slot="icon" />
+            </BoxButton>
 
-              <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
-                class="tour__step10">
-                <Credential width="24.5" height="24.5" slot="icon" color="white" />
-              </BoxButton>
-          
-
-            </div>
-            
-            
-        
-            <div class="box-club">
-
-            
-          <BoxButton :text="$t('pages.appVUE.transfer')" to="/transfer" style="font-size: smaller; color: white"
-            class="tour__step9">
-            <Transfer height="24.5" slot="icon" />
-          </BoxButton>
-
-          <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions"
-            style="font-size: smaller; color: white">
-            <Transactions height="24.5" width="25" slot="icon" />
-          </BoxButton>    
-          
-          <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
-            <Settings slot="icon" />
-          </BoxButton>
+            <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
+              class="tour__step10">
+              <Credential width="24.5" height="24.5" slot="icon" color="white" />
+            </BoxButton>
 
 
-        </div>
+          </div>
 
-         
-          
+
+
+          <div class="box-club">
+
+
+            <BoxButton :text="$t('pages.appVUE.transfer')" to="/transfer" style="font-size: smaller; color: white"
+              class="tour__step9">
+              <Transfer height="24.5" slot="icon" />
+            </BoxButton>
+
+            <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions"
+              style="font-size: smaller; color: white">
+              <Transactions height="24.5" width="25" slot="icon" />
+            </BoxButton>
+
+            <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
+              <Settings slot="icon" />
+            </BoxButton>
+
+
+          </div>
+
+
+
 
 
         </div>
@@ -84,12 +84,12 @@ import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
 import AccountInfo from '../components/AccountInfo';
 import BalanceInfo from '../components/BalanceInfo';
 import BoxButton from '../components/BoxButton';
-import {didResolver} from '../../utils/resolver'
+import { didResolver } from '../../utils/resolver'
 import axios from 'axios';
+import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-
-
+import syncMixin from '../../../mixins/syncMixin'
 export default {
   name: 'Account',
   components: {
@@ -106,6 +106,7 @@ export default {
   },
   data() {
     return {
+      worker: undefined,
       form: {
         url: '',
         amount: '',
@@ -117,29 +118,52 @@ export default {
       isProviderPresent: false,
     };
   },
+  mixins: [syncMixin, verifyTokenMixin],
   computed: {
-    ...mapState(['tourRunning', 'backedUpSeed']),
+    ...mapState([, 'tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
   },
+
   async created() {
     try {
 
       try {
+
+
         // For backward compatiblity
         // Make users loging if they have old did wallet. [did:hs]. So that they can create a new DID for our testnet, 
+
+
         if (this.hypersign.did.includes('did:hs')) {
           console.log('Inside if check')
           await this.$store.dispatch('reset');
           await this.$router.push('/');
+          localStorage.removeItem('authToken')
+
           this.$store.commit('setMainLoading', false);
           this.$store.commit('switchLoggedIn', false);
         } else {
           console.log('Inside else  check')
         }
+
+        this.verifyToken()
+          .then(data => {
+            if (data !== undefined) {
+              const response = data.response
+              if (response.status === 401) {
+                this.$store.dispatch('reset');
+                localStorage.removeItem('authToken')
+                this.$router.push('/');
+                this.$store.commit('setMainLoading', false);
+                this.$store.commit('switchLoggedIn', false);
+
+              }
+            }
+          })
+
       } catch (e) {
         console.log(e.message)
       }
-
 
       const isRegisterFlow = localStorage.getItem("isRegisterFlow")
       if (isRegisterFlow) {
@@ -188,6 +212,7 @@ export default {
     }
   },
   methods: {
+
     async scan() {
       localStorage.setItem("isMobileWallet", true)
       const QRData = await this.$store.dispatch('modals/open', {
@@ -238,17 +263,17 @@ export default {
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                  return
-              }else{
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Schema') 
+                return
+              } else {
+                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Schema')
               }
             }
-            const orgDid=data.data.author
+            const orgDid = data.data.author
             const resolvedDidDoc = await didResolver(orgDid)
-            const {didDocument}=resolvedDidDoc
-            const {controller}=didDocument
-            if(!controller.includes(this.hypersign.did)){
-              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue Schema') 
+            const { didDocument } = resolvedDidDoc
+            const { controller } = didDocument
+            if (!controller.includes(this.hypersign.did)) {
+              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue Schema')
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push(`/schema`);
@@ -266,20 +291,20 @@ export default {
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                  return
-              }else{
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue credential') 
+                return
+              } else {
+                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue credential')
               }
             }
-            const orgDid=data.data.issuerDid
+            const orgDid = data.data.issuerDid
             const resolvedDidDoc = await didResolver(orgDid)
-            const {didDocument}=resolvedDidDoc
-            if (didDocument===null) {
-              throw new Error('Sorry, Issuer DID is not registered on blockchain. Please select a DID which is registered on blockchain to issue credential') 
+            const { didDocument } = resolvedDidDoc
+            if (didDocument === null) {
+              throw new Error('Sorry, Issuer DID is not registered on blockchain. Please select a DID which is registered on blockchain to issue credential')
             }
-            const {controller}=didDocument
-            if(!controller.includes(this.hypersign.did)){
-              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue credential') 
+            const { controller } = didDocument
+            if (!controller.includes(this.hypersign.did)) {
+              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue credential')
             }
 
             this.$store.commit('addRequestingAppInfo', data);
@@ -300,16 +325,16 @@ export default {
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                  return
-              }else{
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Did') 
+                return
+              } else {
+                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Did')
               }
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push('/signdid');
             break;
           }
-          case 'UPDATE_DID':{ // sign did and send to blockchain
+          case 'UPDATE_DID': { // sign did and send to blockchain
             if (this.isPrivateDid()) {
               const selection = await this.$store
                 .dispatch('modals/open', {
@@ -321,9 +346,9 @@ export default {
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                  return
-              }else{
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to update Did') 
+                return
+              } else {
+                throw new Error('Sorry, Selected DID is private. Please select a public DID to update Did')
               }
             }
             this.$store.commit('addRequestingAppInfo', data);
@@ -382,7 +407,7 @@ export default {
           throw new Error('The credential is not issued to you');
         }
 
-        this.$store.commit('addHSVerifiableCredentialTemp', cred);
+        this.$store.dispatch('addHSVerifiableCredentialTemp', cred);
         this.$router.push(`/credential/temp/${cred.id}`);
         // localStorage.removeItem("3rdPartyAuthVC");
       } catch (e) {
@@ -495,11 +520,11 @@ export default {
   border-radius: 49px;
 }
 
-.box-club{
+.box-club {
   padding: 1px;
-    border: 1px solid #80808052;
-    width: 100%;
-    border-radius: 5px;
-    margin-top: 1%;
+  border: 1px solid #80808052;
+  width: 100%;
+  border-radius: 5px;
+  margin-top: 1%;
 }
 </style>
