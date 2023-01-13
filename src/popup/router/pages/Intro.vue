@@ -167,7 +167,7 @@ export default {
 
         const {didDoc, keys, did} = await hypersignSDK.did.getDid({user: { name: "vishwas"}});
         const res = await hypersignSDK.did.register(didDoc);
-        this.$store.commit('setHSkeys', {
+        this.$store.dispatch('setHSkeys', {
               keys,
               did,
             });
@@ -182,7 +182,7 @@ export default {
         //     if (result && result.error) throw new Error(result.error);
         //     const { keys, did } = result.message;
         //     keys['privateKeyBase58'] = hskeys.privateKey;
-        //     this.$store.commit('setHSkeys', {
+        //     this.$store.dispatch('setHSkeys', {
         //       keys,
         //       did,
         //     });

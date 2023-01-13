@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from '.';
 import { defaultNetwork } from '../popup/utils/constants';
 
 export default {
@@ -14,6 +15,7 @@ export default {
     switchLoggedIn(state, payload) {
         state.isLoggedIn = payload;
     },
+    
     updateLatestTransactions(state, payload) {
         state.transactions.latest = payload;
     },
@@ -109,6 +111,7 @@ export default {
             keys,
         }
 
+    
     },
     restoreHypersign(state, payload) {
         Object.assign(state.hypersign, payload);
@@ -120,6 +123,7 @@ export default {
     removeHSVerifiableCredential(state, payload) {
         ////HS_TODO
         state.hypersign.credentials = state.hypersign.credentials.filter((el) => el.id !== payload.id);
+  
     },
     setThridPartyAuth(state, payload) {
         const thridPartyAuth = state.hypersign.thridPartyAuths.find(x => x.provider === payload.provider)

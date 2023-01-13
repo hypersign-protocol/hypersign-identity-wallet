@@ -4,9 +4,9 @@ import Settings from '../pages/Settings';
 import GeneralSettings from '../pages/GeneralSettings';
 import SecuritySettings from '../pages/SecuritySettings';
 import BackupWallet from '../pages/BackupWallet';
-import BackupWalletEdv from '../pages/BackupWalletEdv';
+// import BackupWalletEdv from '../pages/BackupWalletEdv';
 import RestoreWallet from '../pages/RestoreWallet';
-import RestoreWalletEdv from '../pages/RestoreWalletEdv';
+// import RestoreWalletEdv from '../pages/RestoreWalletEdv';
 import AskPinBackUp from '../pages/AskPinBackUp'
 import AskPinLockRecover from '../pages/AskPinLockRecover'
 import AboutSettings from '../pages/AboutSettings';
@@ -142,7 +142,6 @@ export default [{
     component: AskPinBackUp,
     meta: {
         title: 'ask-pin',
-        ifNotAuthOnly:true
     },
 },
 {
@@ -154,14 +153,14 @@ export default [{
         ifNotAuthOnly:true
     },
 },
-{
-    path: '/backupWalletEdv',
-    name: 'backup-wallet-edv',
-    component: BackupWalletEdv,
-    meta: {
-        title: 'backup-wallet',
-    },
-},
+// {
+//     path: '/backupWalletEdv',
+//     name: 'backup-wallet-edv',
+//     component: BackupWalletEdv,
+//     meta: {
+//         title: 'backup-wallet',
+//     },
+// },
 {
     path: '/restoreWallet',
     name: 'restore-wallet',
@@ -173,15 +172,15 @@ export default [{
 },
 
 
-{
-    path: '/restoreWalletEdv',
-    name: 'restore-wallet-edv',
-    component: RestoreWalletEdv,
-    meta: {
-        title: 'restore-wallet',
-        ifNotAuthOnly: true
-    },
-},
+// {
+//     path: '/restoreWalletEdv',
+//     name: 'restore-wallet-edv',
+//     component: RestoreWalletEdv,
+//     meta: {
+//         title: 'restore-wallet',
+//         ifNotAuthOnly: true
+//     },
+// },
 
 {
     path: '/aboutSettings',

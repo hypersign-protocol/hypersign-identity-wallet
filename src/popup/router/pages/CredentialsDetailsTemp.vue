@@ -51,7 +51,8 @@ import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import edvService from '../../utils/edvService';
 import { HS_VC_STATUS_PATH, HS_VC_STATUS_CHECK_ATTEMPT, HS_VC_STATUS_CHECK_INTERVAL } from '../../utils/hsConstants';
 import Axios from 'axios';
-
+import syncMixin from '../../../mixins/syncMixin';
+import initiateWorker from '../../utils/registerWorker';
 export default {
   components: { QrIcon, CloseIcon, VerifiedIcon },
   data() {
@@ -98,8 +99,9 @@ export default {
       this.acceptCredential();
     }
   },
+  mixins:[syncMixin],
   computed: {
-    ...mapGetters(['hypersign']),
+    ...mapGetters(['hypersign','password']),
 
 
   },
@@ -152,7 +154,6 @@ export default {
       this.loading = true;
       try {
 
-        console.log("here");
         this.credStatus = await this.checkStatus(this.verifiableCredential);
         console.log(this.credStatus);
         if (this.credStatus == undefined) {
@@ -169,7 +170,7 @@ export default {
         localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
         return this.$router.push("/account");
       }
-      this.$store.commit('addHSVerifiableCredential', this.verifiableCredential);
+      this.$store.dispatch('addHSVerifiableCredential', this.verifiableCredential);
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       this.accepted = true;
 
@@ -198,7 +199,15 @@ export default {
 
       if (url) {
         // console.log('rejectCredential:: url found');        
-        this.$router.push('/account?url=' + url);
+        // this.$router.push('/account?url=' + url);
+        if(this.password){
+          const worker=initiateWorker()
+          syncMixin.methods.syncSW(worker,this.$store);
+          this.$router.push('/account?url=' + url);
+
+        }else{
+        this.$router.push('/askpinbackup?url='+url)
+        }
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')
         //   this.$router.push('/account?url=' + url);
@@ -209,10 +218,18 @@ export default {
       } else {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
+
+        if(this.password){
+          const worker=initiateWorker()
+          syncMixin.methods.syncSW(worker,this.$store);
+        }else{
+          this.$router.push('/askpinbackup')
+
+        }
+
       }
 
       //  backup wallet here
-      this.$router.push('/backupWalletEdv')
 
 
     }

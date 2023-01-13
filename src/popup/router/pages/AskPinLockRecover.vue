@@ -108,13 +108,14 @@ export default {
         const data = await edvServiceInstance.resync(this.userId)
         const decrypdtWallet = await this.decryptWallet(data.encryptedMessage, this.password)
         const { hypersign, mnemonic } = JSON.parse(decrypdtWallet)
-        console.log(mnemonic)
         await this.restore(hypersign, mnemonic)
 
 
 
         this.$store.commit('setDontGoBack', false)
         this.$store.commit('setProfile', {})
+
+        
 
         this.loading = false
       } catch (e) {

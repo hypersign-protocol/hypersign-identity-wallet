@@ -18,7 +18,7 @@ export default {
     return state.profile
   }
   ,
-
+ 
   password(state) {
     return state.password;
   },

@@ -95,7 +95,7 @@ export default {
                     throw new Error('The credential is not issued to you');
                 }
 
-                this.$store.commit('addHSVerifiableCredentialTemp', cred);
+                this.$store.dispatch('addHSVerifiableCredentialTemp', cred);
                 this.$router.push(`/credential/temp/${cred.id}`);
                 // localStorage.removeItem("3rdPartyAuthVC");
             } catch (e) {

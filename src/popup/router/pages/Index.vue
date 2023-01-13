@@ -178,7 +178,7 @@ export default {
         // }
 
         this.profile.did = did;
-        this.$store.commit('setHSkeys', {
+        this.$store.dispatch('setHSkeys', {
           keys: kp,
           did,
           didDoc,

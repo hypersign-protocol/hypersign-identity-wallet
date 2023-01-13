@@ -26,6 +26,18 @@ export default {
 
             }
         },
+        async encryptWalletNoPopUP(mnemonic, hypersign, password){
+            const dataToEncrypt = {
+                mnemonic: mnemonic,
+                hypersign: hypersign,
+            };
+
+
+            const walletDataJson = JSON.stringify(dataToEncrypt);
+            if (walletDataJson == '') throw new Error('Invalid data');
+            const encryptedMessage = await encrypt(walletDataJson, password);
+            return encryptedMessage
+        },
 
 
 
@@ -40,7 +52,7 @@ export default {
             await this.importAccount(mnemonics)
         },
         async importAccount(mnemonics) {
-             this.loading = true;
+            this.loading = true;
             if (!mnemonics) throw new Error('Mnemonic not found in encryted file.')
 
             mnemonics = mnemonics.trim();
@@ -55,12 +67,20 @@ export default {
                 };
                 await this.$store.dispatch('setLogin', { keypair });
                 this.$store.commit('setBackedUpSeed', true);
-                setTimeout(() => this.$router.push(this.$store.state.loginTargetLocation), 1000);
+
+                const url = localStorage.getItem('qrDataQueryUrl')
+                if (url !== null) {
+
+                    this.$router.push('/account?url=' + url);
+
+                } else {
+                    this.$router.push(this.$store.state.loginTargetLocation)
+                }
             } else {
                 throw new Error('Could not import accounts. Invalid Mnemonic');
             }
         },
-       
+
     },
 
 
