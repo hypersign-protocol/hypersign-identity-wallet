@@ -116,6 +116,7 @@ export default {
       verifiableCredential: {},
       hsAuthDid: "",
       isProviderPresent: false,
+      verifiableCredentials: []
     };
   },
   mixins: [syncMixin, verifyTokenMixin],
@@ -419,37 +420,104 @@ export default {
 
     async credentialDetailsQRdata(qrData) {
       try {
+
+        /**Sample QR data; It sould be called presenation query */
+        /*
+        {
+            "QRType": "REQUEST_CRED",
+            "serviceEndpoint": "https://stage.hypermine.in/whitelist/hs/api/v2/auth",
+            "schemaId": "sch:hid:testnet:z12GNMh8pWFnY4wN1evLaQ52gwD8Be4VKstKSriVEnpe8:1.0", // this can either contain 1 schema or multiple schemas. this can be a string field or an array field.
+            "appDid": "did:hid:testnet:z7HAgbm3m9KKBEC8CxWuJoWmDnUs9Snr3QNxdRPtD1u4G",
+            "appName": "Hypersign Auth",
+            "challenge": "d900f8af-68be-4151-bfd0-1e2113f6fa7c",
+            "domain": "https://localhost:123"  // optional for time being ..  this should be mandatory to check if some attacker has not stollen the challenge of a legit 
+                          // domain and not trying to perform reply attacks
+          }
+        */
+
         if (qrData == {}) throw new Error('Parsed QR data is empty');
 
-        // TODO: verifying all fields
+        // TODO a requete may want to request multiple schemas...
+        // But we need to properly implement presentation request specification
+        // https://w3c-ccg.github.io/vp-request-spec/#step-2-notification-response
         const { appDid, schemaId } = qrData;
 
         if (!schemaId) throw new Error('Invalid schemaId');
 
         this.$store.commit('addRequestingAppInfo', qrData);
-        this.verifiableCredential = this.hypersign.credentials.find((x) => {
 
-          // hs:"http://localhost:1317/hypersign-protocol/hidnode/ssi/schema/did:hs:a58d3f48-7f29-47a9-ae73-a0800b409be7;id=e5419418-76e0-473b-8af8-09258bb2b761;version=1.0:"
-          // http://localhost:1317/hypersign-protocol/hidnode/ssi/schema/did:hs:a58d3f48-7f29-47a9-ae73-a0800b409be7;id=e5419418-76e0-473b-8af8-09258bb2b761;version=1.0: 
-          const credentialSchemaUrl = x['@context'][1].hs;
-          const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+        if(Array.isArray(schemaId)) {
+          //// Doc: more than one credentials are requested 
+          //// All schemas must exists, otherwise it will fail 
+          const schemaIds = schemaId;
+          const credentialSchemasIds = this.hypersign.credentials.map(x => getSchemaIdFromSchemaUrl(x['@context'][1].hs))
+          console.log({
+            credentialSchemasIds
+          })
 
-          if (credentialSchemaId === schemaId) {
-            if (x.issuer === appDid) { // check if the app company issued this credential ;;  the registration flow
-              return x;
-            }
-
-            if (x.issuer === this.hsAuthDid) { // of the issuer is Hypersign Auth server? ;; without registration flow
-              return x;
-            }
+          if(this.hypersign.credentials <= 0){
+            throw new Error('No credential found');
           }
-          // // if (x.issuer === appDid && credentialSchemaId === schemaId) return x; // we need to fix this later: should we not include x.issuer === appDid check as well?
-          // if (credentialSchemaId === schemaId) return x; 
-        });
 
-        if (!this.verifiableCredential) throw new Error('Credential not found');
+          const intersectionSchemasIds = credentialSchemasIds.filter(x => schemaIds.indexOf(x) > -1)
 
-        this.$router.push(`/credential/authorize/${this.verifiableCredential.id}`);
+          if(intersectionSchemasIds.length <= 0){
+            throw new Error('Credential not found for schemaIds ' + schemaId.join(','))
+          }
+
+          if(intersectionSchemasIds.length !== schemaIds.length){
+            const rest =  schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0)
+            throw new Error('Credential not found for schemaIds ' + rest? rest.join(',') : '')
+          }
+          
+          this.verifiableCredentials = this.hypersign.credentials.filter(x => {
+            const credentialSchemaUrl = x['@context'][1].hs;
+            const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+            if(intersectionSchemasIds.indexOf(credentialSchemaId) >= 0){
+              return x;  
+            }
+          })
+
+          if(this.verifiableCredentials.length <= 0){
+            throw new Error('Credential not found')
+          }
+
+          const filteredCredentialIds = this.verifiableCredentials.map(x => x.id);
+
+          console.log({
+            filteredCredentialIds
+          })
+
+          this.$router.push(`/credential/authorize/${filteredCredentialIds.join(',')}`);
+        } else {
+          //// Doc: else not interpting the existing flow
+
+          // Here we are searching the wallet for credential
+          this.verifiableCredential = this.hypersign.credentials.find((x) => {
+            const credentialSchemaUrl = x['@context'][1].hs;
+            const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+
+            if (credentialSchemaId === schemaId) {
+              if (x.issuer === appDid) { // check if the app company issued this credential ;;  the registration flow
+                return x;
+              }
+
+              if (x.issuer === this.hsAuthDid) { // of the issuer is Hypersign Auth server? ;; without registration flow
+                return x;
+              }
+            }
+            // // if (x.issuer === appDid && credentialSchemaId === schemaId) return x; // we need to fix this later: should we not include x.issuer === appDid check as well?
+            // if (credentialSchemaId === schemaId) return x; 
+          });
+
+          // If not, we throw an error
+          if (!this.verifiableCredential) throw new Error('Credential not found');
+
+          this.$router.push(`/credential/authorize/${this.verifiableCredential.id}`);
+        }
+
+
+
       } catch (e) {
         console.log(e);
         this.loading = false;
