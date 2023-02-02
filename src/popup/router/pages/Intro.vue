@@ -138,7 +138,7 @@ export default {
     };
   },
   created() {
-    console.log("DEPLOYED");
+    // console.log("DEPLOYED");
   },
   methods: {
     async createWallet() {

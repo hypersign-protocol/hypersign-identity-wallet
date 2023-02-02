@@ -5,11 +5,11 @@ export default {
             try {
 
                 const edvServiceInstance = new edvService()
-                
-               const data= await edvServiceInstance.verifyToken()
-               console.log(data);
+
+                const data = await edvServiceInstance.verifyToken()
+                //    console.log(data);
             } catch (error) {
-return error
+                return error
             }
         }
     },

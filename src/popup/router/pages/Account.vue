@@ -362,7 +362,7 @@ export default {
         }
 
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }
     },
@@ -412,7 +412,7 @@ export default {
         this.$router.push(`/credential/temp/${cred.id}`);
         // localStorage.removeItem("3rdPartyAuthVC");
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }
@@ -451,9 +451,9 @@ export default {
           //// All schemas must exists, otherwise it will fail 
           const schemaIds = schemaId;
           const credentialSchemasIds = this.hypersign.credentials.map(x => getSchemaIdFromSchemaUrl(x['@context'][1].hs))
-          console.log({
-            credentialSchemasIds
-          })
+          // console.log({
+            // credentialSchemasIds
+          // })
 
           if (this.hypersign.credentials <= 0) {
             throw new Error('No credential found');
@@ -484,9 +484,9 @@ export default {
 
           const filteredCredentialIds = this.verifiableCredentials.map(x => x.id);
 
-          console.log({
-            filteredCredentialIds
-          })
+          // console.log({
+          //   filteredCredentialIds
+          // })
 
           this.$router.push(`/credential/authorize/${filteredCredentialIds.join(',')}`);
         } else {
@@ -519,7 +519,7 @@ export default {
 
 
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }

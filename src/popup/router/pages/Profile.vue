@@ -63,7 +63,7 @@ export default {
         this.loading = true;
         await this.setupProfile();
       }catch (e) {
-        console.log(e)
+        // console.log(e)
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
       }

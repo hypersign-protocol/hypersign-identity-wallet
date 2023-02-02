@@ -79,7 +79,7 @@ export default {
   },
   methods: {
      deleteCredential() {
-      console.log("deleteCredential");
+      // console.log("deleteCredential");
       try {
         this.loading = true
         this.$store.dispatch('removeHSVerifiableCredential', this.verifiableCredential)
@@ -124,7 +124,7 @@ export default {
         }
       });
 
-      console.log(result.data.record);
+      // console.log(result.data.record);
       const id = result.data.record._id;
       this.loading = false;
       return this.$router.push({ name: 'sharedCredential', params: { vp: id } });

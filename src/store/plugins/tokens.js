@@ -68,7 +68,7 @@ export default store =>
                                         return { contract, ...token };
                                     }
                                 } catch (error) {
-                                    console.log(error);
+                                    // console.log(error);
                                 }
                                 return {};
                             }),
@@ -86,7 +86,7 @@ export default store =>
                             const { decodedResult: balance } = await instance.methods.balance(account.publicKey);
                             commit('setBalance', { contract, balance: parseInt(balance, 10) });
                         } catch (e) {
-                            console.log(e);
+                            // console.log(e);
                         }
                     }),
                 );

@@ -63,7 +63,7 @@ export default {
 
         // get the schemadata to sign from route
         this.schemaRaw = this.hypersign.requestingAppInfo.data;
-        console.log(JSON.stringify(this.schemaRaw))
+        // console.log(JSON.stringify(this.schemaRaw))
         await hidWalletInstance.generateWallet(this.mnemonic);
         this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
         await this.hsSDK.init();
@@ -90,7 +90,7 @@ export default {
             try{
                 this.loading = true;
                 const schemaToSign = await this.prepareSchema();
-                console.log(schemaToSign);
+                // console.log(schemaToSign);
                 const signature = await this.hsSDK.schema.signSchema({ privateKey: this.hypersign.keys.privateKeyMultibase, schema: schemaToSign })
                 const { assertionMethod }  = this.hypersign.didDoc;
                 // TODO: This should go into hs-ssi-sdk
@@ -134,7 +134,7 @@ export default {
                     }
                 }
             }catch(e){
-                console.log(e)
+                // console.log(e)
                 this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
             } finally {
                 this.loading = false;
