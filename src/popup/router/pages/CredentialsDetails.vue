@@ -59,6 +59,10 @@ export default {
     const credentialId = this.$route.params.credentialId;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
+      if(this.verifiableCredential===undefined){
+        return this.$router.push('/account')
+         
+      }
       this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate);
       this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate);
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
