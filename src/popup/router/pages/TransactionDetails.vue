@@ -51,7 +51,7 @@ export default {
     const queryDataStr = this.$route.query.data
     if(queryDataStr){
       const decodedStr = decodeURI(queryDataStr)
-      console.log(decodedStr)
+      // console.log(decodedStr)
       this.tx = { ...JSON.parse(decodedStr) }
     }else {
       console.error('No query data found')

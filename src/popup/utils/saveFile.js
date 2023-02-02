@@ -50,7 +50,7 @@ export default async (fileName, blob) => {
          })
          .catch(err => {
              console.warn('Error in file download')
-             console.log(JSON.stringify(err));
+            //  console.log(JSON.stringify(err));
          })
       });
       break;

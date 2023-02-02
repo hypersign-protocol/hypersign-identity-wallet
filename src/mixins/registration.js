@@ -73,6 +73,11 @@ export default {
                     body["accessToken"] = thridPartyAuthGetter.accessToken;
                 }
             }
+            const forgetPassword=localStorage.getItem('forgetPassword')
+            if(forgetPassword==="true"){
+                body["forgetPassword"]=forgetPassword
+            }
+            localStorage.removeItem("forgetPassword")
             
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
 
@@ -87,7 +92,7 @@ export default {
 
 
             // console.log(typeof(res.message))
-            console.log(res.message)
+            // console.log(res.message)
             if (isThridPartyAuth && res && res.message) {
                 // console.log("Before setting 3rdPartyAuthVC");
                 // only in case of 3rd party auth, verifiable credenital will come

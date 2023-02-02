@@ -102,7 +102,7 @@ export default {
             // using hs-ssi-sdk to g
             const schemaOptions = this.credentialRaw;
             const { fields, subjectDid, schemaId, expirationDate ,issuerDid } = this.credentialRaw;
-            console.log("Credential to sign",  this.credentialRaw);
+            // console.log("Credential to sign",  this.credentialRaw);
             if (!fields) {
                 throw new Error('field is missing')
             }
@@ -178,7 +178,7 @@ export default {
                     credential = await this.checkCredentialStatus(this.credentialRaw.credentialStatusUrl);  
                     credential = credential.data    
                     const status=credential.credStatus.claim.currentStatus.toUpperCase();
-                    console.log('status',status);
+                    // console.log('status',status);
                     if(status === 'REVOKED' || status==="EXPIRED"){
                         throw new Error('Credential is already '+status.toLowerCase())
                     }
@@ -242,7 +242,7 @@ export default {
                     throw new Error('Invalid status')
                 }
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
             }
 
@@ -295,7 +295,7 @@ export default {
                     }
                 }
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
             } finally {
                 this.loading = false;

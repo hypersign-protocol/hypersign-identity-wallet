@@ -68,7 +68,7 @@ export default {
         this.credStatus = await axios.get(`${HS_VC_STATUS_PATH}/${this.verifiableCredential.id}`);
         this.loading = false;
         if (this.credStatus.data.vc.credStatus.claim.currentStatus == "Live") {
-          console.log("inside if");
+          // console.log("inside if");
           this.$store.dispatch('addHSVerifiableCredentialTemp', this.verifiableCredential);
           this.$router.push(`/credential/temp/${this.verifiableCredential.id}`);
         }

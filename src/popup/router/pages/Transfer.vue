@@ -3,11 +3,11 @@
     <div class="mt-10">
       <Input label="WALLET ADDRESS" :value="walletAddress" disabled class="ae-address" />
 
-      <Input label="BALANCE (uHID)" :value="walletBalance" disabled class="ae-address" />
+      <Input label="BALANCE (HID)" :value="walletBalance/1e6" disabled class="ae-address" />
 
       <Input label="Enter Recipient Address" v-model="recipient" class="ae-address" />
 
-      <Input label="Enter Amount (uHID)" v-model="amount" class="ae-address" />
+      <Input label="Enter Amount (HID)" v-model="amount" class="ae-address" />
 
       <Button half @click="sendTokens">
         Send
@@ -35,6 +35,7 @@ export default {
     walletBalance: "",
     recipient: "",
     amount: "",
+    actualAmount:"",
   }),
   async created() {
     await hidWalletInstance.generateWallet(this.mnemonic);
@@ -48,11 +49,13 @@ export default {
         if (this.amount == "") throw new Error("Amount can not be blank");
         if (this.recipient == "") throw new Error("Recipient can not be blank");
         if (this.recipient.indexOf('hid') < 0) throw new Error('Invalid address');
-        if (parseFloat(this.walletAddress) < parseFloat(this.amount)) throw new Error("Insufficient balance")
+        this.actualAmount=parseFloat(this.amount)*1e6
+        if (parseFloat(this.walletAddress) < this.actualAmount) throw new Error("Insufficient balance")
+        this.actualAmount=this.actualAmount.toString()
         const amount = [
           {
             denom: "uhid",
-            amount: this.amount.trim(),
+            amount: this.actualAmount.trim(),
           },
         ];
         const result = await hidWalletInstance.sendTokens({ recipient: this.recipient.trim(), amount});
@@ -63,7 +66,7 @@ export default {
 });
         }
       }catch(e){
-        console.log(e)
+        // console.log(e)
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       } finally{
@@ -77,7 +80,7 @@ export default {
         this.loading = true;
         await this.setupProfile();
       }catch (e) {
-        console.log(e)
+        // console.log(e)
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg:e.message });
       }

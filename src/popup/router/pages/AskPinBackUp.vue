@@ -147,7 +147,7 @@ export default {
 
           const walletDataJson = JSON.stringify(dataToEncrypt);
           if (walletDataJson == '') throw new Error('Invalid data');
-          console.log("Password", this.password);
+          // console.log("Password", this.password);
           const encryptedMessage = await encrypt(walletDataJson, this.password);
           
           // const fileName = 'hypersign-identity-wallet-backup.txt';

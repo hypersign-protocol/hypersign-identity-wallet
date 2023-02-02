@@ -140,9 +140,9 @@ export default {
       //  await hidWalletInstance.rechargeWallet(); 
 
       /// Use the HID wallet with SSI sdk
-      console.log({
-        HIDNODE_NAMESPACE
-      })
+      // console.log({
+      //   HIDNODE_NAMESPACE
+      // })
       const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
       await hsSdk.init();
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
@@ -205,7 +205,7 @@ export default {
         }
 
       } catch (e) {
-        console.log({ ...e });
+        // console.log({ ...e });
         if (e.response.status === 403) {
           const data = e.response.data.authToken;
           localStorage.setItem('authToken',data)      

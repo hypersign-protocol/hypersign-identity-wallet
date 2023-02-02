@@ -99,7 +99,7 @@ export default {
                 this.$router.push(`/credential/temp/${cred.id}`);
                 // localStorage.removeItem("3rdPartyAuthVC");
             } catch (e) {
-                console.log(e);
+                // console.log(e);
                 this.loading = false;
                 if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
             }

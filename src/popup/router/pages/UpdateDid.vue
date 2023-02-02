@@ -163,7 +163,7 @@
                       }
                   }
               }catch(e){
-                  console.log(e)
+                  // console.log(e)
                   this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
               } finally {
                   this.loading = false;

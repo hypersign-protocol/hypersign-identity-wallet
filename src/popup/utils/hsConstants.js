@@ -1,5 +1,5 @@
-export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://stage.hypermine.in/authserver/";
-// export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "http://localhost:8001/";
+// export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://stage.hypermine.in/authserver/";
+export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "http://localhost:8001/";
 // export const SUPERHERO_HS_AUTH_BASE_URL = process.env.VUE_APP_HS_AUTH_BASE_URL || "https://api.fyre.hypersign.id/auth/";
 export const HS_VC_STATUS_CHECK_ATTEMPT=process.env.VUE_APP_HS_VC_STATUS_CHECK_ATTEMPT  || 15;
 export const HS_VC_STATUS_CHECK_INTERVAL=process.env.VUE_APP_  || 7000;
