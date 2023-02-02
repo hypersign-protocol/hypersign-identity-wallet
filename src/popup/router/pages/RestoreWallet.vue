@@ -2,8 +2,8 @@
   <div class="popup">
     <div data-cy="seed-phrase-backup-window" v-if="type == ''">
       <div class="maindiv_input-group-addon">
-          <p class="heading sett_info">{{ $t('pages.restore-wallet.heading') }}</p>
-          <img src="../../../icons/cloud-download-down-arrow.svg" alt="Upload logo" class="icon" />
+          <p class="heading sett_info">{{ $t('pages.restore-wallet-local.heading') }}</p>
+          <img src="../../../icons/restore-from-file.png" alt="Upload logo" class="icon" />
           
           
           <div class="margin-20">

@@ -141,7 +141,7 @@ export default [{
     name: 'ask-pin',
     component: AskPinBackUp,
     meta: {
-        title: 'ask-pin',
+        title: 'backup-wallet',
     },
 },
 {
@@ -149,7 +149,7 @@ export default [{
     name: 'ask-pin-recover-lock',
     component: AskPinLockRecover,
     meta: {
-        title: 'ask-pin',
+        title: 'restore-wallet',
         ifNotAuthOnly:true
     },
 },

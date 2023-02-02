@@ -37,6 +37,9 @@
         <Button @click="askPin()" style="margin-top: 30%;">
           {{ $t('pages.restore-wallet.button') }}
         </Button>
+        <br />
+        <a href="#" @click="forgotPassword">{{ $t('pages.index.forgotPassword') }}</a>
+
       </div>
       <Loader v-if="loading" />
     </div>
@@ -48,6 +51,8 @@ import ListItem from '../components/ListItem';
 import CheckBox from '../components/CheckBox';
 import Input from '../components/Input';
 import cryptoService from '../../../mixins/cryptoService'
+import removeAccountMixin from '../../../mixins/removeAccount';
+
 import edvService from '../../utils/edvService'
 export default {
   components: {
@@ -86,7 +91,7 @@ export default {
       type: ''
     };
   },
-  mixins: [cryptoService],
+  mixins: [cryptoService,removeAccountMixin],
 
   mounted() {
     this.$store.commit('setDontGoBack', true)
@@ -97,6 +102,13 @@ export default {
   },
 
   methods: {
+   
+  async  forgotPassword(){
+     await this.forgetPassword("Forget Password ?","This action will remove your wallet data forever, this action canont be reversed. Confirm to continue.")
+      localStorage.setItem('forgetPassword',true)
+
+      
+    },
     async askPin() {
 
       try {
@@ -115,14 +127,14 @@ export default {
         this.$store.commit('setDontGoBack', false)
         this.$store.commit('setProfile', {})
 
-        
+
 
         this.loading = false
       } catch (e) {
         this.$store.commit('setDontGoBack', false)
         this.loading = false
-        console.log(e);
-        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
+        this.password = "";
+        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: "Incorrect password" });
       }
       finally {
         this.loading = false

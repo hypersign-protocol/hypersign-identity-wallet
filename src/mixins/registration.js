@@ -73,6 +73,11 @@ export default {
                     body["accessToken"] = thridPartyAuthGetter.accessToken;
                 }
             }
+            const forgetPassword=localStorage.getItem('forgetPassword')
+            if(forgetPassword==="true"){
+                body["forgetPassword"]=forgetPassword
+            }
+            localStorage.removeItem("forgetPassword")
             
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
 

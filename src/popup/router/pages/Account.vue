@@ -90,6 +90,8 @@ import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import syncMixin from '../../../mixins/syncMixin'
+import removeAccountMixin from '../../../mixins/removeAccount';
+
 export default {
   name: 'Account',
   components: {
@@ -119,7 +121,7 @@ export default {
       verifiableCredentials: []
     };
   },
-  mixins: [syncMixin, verifyTokenMixin],
+  mixins: [syncMixin, verifyTokenMixin,removeAccountMixin],
   computed: {
     ...mapState([, 'tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
@@ -151,12 +153,10 @@ export default {
           .then(data => {
             if (data !== undefined) {
               const response = data.response
-              if (response.status === 401) {
-                this.$store.dispatch('reset');
-                localStorage.removeItem('authToken')
-                this.$router.push('/');
+              if (response.status === 401) {               
                 this.$store.commit('setMainLoading', false);
                 this.$store.commit('switchLoggedIn', false);
+                this.removeAccountSilent()
 
               }
             }
@@ -446,7 +446,7 @@ export default {
 
         this.$store.commit('addRequestingAppInfo', qrData);
 
-        if(Array.isArray(schemaId)) {
+        if (Array.isArray(schemaId)) {
           //// Doc: more than one credentials are requested 
           //// All schemas must exists, otherwise it will fail 
           const schemaIds = schemaId;
@@ -455,30 +455,30 @@ export default {
             credentialSchemasIds
           })
 
-          if(this.hypersign.credentials <= 0){
+          if (this.hypersign.credentials <= 0) {
             throw new Error('No credential found');
           }
 
           const intersectionSchemasIds = credentialSchemasIds.filter(x => schemaIds.indexOf(x) > -1)
 
-          if(intersectionSchemasIds.length <= 0){
+          if (intersectionSchemasIds.length <= 0) {
             throw new Error('Credential not found for schemaIds ' + schemaId.join(','))
           }
 
-          if(intersectionSchemasIds.length !== schemaIds.length){
-            const rest =  schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0)
-            throw new Error('Credential not found for schemaIds ' + rest? rest.join(',') : '')
+          if (intersectionSchemasIds.length !== schemaIds.length) {
+            const rest = schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0)
+            throw new Error('Credential not found for schemaIds ' + rest ? rest.join(',') : '')
           }
-          
+
           this.verifiableCredentials = this.hypersign.credentials.filter(x => {
             const credentialSchemaUrl = x['@context'][1].hs;
             const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
-            if(intersectionSchemasIds.indexOf(credentialSchemaId) >= 0){
-              return x;  
+            if (intersectionSchemasIds.indexOf(credentialSchemaId) >= 0) {
+              return x;
             }
           })
 
-          if(this.verifiableCredentials.length <= 0){
+          if (this.verifiableCredentials.length <= 0) {
             throw new Error('Credential not found')
           }
 
