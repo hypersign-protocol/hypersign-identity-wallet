@@ -2,8 +2,8 @@
   <div class="popup">
     <div data-cy="seed-phrase-backup-window" v-if="type == ''">
       <div class="maindiv_input-group-addon">
-        <p class="heading sett_info">{{ $t('pages.backup-wallet.heading') }}</p>
-        <img src="../../../icons/cloud-backup-up-arrow_gray.png" alt="Upload logo" class="icon" />
+        <p class="heading sett_info">{{ $t('pages.backup-wallet-local.heading') }}</p>
+        <img src="../../../icons/backup-from-file.png" alt="Upload logo" class="icon" />
 
         <div class="margin-20">
           <Input placeholder="Enter your password" label="" type="password" v-model="password" />
@@ -178,9 +178,13 @@ export default {
   margin-bottom: 10px;
 }
 .icon {
-  max-width: 55%;
+  max-width:55%;
   margin-left: 23%;
-  display: block;
+  display:block;
+  margin-top: 10%;
+  width: 50%;
+  filter: invert(51%) sepia(63%) saturate(10%) hue-rotate(37deg) brightness(88%) contrast(89%);
+  margin-bottom: 17%;
 }
 .heading {
   margin-top: 10px !important;

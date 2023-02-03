@@ -59,6 +59,10 @@ export default {
     const credentialId = this.$route.params.credentialId;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
+      if(this.verifiableCredential===undefined){
+        return this.$router.push('/account')
+         
+      }
       this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate);
       this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate);
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
@@ -79,10 +83,10 @@ export default {
   },
   methods: {
      deleteCredential() {
-      console.log("deleteCredential");
+      // console.log("deleteCredential");
       try {
         this.loading = true
-        this.$store.commit('removeHSVerifiableCredential', this.verifiableCredential)
+        this.$store.dispatch('removeHSVerifiableCredential', this.verifiableCredential)
         this.$store.dispatch('modals/open', { name: 'default', msg: 'Credential deleted successfully' });
         this.$router.push({ name: 'credential' })
         this.loading = false
@@ -124,7 +128,7 @@ export default {
         }
       });
 
-      console.log(result.data.record);
+      // console.log(result.data.record);
       const id = result.data.record._id;
       this.loading = false;
       return this.$router.push({ name: 'sharedCredential', params: { vp: id } });

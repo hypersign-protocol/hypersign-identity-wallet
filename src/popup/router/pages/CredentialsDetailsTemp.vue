@@ -23,13 +23,14 @@
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="acceptCredential">
           <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-              $t('pages.credential.accept')
+            $t('pages.credential.accept')
           }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="rejectCredential">
-          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{ $t('pages.credential.reject')
+          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
+            $t('pages.credential.reject')
           }}</span>
         </Button>
       </div>
@@ -47,9 +48,11 @@ import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import { toFormattedDate, toStringShorner } from '../../utils/helper'
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import { HS_VC_STATUS_PATH , HS_VC_STATUS_CHECK_ATTEMPT,HS_VC_STATUS_CHECK_INTERVAL} from '../../utils/hsConstants';
+import edvService from '../../utils/edvService';
+import { HS_VC_STATUS_PATH, HS_VC_STATUS_CHECK_ATTEMPT, HS_VC_STATUS_CHECK_INTERVAL } from '../../utils/hsConstants';
 import Axios from 'axios';
-
+import syncMixin from '../../../mixins/syncMixin';
+import initiateWorker from '../../utils/registerWorker';
 export default {
   components: { QrIcon, CloseIcon, VerifiedIcon },
   data() {
@@ -96,8 +99,11 @@ export default {
       this.acceptCredential();
     }
   },
+  mixins:[syncMixin],
   computed: {
-    ...mapGetters(['hypersign']),
+    ...mapGetters(['hypersign','password']),
+
+
   },
   methods: {
     toUpper(t) {
@@ -123,7 +129,7 @@ export default {
 
 
       } catch (error) {
-        if(error.response.data.error !== null){
+        if (error.response.data.error !== null) {
           this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.error })
           this.$router.push('/account');
           return;
@@ -140,13 +146,14 @@ export default {
       return res
 
     },
+
+
     async acceptCredential() {
 
 
       this.loading = true;
       try {
 
-        console.log("here");
         this.credStatus = await this.checkStatus(this.verifiableCredential);
         console.log(this.credStatus);
         if (this.credStatus == undefined) {
@@ -163,7 +170,7 @@ export default {
         localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
         return this.$router.push("/account");
       }
-      this.$store.commit('addHSVerifiableCredential', this.verifiableCredential);
+      this.$store.dispatch('addHSVerifiableCredential', this.verifiableCredential);
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       this.accepted = true;
 
@@ -189,9 +196,18 @@ export default {
       const url = localStorage.getItem("qrDataQueryUrl");
       localStorage.removeItem("qrDataQueryUrl");
       localStorage.removeItem("3rdPartyAuthVC");
+
       if (url) {
         // console.log('rejectCredential:: url found');        
-        this.$router.push('/account?url=' + url);
+        // this.$router.push('/account?url=' + url);
+        if(this.password){
+          const worker=initiateWorker()
+          syncMixin.methods.syncSW(worker,this.$store);
+          this.$router.push('/account?url=' + url);
+
+        }else{
+        this.$router.push('/askpinbackup?url='+url)
+        }
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')
         //   this.$router.push('/account?url=' + url);
@@ -202,7 +218,20 @@ export default {
       } else {
         // console.log('rejectCredential:: url not found')
         this.$router.push("/account");
+
+        if(this.password){
+          const worker=initiateWorker()
+          syncMixin.methods.syncSW(worker,this.$store);
+        }else{
+          this.$router.push('/askpinbackup')
+
+        }
+
       }
+
+      //  backup wallet here
+
+
     }
   },
 };

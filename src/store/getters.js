@@ -11,9 +11,18 @@ export default {
     }
     return state.account;
   },
-  hypersign(state){
+  hypersign(state) {
     return state.hypersign;
   },
+  profile(state){
+    return state.profile
+  }
+  ,
+ 
+  password(state) {
+    return state.password;
+  },
+
   currentCurrencyRate: ({ current: { currency }, currencies }) => currencies[currency] || 0,
   balanceCurrency({ balance }, { currentCurrencyRate }) {
     return (currentCurrencyRate * balance).toFixed(2);
@@ -45,7 +54,7 @@ export default {
       ? state.tokens[state.current.token].balance.toFixed(2)
       : state.balance.toFixed(2);
   },
-  thirdPartyGoogleAuth(state){
+  thirdPartyGoogleAuth(state) {
     return state.hypersign.thridPartyAuths.find(x => x.provider === 'Google')
   }
 };

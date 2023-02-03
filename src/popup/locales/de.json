@@ -504,7 +504,7 @@
             "purchase": "Buy AE tokens"
         },
         "backup-wallet": {
-            "heading": "Backup your wallet to protect your information from being lost or destroyed",
+            "heading": "Backup your wallet to cloud.",
             "select-info": "Choose your source",
             "select-option-1": "Local Backup",
             "select-option-2": "Cloud Backup",

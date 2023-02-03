@@ -205,6 +205,7 @@
         },
         "titles": {
             "settings": "Settings",
+            "ask-pin":"Encrypt / Decrypt your wallet",
             "backup-wallet": "Backup",
             "restore-wallet": "Restore",
             "general": "Language",
@@ -548,6 +549,7 @@
             "securingAccount": "Securing your account",
             "generateWallet": "Generate Wallet",
             "restoreWallet": "Restore Wallet",
+            "forgotPassword":"Forget Password",
             "importWallet": "Retrieve existing account",
             "passwordError": "Password must be at lest 4 symbols.",
             "incorrectPasswordError": "Incorrect password.",
@@ -625,16 +627,34 @@
             "purchase": "Buy AE tokens"
         },
         "backup-wallet": {
-            "heading": "Backup your wallet to protect your information from being lost or destroyed",
+            "heading": "Backup your wallet to cloud.",
             "select-info": "Choose your destination",
             "select-option-1": "Local Backup",
             "select-option-2": "Cloud Backup",
             "select-option-1-msg": "You choose to backup your data on local device. On confirmation, your data will be encryted with the password you provided and will be downloaded in your local device as a file. You will need this encrypted file in to restore your data. Make sure you remember this password because we do not store your password anywhere. Do you want to continue?",
             "select-option-2-msg": "You choose to backup your data on our cloud. On confirmation, your data will be encryted with the password you provided and will be stored on the cloud. You can recover it from any device. Make sure you remember this password because we do not store your password anywhere. Do you want to continue?",
+            "setelct-option-ask-pin":"Enter password to lock/unloack wallet",
+            "button": "Continue"
+        },
+        "backup-wallet-local": {
+            "heading": "Backup your wallet to filesystem.",
+            "select-info": "Choose your destination",
+            "select-option-1": "Local Backup",
+            "select-option-2": "Cloud Backup",
+            "select-option-1-msg": "You choose to backup your data on local device. On confirmation, your data will be encryted with the password you provided and will be downloaded in your local device as a file. You will need this encrypted file in to restore your data. Make sure you remember this password because we do not store your password anywhere. Do you want to continue?",
+            "select-option-2-msg": "You choose to backup your data on our cloud. On confirmation, your data will be encryted with the password you provided and will be stored on the cloud. You can recover it from any device. Make sure you remember this password because we do not store your password anywhere. Do you want to continue?",
+            "setelct-option-ask-pin":"Enter password to lock/unloack wallet",
             "button": "Continue"
         },
         "restore-wallet": {
-            "heading": "Restore your wallet using encrypted backup file",
+            "heading": "Restore your wallet from cloud.",
+            "select-info": "Choose your source",
+            "select-option-1": "Local Backup",
+            "select-option-2": "Cloud Backup",
+            "button": "Continue"
+        },
+        "restore-wallet-local":{
+            "heading": "Restore your wallet from filesystem.",
             "select-info": "Choose your source",
             "select-option-1": "Local Backup",
             "select-option-2": "Cloud Backup",

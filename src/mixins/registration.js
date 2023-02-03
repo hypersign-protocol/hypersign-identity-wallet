@@ -73,19 +73,26 @@ export default {
                     body["accessToken"] = thridPartyAuthGetter.accessToken;
                 }
             }
+            const forgetPassword=localStorage.getItem('forgetPassword')
+            if(forgetPassword==="true"){
+                body["forgetPassword"]=forgetPassword
+            }
+            localStorage.removeItem("forgetPassword")
             
             let res = await axios.post(HS_STUDIO_REGISTER_URL, body);
 
             if (!res) throw new Error("Could not register the user");
             // console.log("After getting response")
             res = res.data;
+            localStorage.setItem('authToken',res.authToken)
             // console.log(res)
             // console.log(res.message)
+           
             if (res && res.status != 200) throw new Error(res.error);
 
 
             // console.log(typeof(res.message))
-            console.log(res.message)
+            // console.log(res.message)
             if (isThridPartyAuth && res && res.message) {
                 // console.log("Before setting 3rdPartyAuthVC");
                 // only in case of 3rd party auth, verifiable credenital will come

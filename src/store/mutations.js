@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from '.';
 import { defaultNetwork } from '../popup/utils/constants';
 
 export default {
@@ -14,6 +15,7 @@ export default {
     switchLoggedIn(state, payload) {
         state.isLoggedIn = payload;
     },
+    
     updateLatestTransactions(state, payload) {
         state.transactions.latest = payload;
     },
@@ -29,7 +31,7 @@ export default {
     },
     setUserNetwork(state, { index, ...network }) {
         if (index !== undefined) state.userNetworks[index] = network;
-        else state.userNetworks.push({...defaultNetwork, ...network });
+        else state.userNetworks.push({ ...defaultNetwork, ...network });
     },
     deleteUserNetwork(state, index) {
         state.userNetworks = state.userNetworks.filter((el, idx) => idx !== index);
@@ -89,26 +91,27 @@ export default {
         state.txQueue = [...state.txQueue, payload];
     },
     addConnectedAepp(state, { host, account }) {
-        state.connectedAepps = {...state.connectedAepps, [host]: [account] };
+        state.connectedAepps = { ...state.connectedAepps, [host]: [account] };
     },
     setHSkeys(state, payload) {
-        const { status , hdPathIndex, didDoc, did, keys, selected } = payload; 
+        const { status, hdPathIndex, didDoc, did, keys, selected } = payload;
 
         ////HS_TODO
-        if(selected == true){
+        if (selected == true) {
             state.hypersign.did = payload.did;
             state.hypersign.didDoc = payload.didDoc;
-            state.hypersign.keys= payload.keys;
+            state.hypersign.keys = payload.keys;
         }
-        
-        
+
+
         state.hypersign.dids[did] = {
             didDoc,
             hdPathIndex,
             status,
             keys,
         }
-        
+
+    
     },
     restoreHypersign(state, payload) {
         Object.assign(state.hypersign, payload);
@@ -120,10 +123,11 @@ export default {
     removeHSVerifiableCredential(state, payload) {
         ////HS_TODO
         state.hypersign.credentials = state.hypersign.credentials.filter((el) => el.id !== payload.id);
+  
     },
     setThridPartyAuth(state, payload) {
         const thridPartyAuth = state.hypersign.thridPartyAuths.find(x => x.provider === payload.provider)
-        if(!thridPartyAuth){
+        if (!thridPartyAuth) {
             state.hypersign.thridPartyAuths.push(payload);
         }
     },
@@ -139,7 +143,7 @@ export default {
         ////HS_TODO
         state.hypersign.requestingAppInfo = ''
     },
-    addHypersignAuthDid(state, payload){
+    addHypersignAuthDid(state, payload) {
         state.hypersign.hsAuthDID = payload;
     },
     addHSVerifiableCredentialTemp(state, payload) {
@@ -172,8 +176,19 @@ export default {
     setTourRunning(state, payload) {
         state.tourRunning = payload;
     },
+
+    setDontGoBack(state, payload) {
+        state.dontGoBack = payload;
+
+    },
     setTourStatusBar(state, payload) {
         state.tourStartBar = payload;
+    },
+    setProfile(state, payload) {
+        state.profile = payload
+    },
+    setPassword(state, payload) {
+        state.password = payload
     },
     setTippingAddress(state, payload) {
         state.tippingAddress = payload;

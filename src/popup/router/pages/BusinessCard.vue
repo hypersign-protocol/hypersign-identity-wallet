@@ -273,7 +273,7 @@ export default {
 
     this.link = WALLET_URL + "businesscard/" + this.sortUrl
     this.qrdata = this.link
-    console.log(this.vcf);
+    // console.log(this.vcf);
     this.showQr = true
 
 
@@ -290,7 +290,7 @@ export default {
     }
     ,
     share() {
-      console.log('Clicked...');
+      // console.log('Clicked...');
       this.showMenu = true;
     },
     iOS() {
@@ -314,11 +314,11 @@ export default {
       let blob = ''
       if (this.iOS() === true) {
         blob = new Blob([this.vcf], { type: "text/vcard;charset=utf-8" });
-        console.log("iOS:: Detected");
+        // console.log("iOS:: Detected");
 
       } else {
         blob = new Blob([this.vcf], { type: "text/plain;charset=utf-8" });
-        console.log("Not IOS");
+        // console.log("Not IOS");
 
 
       }

@@ -3,17 +3,49 @@
     <div v-if="!isProviderPresent">
       <div class="">
         <div class="appInfo">
-          <p>This organisation <span style="font-style:oblique">{{hypersign.requestingAppInfo.appName}}</span>
-          is requesting the following information.</p>
+          <div class="row" style="  color: black;padding: 10px;border: 1px solid #8080801a;margin-bottom: 3%;border-radius: 5px;background: #80808026;">
+            <div class="col-md-2" style="float: left;margin-right: 10px;">
+              <img src='../../../icons/org.png' style="height: 40px;width: 40px;"/>
+            </div>
+            <div class="col-md-8" style="font-size: small; text-align: left;">
+              <div style="font-weight: bold;"> {{hypersign.requestingAppInfo.appName}}</div>
+              <div style="color: gray;" v-if="hypersign.requestingAppInfo.domain"> {{hypersign.requestingAppInfo.domain}}</div>
+            </div>
+          </div>
+          <div class="row" style="color: black;text-align: left;word-break: break-word;font-size: small;">
+            <div class="col-md-10" style="padding: 5px" v-if="hypersign.requestingAppInfo.reason">
+              {{hypersign.requestingAppInfo.reason}}
+            </div>
+            <div class="col-md-10" style="padding: 5px" v-else>
+              Requesting the following information to give you the service
+            </div>
+          </div>
+          <!-- <p> Orgin <span style="font-style:oblique">{{hypersign.requestingAppInfo.domain ? hypersign.requestingAppInfo.domain: hypersign.requestingAppInfo.appName }}</span>
+            is requesting information:</p> -->
         </div>
-        <ul class="list-group credential-item">
-          <li class="list-group-item" v-for="claim in claims" :key="claim">
-            <div class="list-title">{{ claim }}: </div>
-            <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
-          </li>
-        </ul>
+
+
+        <div class=""  style="max-height: 500px;overflow-y: scroll;">
+          <div class="card" v-for="eachCred in credsDetials" style="overflow: unset;margin-bottom: 4%;">
+            <div class="card-header" style="text-align: left; color: black;border: 1px solid #80808042;padding: 8px;border-radius: 5px;background: whitesmoke;">
+               {{eachCred.formattedSchemaName}}</div>
+            <div class="card-body" style="border: 1px solid #80808042;border-radius: 5px;">
+              <ul class="list-group credential-item">
+                <li class="list-group-item" v-for="claim in eachCred.claims" :key="claim">
+                  <div class="list-title">{{ claim }}: </div>
+                  <div>{{ eachCred.credentialSubject[claim] }}</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        
+        
         <Loader v-if="loading" />
       </div>
+
+
       <div class="scanner d-flex">
         <Button class="scan"  data-cy="scan-button" @click="authorize">
           <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
@@ -45,24 +77,18 @@ import {  HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE  } from '../../utils/hsCo
 
 
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
-// import HypersignSSISdk from 'hs-ssi-sdk';
 const HypersignSSISdk = require('hs-ssi-sdk');
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
+
 
 export default {
   components: { QrIcon,CloseIcon,VerifiedIcon },
   data() {
     return {
       hsSDK: null,
-      verifiableCredential: {},
+      verifiableCredentials: [],
+      credsDetials:[], 
       claims: [],
       loading: false,
-      credDetials: {
-        formattedIssuer: "",
-        formattedExpirationDate: "",
-        formattedIssuanceDate: "",
-        formattedSchemaName: ""
-      },
       isProviderPresent: false,
     };
   },
@@ -77,15 +103,32 @@ export default {
     const credentialId = this.$route.params.credentialId;
 
     if (credentialId) {
-      this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
-      if(!this.verifiableCredential){
-        throw new Error('No credenital foud with id - ' + credentialId)
+      const credentialIdCommaSepStr = credentialId;
+      let credIds = credentialIdCommaSepStr.split(',')
+      
+      if(credIds &&  credIds.length > 0){
+
+        credIds = credIds.filter(x => x != null || x != '' || x != undefined)
+
+        this.verifiableCredentials = this.hypersign.credentials.filter(x =>  credIds.indexOf(x.id) >= 0);
+        if(!this.verifiableCredentials || this.verifiableCredentials.length <= 0){
+            throw new Error('No credenital found')
+        }
+
+        this.verifiableCredentials.forEach(credential => {
+          this.credsDetials.push({
+            formattedExpirationDate: toFormattedDate(credential.expirationDate),
+            formattedIssuanceDate: toFormattedDate(credential.issuanceDate),
+            formattedIssuer: toStringShorner(credential.issuer, 32, 15),
+            formattedSchemaName: credential.type[1],
+            claims: Object.keys(credential.credentialSubject),
+            credentialSubject: credential.credentialSubject
+          })
+        })        
+      } else {
+        console.error('No credIds passed')
+        return;
       }
-      this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate) ;
-      this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate) ;
-      this.credDetials.formattedIssuer =  toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName =  this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
-      this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
 
     const isRegisterFlow = localStorage.getItem("isRegisterFlow")
@@ -100,11 +143,9 @@ export default {
   },
   methods: {    
     async authorize() {
-      try {
-        const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-        const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);        
-            let { serviceEndpoint, schemaId, challenge } = this.hypersign.requestingAppInfo;
-            if(schemaId != credentialSchemaId) throw new Error('Invalid credential request: Requesting schema does not exist. Make sure you register first to get credential');
+      try {  
+            let { serviceEndpoint, challenge } = this.hypersign.requestingAppInfo;
+              
             const url = Url(serviceEndpoint, true);
             // TODO: need to remove this later. this is depreciated
             if(!challenge){
@@ -113,15 +154,15 @@ export default {
             this.loading= true;
             const verifyUrl = url.origin + url.pathname;
             const vp_unsigned = await this.hsSDK.vp.getPresentation(
-              {verifiableCredentials: [this.verifiableCredential],
+              {verifiableCredentials: this.verifiableCredentials,
               holderDid:  this.hypersign.did}
             );
             const verificationMethodId=this.hypersign.did + '#key-1';
             const vp_signed = await this.hsSDK.vp.signPresentation(
              { presentation: vp_unsigned,
                 holderDidDocSigned: this.hypersign.didDoc,
-               privateKey: this.hypersign.keys.privateKeyMultibase,
-               challenge,
+                privateKey: this.hypersign.keys.privateKeyMultibase,
+                challenge,
                 verificationMethodId
               }
             );

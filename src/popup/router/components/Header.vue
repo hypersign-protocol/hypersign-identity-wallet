@@ -1,7 +1,7 @@
 <template>
   <div class="header" v-if="showNavigation && !aeppPopup">
     <div class="content" :class="{ isLoggedIn }">
-      <Arrow v-if="title && !tourRunning" @click="back" class="back-arrow" data-cy="back-arrow" />
+      <Arrow v-if="title && !tourRunning && !dontGoBack" @click="back" class="back-arrow" data-cy="back-arrow" /> 
       <button :class="$route.path === '/intro' && !isLoggedIn ? 'intro_style' : ''" v-else>
       </button>
       <div class="title">
@@ -51,7 +51,7 @@ export default {
   //   };
   // },
   computed: {
-    ...mapState(['tourRunning', 'isLoggedIn', 'notifications']),
+    ...mapState(['tourRunning', 'isLoggedIn', 'notifications','dontGoBack']),
     title() {
       return this.$route.meta.title;
     },

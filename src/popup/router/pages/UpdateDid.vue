@@ -98,7 +98,31 @@
                   this.loading = true;
                   
                   // Generating dummy key
-                    this.updatedDid.didDocument.controller=this.didRaw.controllers;
+                   this.updatedDid.didDocument.controller=this.didRaw.controllers;
+                    let verificationMethod=[]
+                    let authentication=[]
+                    let assertionMethod=[]
+                    let keyAgreement=[]
+                    let capabilityInvocation=[]
+                    let capabilityDelegation=[]
+
+                    for(let i=0;i<this.didRaw.controllers.length;i++){
+                      const { didDocument } = await this.hsSDK.did.resolve({did: this.didRaw.controllers[i]})
+                      verificationMethod.push(didDocument.verificationMethod[0])
+                      authentication.push(didDocument.authentication[0])
+                      assertionMethod.push(didDocument.assertionMethod[0])
+                      keyAgreement.push(didDocument.keyAgreement[0])
+                      capabilityInvocation.push(didDocument.capabilityInvocation[0])
+                      capabilityDelegation.push(didDocument.capabilityDelegation[0])
+
+                    }
+                    // this.updatedDid.didDocument.verificationMethod=verificationMethod
+                    this.updatedDid.didDocument.authentication=authentication
+                    this.updatedDid.didDocument.assertionMethod=assertionMethod
+                    this.updatedDid.didDocument.keyAgreement=keyAgreement
+                    this.updatedDid.didDocument.capabilityInvocation=capabilityInvocation
+                    this.updatedDid.didDocument.capabilityDelegation=capabilityDelegation
+
                     const versionId=this.updatedDid.didDocumentMetadata.versionId;
                   const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id;
                   
@@ -139,7 +163,7 @@
                       }
                   }
               }catch(e){
-                  console.log(e)
+                  // console.log(e)
                   this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
               } finally {
                   this.loading = false;
