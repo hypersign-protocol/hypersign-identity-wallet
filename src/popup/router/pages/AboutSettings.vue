@@ -6,7 +6,7 @@
       <span class="version">
         <a
           @click="
-            openUrl(`https://github.com/aeternity/superhero-wallet/commit/${commitHash}`, true)
+            openUrl(`https://github.com/hypersign-protocol/hypersign-identity-wallet/commit/${commitHash}`, true)
           "
         >
           {{ commitHash.slice(0, 7) }}</a

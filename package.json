@@ -1,8 +1,8 @@
 {
     "name": "hypersign-wallet",
-    "version": "4.0.0",
+    "version": "5.0.0",
     "description": "Hypersign Identity wallet for managing credentials and DIDs",
-    "author": "Hypermine",
+    "author": "Hypermine Core Dev",
     "license": "MIT",
     "private": true,
     "scripts": {
