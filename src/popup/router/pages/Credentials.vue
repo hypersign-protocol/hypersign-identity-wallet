@@ -5,7 +5,7 @@
       <CreateIcon ></CreateIcon>
     </Button>
       <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get credentials.</span>
-      <div v-else style="max-height: 600px; overflow: scroll">
+      <div v-else style="max-height: 600px; overflow-y: scroll">
         <div class="cred-card" v-for="credential in hypersign.credentials" :key="credential.id"  @click="moveTo(`/credential/${credential.id}`)">
           <div class="cred-card-header">
             <div style="float: left">
@@ -17,7 +17,7 @@
           <div class="cred-card-body container">
             
             <div style="width: 100%; padding: 5px;   height: 3vh;margin-top: 14px;color: #CCCCCC; font-weight: bold;   font-size: 14px">
-              {{ shortner(credential.id.toUpperCase(), 31, 6) }}
+              {{ shortner(credential.id.toUpperCase(), 28, 6) }}
             </div>
 
             
