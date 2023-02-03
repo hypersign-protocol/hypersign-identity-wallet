@@ -9,7 +9,7 @@
         <div class="cred-card" v-for="credential in hypersign.credentials" :key="credential.id"  @click="moveTo(`/credential/${credential.id}`)">
           <div class="cred-card-header">
             <div style="float: left">
-              <div class="whiteFont" style="font-size:large; font-weight: bold;">{{ credential.type[1] }}</div>
+              <div class="whiteFont" style="font-size:large; font-weight: bold;">{{ shortner(credential.type[1],19, 10) }}</div>
               <div class="fieldName">{{ schemaIdFormatted(credential['@context'][1].hs).toUpperCase() }}</div>
             </div>
             <div class="bg-img-hs"></div>
@@ -131,7 +131,11 @@ export default {
 
   methods: {
     shortner(str, max, len){
-      return toStringShorner(str, max, len)
+      if(str && str.length > max){
+        return toStringShorner(str, max, len)
+      }else {
+        return str
+      }
     },
     schemaIdFormatted(credentialSchemaUrl){
       if(credentialSchemaUrl){
