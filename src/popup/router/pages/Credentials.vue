@@ -5,7 +5,49 @@
       <CreateIcon ></CreateIcon>
     </Button>
       <span class="altText" v-if="hypersign.credentials.length == 0">No credential found. Scan QR to get credentials.</span>
-      <Panel v-else>
+      <div v-else style="max-height: 600px; overflow-y: scroll">
+        <div class="cred-card" v-for="credential in hypersign.credentials" :key="credential.id"  @click="moveTo(`/credential/${credential.id}`)">
+          <div class="cred-card-header">
+            <div style="float: left">
+              <div class="whiteFont" style="font-size:large; font-weight: bold;">{{ credential.type[1] }}</div>
+              <div class="fieldName">{{ schemaIdFormatted(credential['@context'][1].hs).toUpperCase() }}</div>
+            </div>
+            <div class="bg-img-hs"></div>
+          </div>
+          <div class="cred-card-body container">
+            
+            <div style="width: 100%; padding: 5px;   height: 3vh;margin-top: 14px;color: #CCCCCC; font-weight: bold;   font-size: 14px">
+              {{ shortner(credential.id.toUpperCase(), 28, 6) }}
+            </div>
+
+            
+            <div style="display: table;   width: 100%;">
+              
+                <div style="float: left;   width: 45%; padding: 5px;">
+                  <div class="fieldName">Issuer</div>
+                  <div class="whiteFont"> {{  shortner(credential.issuer, 15, 5).toUpperCase()  }}</div>
+                </div>
+              
+              <div style="float: left; width: 27%; padding: 5px;">
+
+                  <div class="fieldName">Issued At</div>
+                  <div class="whiteFont"> {{  formattedDate(credential.issuanceDate) }}</div>
+        
+              </div>
+              <div style="float: left; width: 28%; padding: 5px; text-align: right;">
+                  <div class="fieldName">Valid Till</div>                    
+                  <div class="whiteFont">{{  formattedDate(credential.expirationDate) }}</div>
+              </div>
+
+              
+            </div>
+            <!-- <div class="cred-card-body-detail"> {{ credential.id.toUpperCase() }}</div> -->
+          </div>
+        </div>
+      </div>
+      
+      
+      <!-- <Panel>
         
         <PanelItem
           v-for="credential in hypersign.credentials"
@@ -14,7 +56,7 @@
           :title="credential.type[1]"
           :info="toFormattedDate(credential.issuanceDate)"
         />
-      </Panel>
+      </Panel> -->
       <Loader v-if="loading" />
     </div>
 </template>
@@ -32,7 +74,7 @@ import axios from 'axios';
 import { HS_VC_STATUS_PATH } from '../../utils/hsConstants'
 import CreateIcon from '../../../icons/topup-icon.svg?vue-component';
 import {toFormattedDate, toStringShorner} from '../../utils/helper'
-
+import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 export default {
   mixins: [removeAccountMixin],
   components: { CheckBox, Panel,Button, PanelItem, QrIcon, Textarea ,CreateIcon},
@@ -56,6 +98,7 @@ export default {
     validUrl() {
       return this.form.url != '';
     },
+    
   },
   async created() {
     //Only for deeplinking
@@ -87,6 +130,34 @@ export default {
   },
 
   methods: {
+    shortner(str, max, len){
+      return toStringShorner(str, max, len)
+    },
+    schemaIdFormatted(credentialSchemaUrl){
+      if(credentialSchemaUrl){
+        return toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 24, 4)
+      }  else {
+        return ""
+      }
+    },
+    moveTo(path){
+      this.$router.push(path);
+    },
+    // formattedExpiryDate(expDate, issDate = ''){
+    //   const date1 = new Date(expDate);
+    //   if(issDate){
+    //     const date2 = new Date(issDate);
+    //     const diffTime = Math.abs(date2 - date1);
+    //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    //     return diffDays
+    //   } else {
+    //      return date1.toLocaleDateString()
+    //   }
+    // },
+    formattedDate(date){
+      const d =  new Date(date)      
+      return d.toLocaleDateString() //`${month}/${day}/${year}`
+    },
     toFormattedDate(dateStr) {
       const d = new Date(dateStr);
       return d.toDateString();
@@ -106,16 +177,17 @@ export default {
     },
 
     async fetchCredential() {
-      //console.log('fetchCredential...')
       this.form.url = this.form.url + '&did=' + this.hypersign.did;
       this.loading = true;
       let response = await axios.get(this.form.url);
-      response = response.data;
-      if (!response) throw new Error('Can not accept credential');
-      if (response && response.status != 200) throw new Error(response.error);
-      if (!response.message) throw new Error('Can not accept credential');
-      await this.acceptCredential(response.message)
-      this.loading = false;
+      if(response){
+        response = response.data;
+        if (!response) throw new Error('Can not accept credential');
+        if (response && response.status != 200) throw new Error(response.error);
+        if (!response.message) throw new Error('Can not accept credential');
+        await this.acceptCredential(response.message)
+        this.loading = false;
+      }
     },
 
     async deeplink(url) {
@@ -156,6 +228,48 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
+.bg-img-hs{
+  float: right;
+               height: 83px;
+               width: 66px; 
+               background-repeat: no-repeat;
+               opacity: 0.2;
+               background-size: 187px;
+               background-image: url('https://static.tildacdn.com/tild6465-3733-4035-b237-306265336431/Group_462.svg');
+}
+ 
+.fieldName{
+  font-size: xx-small;
+  color: grey;
+}
+.cred-card-body {
+  // height: 14vh;
+  // padding: 10px;
+  height: 8vh;
+}
+
+.whiteFont{
+  color: white;
+}
+.cred-card {
+  // background: #1B1927 !important;
+  box-shadow: 0px 0px 4px 0 rgba(0, 0, 0, 0.2);
+  font-family: 'IBM Plex Sans',Arial,sans-serif;
+  padding: 16px;
+  background: -webkit-linear-gradient(140deg, #8653a4, #1b1927);
+  border-radius: 14px;
+  margin-top: 7%;
+  text-align: left;
+  font-size: 13px;
+  color: gray;
+}
+
+.cred-card-header {
+  color: #fff;
+  height:10vh;  
+  padding: 5px;
+}
+
 
 .altText {
   color: #80808091;

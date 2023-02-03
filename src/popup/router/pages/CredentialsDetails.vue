@@ -1,7 +1,7 @@
 <template>
   <div class="popup">
     <div class="">
-      <div class="cred-card">
+      <!-- <div class="cred-card">
         <div class="cred-card-header">
           <span>{{ credDetials.formattedSchemaName }}</span>
         </div>
@@ -10,8 +10,36 @@
           <span class="cred-card-body-detail">ISSUER ID: {{ credDetials.formattedIssuer }}</span><br />
           <span class="cred-card-body-detail">ISSUED ON: {{ credDetials.formattedIssuanceDate }}</span><br />
         </div>
-      </div>
+      </div> -->
       <ul class="list-group">
+        <li class="list-group-item">
+          <div class="list-title">CREDENTIAL ID: </div>
+          <div>{{ verifiableCredential.id }}</div>
+        </li>
+        <li class="list-group-item">
+          <div class="list-title">CREDENTIAL TYPE: </div>
+          <div>{{ credDetials.formattedSchemaName }}</div>
+        </li>
+        <li class="list-group-item">
+          <div class="list-title">SCHEMA ID: </div>
+          <div>{{ credDetials.schemaId }}</div>
+        </li>
+        <li class="list-group-item">
+          <div class="list-title">ISSUER DID: </div>
+            <div>{{ verifiableCredential.issuer }}</div>
+        </li>
+        <li class="list-group-item" style="height: 66px;">
+          <div style="float:left; width: 50%">
+            <div class="list-title">ISSUANCE DATE: </div>
+            <div>{{ formattedDate(verifiableCredential.issuanceDate) }}</div>
+          </div>
+          <div style="float:right; width: 50%; text-align: right;">
+            <div class="list-title">EXPIRY DATE: </div>
+            <div>{{ formattedDate(verifiableCredential.expirationDate) }}</div>
+          </div>
+        </li>
+
+
         <li class="list-group-item" v-for="claim in claims" :key="claim">
           <div class="list-title">{{ toUpper(claim) }}: </div>
           <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
@@ -20,8 +48,11 @@
       <Loader v-if="loading" />
     </div>
     <div>
-      <Button v-if="share" v-on:click="shareCredential">Share Credential</Button>
-      <Button v-on:click="deleteCredential">Delete Credential</Button>
+      <Button v-if="share" v-on:click="shareCredential">Share</Button>
+        <Button  @click="deleteCredential">
+          <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">Delete</span>
+        </Button>
+      
       <Loader v-if="loading" />
 
     </div>
@@ -37,9 +68,10 @@ import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import hidWalletInstance from '../../utils/hidWallet';
 import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE, SUPERHERO_HS_AUTH_BASE_URL, BUSINESSCARD_SCHEMA } from '../../utils/hsConstants'
 import Axios from 'axios';
+import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 
 export default {
-  components: { QrIcon },
+  components: { QrIcon, CloseIcon },
   data() {
     return {
       share: false,
@@ -72,7 +104,7 @@ export default {
       if (credentialSchema === BUSINESSCARD_SCHEMA) {
         this.share = true
       }
-      this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 32, 15);
+      this.credDetials.schemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim();
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
   },
@@ -82,6 +114,10 @@ export default {
 
   },
   methods: {
+    formattedDate(date){
+      const d =  new Date(date)      
+      return d.toLocaleDateString() 
+    },
      deleteCredential() {
       // console.log("deleteCredential");
       try {
