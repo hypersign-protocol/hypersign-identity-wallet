@@ -250,6 +250,7 @@ export default {
 
 .whiteFont{
   color: white;
+  font-size: smaller;
 }
 .cred-card {
   // background: #1B1927 !important;
