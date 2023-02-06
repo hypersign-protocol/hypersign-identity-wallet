@@ -5,7 +5,7 @@
       <img v-if="IN_FRAME" src="../../../icons/iframe/sendAndReceive.svg" />
 
       <div v-else class="not-iframe">
-        <img src="../../../icons/hypersign-logo.png" :class="{ logo: !IS_WEB }" />
+        <img src="../../../icons/hypersign-logo-white.svg" :class="{ logo: !IS_WEB }" />
       </div>
 
       <Button @click="loginWithGoogle" data-cy="login-with-google">

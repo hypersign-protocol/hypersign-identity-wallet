@@ -187,7 +187,7 @@ main {
 .input {
     outline: none;
     resize: none;
-    background: #f7fafc !important;
+    background: $bg-color;
     border: none;
     padding-left: 1rem;
 }
@@ -367,15 +367,22 @@ button {
 
 .round-button {
     z-index: 1;
-    box-shadow: 0px 0px 5px 5px #8889;
     width: 70px;
     height: 70px;
     border-radius: 50%;
     display: block;
-    background: #272831;
     text-align: center;
     position: fixed;
     bottom: 20px;
+    color: #ffffff;
+    font-size: 17px;
+    font-family: 'IBM Plex Sans', Arial, sans-serif;
+    line-height: 1.55;
+    font-weight: 600;
+    background-image: linear-gradient(79deg, rgba(144, 90, 176, 1) 0%, rgba(86, 52, 105, 1) 98%);
+    border-color: transparent;
+    border-style: solid;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
 .round-button-qr {

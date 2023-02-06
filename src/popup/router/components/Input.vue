@@ -46,10 +46,10 @@ export default {
 input.input {
     width: 100%;
     border-bottom: 2px solid #bbb!important;
-    background: #f1f1f1!important;
+    background: $bg-color;
     padding-left: 0px;
     margin-bottom: 22px;
-    color: #3e3e3e!important;
+    color: #b2b4b8 !important;
     font-size: 14px;
     min-height: 35px;
 

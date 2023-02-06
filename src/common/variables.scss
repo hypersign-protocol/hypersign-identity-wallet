@@ -15,27 +15,27 @@ $ledger-color: #203040;
 
 /** Colors for new designs */
 
-$bg-color: #f1f1f1;
+$bg-color: #160e21;
 $white-color: #f1f1f1;
 $border-color: #bbb;
 $input-bg-color: #d6d6d6;
-$button-color:#272831;
+$button-color:rgba(144, 90, 176, 1);
 $button-text-color: #fff; 
 $modal-background: #1b1b23;
 $placeholder-color: #67676d;
-$text-color: #3e3e3e;
-$accent-color: #18A17C;
-$secondary-color: #2a9cff;
-$nav-bg-color: #1d1e27;
+$text-color: #ffffff;
+$accent-color: rgba(144, 90, 176, 1);
+$secondary-color: rgba(76, 105, 100, 1);
+$nav-bg-color: rgb(63, 55, 74);
 $input-focus-color: #2d3940;
 $input-error-color: #ff5857;
 $error-color: #ff5857;
 $transactions-bg: #12121b;
 $nav-border-color: #3a3a47;
 $tx-border-color: #33343e;
-$box-button-color: #33343e;
+$box-button-color: rgba(144, 90, 176, 1);;
 $scrollbar-color: #707075;
-$submenu-bg: #f1f1f1;
+$submenu-bg: $bg-color;
 $black-color: #000;
 $filters-bg: #111117;
 $untrustred-badge-bg: #ff5857;
