@@ -121,7 +121,7 @@ export default {
       verifiableCredentials: []
     };
   },
-  mixins: [syncMixin, verifyTokenMixin,removeAccountMixin],
+  mixins: [syncMixin, verifyTokenMixin, removeAccountMixin],
   computed: {
     ...mapState([, 'tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
@@ -149,13 +149,15 @@ export default {
           console.log('Inside else  check')
         }
 
-        const qrDataQueryUrl=localStorage.getItem('qrDataQueryUrl')
+        const qrDataQueryUrl = this.$route.query.url
         this.verifyToken()
           .then(data => {
             if (data !== undefined) {
               const response = data.response
-              if (response.status === 401) {         
-                localStorage.setItem('qrDataQueryUrl',qrDataQueryUrl)
+              if (response.status === 401) {
+                if (qrDataQueryUrl !== null && qrDataQueryUrl !== undefined) {
+                  localStorage.setItem('qrDataQueryUrl', qrDataQueryUrl)
+                }
                 this.$store.commit('setMainLoading', false);
                 this.$store.commit('switchLoggedIn', false);
                 this.removeAccountSilent()
@@ -164,7 +166,7 @@ export default {
             }
           })
 
-          console.log();
+        console.log();
 
       } catch (e) {
         console.log(e.message)
@@ -456,7 +458,7 @@ export default {
           const schemaIds = schemaId;
           const credentialSchemasIds = this.hypersign.credentials.map(x => getSchemaIdFromSchemaUrl(x['@context'][1].hs))
           // console.log({
-            // credentialSchemasIds
+          // credentialSchemasIds
           // })
 
           if (this.hypersign.credentials <= 0) {
