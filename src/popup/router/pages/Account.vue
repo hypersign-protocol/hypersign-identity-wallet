@@ -149,11 +149,13 @@ export default {
           console.log('Inside else  check')
         }
 
+        const qrDataQueryUrl=localStorage.getItem('qrDataQueryUrl')
         this.verifyToken()
           .then(data => {
             if (data !== undefined) {
               const response = data.response
-              if (response.status === 401) {               
+              if (response.status === 401) {         
+                localStorage.setItem('qrDataQueryUrl',qrDataQueryUrl)
                 this.$store.commit('setMainLoading', false);
                 this.$store.commit('switchLoggedIn', false);
                 this.removeAccountSilent()
@@ -161,6 +163,8 @@ export default {
               }
             }
           })
+
+          console.log();
 
       } catch (e) {
         console.log(e.message)
