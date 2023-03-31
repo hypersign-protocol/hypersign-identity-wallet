@@ -139,7 +139,8 @@
                 "title": "Allowance created",
                 "msg": "Allowance created successfully"
             },
-            "transfer": {
+          
+            "connections":{
                 "title": "Allowance transferred",
                 "msg": "Allowance transferred successfully"
             },
@@ -246,6 +247,7 @@
             "IssueSchema":"Sign Transaction",
             "transactionDetails": "Transaction Details",
             "transfer": "Transfer",
+            "Messages":"Messages",
             "credential": "Credentials",
             "credentialDetails": "Credential Details",
             "credentialDetailsTemp": "Credential Offer",

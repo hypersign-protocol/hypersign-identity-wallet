@@ -1,7 +1,7 @@
 {
   "name": "Hypersign",
   "description": "Hypersign Wallet",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "manifest_version": 2,
   "permissions": [
     "storage",

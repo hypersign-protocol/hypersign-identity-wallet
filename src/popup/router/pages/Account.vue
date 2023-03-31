@@ -48,6 +48,17 @@
               <Settings slot="icon" />
             </BoxButton>
 
+          </div>
+
+
+          <div class="box-club">
+
+
+            <BoxButton :text="$t('pages.appVUE.transfer')" to="/connections" style="font-size: smaller; color: white"
+              class="tour__step9">
+              <Message height="26" slot="icon" />
+            </BoxButton>
+
 
           </div>
 
@@ -76,6 +87,7 @@ import Settings from '../../../icons/settings-icon.svg?vue-component';
 
 import Profile from '../../../icons/profile.svg?vue-component';
 import Transfer from '../../../icons/invite.svg?vue-component';
+import Message from '../../../icons/message.svg?vue-component'
 import Transactions from '../../../icons/hamburger.svg?vue-component';
 import DidIcon from '../../../icons/activity-icon.svg?vue-component';
 
@@ -96,6 +108,7 @@ export default {
   name: 'Account',
   components: {
     QrIcon,
+    Message,
     Settings,
     AccountInfo,
     BoxButton,
@@ -121,7 +134,7 @@ export default {
       verifiableCredentials: []
     };
   },
-  mixins: [syncMixin, verifyTokenMixin,removeAccountMixin],
+  mixins: [syncMixin, verifyTokenMixin, removeAccountMixin],
   computed: {
     ...mapState([, 'tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
@@ -153,7 +166,7 @@ export default {
           .then(data => {
             if (data !== undefined) {
               const response = data.response
-              if (response.status === 401) {               
+              if (response.status === 401) {
                 this.$store.commit('setMainLoading', false);
                 this.$store.commit('switchLoggedIn', false);
                 this.removeAccountSilent()
@@ -452,7 +465,7 @@ export default {
           const schemaIds = schemaId;
           const credentialSchemasIds = this.hypersign.credentials.map(x => getSchemaIdFromSchemaUrl(x['@context'][1].hs))
           // console.log({
-            // credentialSchemasIds
+          // credentialSchemasIds
           // })
 
           if (this.hypersign.credentials <= 0) {
