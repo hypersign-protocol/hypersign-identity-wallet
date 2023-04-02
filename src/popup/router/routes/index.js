@@ -4,6 +4,7 @@ import Settings from '../pages/Settings';
 import GeneralSettings from '../pages/GeneralSettings';
 import SecuritySettings from '../pages/SecuritySettings';
 import BackupWallet from '../pages/BackupWallet';
+import MessageDetails from '../pages/MessageDetails'
 // import BackupWalletEdv from '../pages/BackupWalletEdv';
 import RestoreWallet from '../pages/RestoreWallet';
 // import RestoreWalletEdv from '../pages/RestoreWalletEdv';
@@ -19,7 +20,7 @@ import NotFound from '../pages/NotFound';
 import Address from '../pages/Address';
 import webIframePopups from './web-iframe-popups';
 import BusinessCard from '../pages/BusinessCard';
-
+import Messages from '../pages/Messages'
 // Hypersign related
 import Credentials from '../pages/Credentials';
 import CredentialIssue from '../pages/CredentialIssue';
@@ -299,7 +300,15 @@ export default [{
         title: 'DidsDetails',
     }
 }
-    ,
+    ,{
+        name: 'MessageDetails',
+        path: '/message/:did',
+        component: MessageDetails,
+        props: true,
+        meta: {
+            title: 'MessageDetails',
+        }
+    },
 {
     name: 'transactions',
     path: '/transactions',
@@ -341,6 +350,17 @@ export default [{
     },
 
 }
+    ,
+    
+    {
+        name:'Messages',
+        path:'/messages',
+        component:Messages,
+        props:true,
+        meta:{
+            title:'Messages'
+        }
+    }
     ,
 
 {

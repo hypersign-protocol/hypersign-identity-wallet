@@ -54,7 +54,7 @@
           <div class="box-club">
 
 
-            <BoxButton :text="$t('pages.appVUE.transfer')" to="/connections" style="font-size: smaller; color: white"
+            <BoxButton :text="$t('pages.appVUE.messages')" to="/messages" style="font-size: smaller; color: white"
               class="tour__step9">
               <Message height="26" slot="icon" />
             </BoxButton>

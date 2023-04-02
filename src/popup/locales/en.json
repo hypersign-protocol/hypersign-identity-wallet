@@ -205,6 +205,7 @@
             "understand": "I understand that this is a cryptocurrency wallet and I am responsible for backing up my account recovery seed phrase."
         },
         "titles": {
+            "MessageDetails":"Chat",
             "settings": "Settings",
             "ask-pin":"Encrypt / Decrypt your wallet",
             "backup-wallet": "Backup",
@@ -254,12 +255,14 @@
             "credentialDetailsAuthorize": "Proof Details"
         },
         "appVUE": {
+            "MesssageDetails":"Chat",
             "systemName": "Hypersign",
             "manageNetworks": "Manage networks",
             "manageAccounts": "Manage accounts",
             "airGapVault": "Create a vault for AirGap",
             "ledgerAccount": "Add Ledger Account",
             "menu": "Menu",
+            "messages":"Messages",
             "myAccount": "My Account",
             "switchToken": "Tokens",
             "utilities": "Utilities",
