@@ -11,10 +11,10 @@
         </div>
       </div>
       <div>
-        <Button @click="selectDid" data-cy="selectDid" inline dark v-if="hypersign.did!==did">
+        <Button @click="selectDid" data-cy="selectDid" inline dark v-if="hypersign.did !== did">
           Confirm
         </Button>
-        <Button @click="register" data-cy="register-on-chain" v-if="status==='Unregistred'" inline>
+        <Button @click="register" data-cy="register-on-chain" v-if="status === 'Unregistred'" inline>
           Register
         </Button>
       </div>
@@ -60,11 +60,18 @@ export default {
         this.hdPathIndex = this.hypersign.dids[this.did].hdPathIndex;
         this.status = this.toUpper(this.hypersign.dids[this.did].status) === 'PRIVATE' ? 'Unregistred' : 'Registred';
         if (this.toUpper(this.hypersign.dids[this.did].status) === 'PRIVATE') {
-          await this.resolveDid()
+          try {
+            await this.resolveDid()
+
+          } catch (e) {
+            if (e.response.data.code == 3) {
+              console.log(e.response.data.message);
+            }
+          }
         }
       }
       this.loading = false;
-    } catch (error) {
+    } catch (e) {
       if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
 
       this.loading = false;
@@ -81,7 +88,7 @@ export default {
       await hidWalletInstance.generateWallet(this.mnemonic);
       const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
       await hsSdk.init();
-      const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({ did: did_id?did_id: this.did });
+      const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({ did: did_id ? did_id : this.did });
       if (didDocumentMetadata === null) {
         this.status = 'Unregistred'
       } else {
@@ -89,7 +96,7 @@ export default {
       }
     }
     ,
-   async selectDid() {
+    async selectDid() {
       try {
         await this.resolveDid(this.didDoc.id)
         this.$store.dispatch('setHSkeys', {
@@ -110,54 +117,54 @@ export default {
     },
     async register() {
       try {
-          await hidWalletInstance.generateWallet(this.mnemonic);
-            const balance= await hidWalletInstance.getBalance()
-            console.log(balance);
-            if(balance<49999){
-              this.$store.dispatch('modals/open', { name: 'default', msg: 'Insufficient balance. Buy HID and try again' });
-              this.loading = false;
-              return;
-            }
-          const register = await this.$store
-            .dispatch('modals/open', {
-              name: 'confirm',
-              title: this.$t('modals.registerDid.title'),
-              msg: this.$t('modals.registerDid.msg'),
-            }).catch(() => false);
-          if (register) {
-            this.$emit('closeMenu');
-            this.loading = true;            
-            const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
-            await hsSdk.init();
-            const verificationMethodId = this.didDoc.id + '#key-1';
-            const publicKeyMultibase=this.didDoc.id.split(':').at(-1)
-            this.didDoc.verificationMethod[0].publicKeyMultibase=publicKeyMultibase
-            const tx = await hsSdk.did.register({
-              didDocument: this.didDoc, privateKeyMultibase: this.key.privateKeyMultibase,
-              verificationMethodId
-            });
-
-            this.status = 'Registred'
-            this.selectDid()
-          }
-
+        await hidWalletInstance.generateWallet(this.mnemonic);
+        const balance = await hidWalletInstance.getBalance()
+        console.log(balance);
+        if (balance < 49999) {
+          this.$store.dispatch('modals/open', { name: 'default', msg: 'Insufficient balance. Buy HID and try again' });
           this.loading = false;
+          return;
         }
+        const register = await this.$store
+          .dispatch('modals/open', {
+            name: 'confirm',
+            title: this.$t('modals.registerDid.title'),
+            msg: this.$t('modals.registerDid.msg'),
+          }).catch(() => false);
+        if (register) {
+          this.$emit('closeMenu');
+          this.loading = true;
+          const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+          await hsSdk.init();
+          const verificationMethodId = this.didDoc.id + '#key-1';
+          const publicKeyMultibase = this.didDoc.id.split(':').at(-1)
+          this.didDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultibase
+          const tx = await hsSdk.did.register({
+            didDocument: this.didDoc, privateKeyMultibase: this.key.privateKeyMultibase,
+            verificationMethodId
+          });
+
+          this.status = 'Registred'
+          this.selectDid()
+        }
+
+        this.loading = false;
+      }
       catch (e) {
-          if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
-          this.loading = false;
+        if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
+        this.loading = false;
 
-        }
-      },
-      
-      toUpper(t) {
-        if (t)
-          return t.toString().toUpperCase();
-        else
-          return t;
-      },
+      }
     },
-  }
+
+    toUpper(t) {
+      if (t)
+        return t.toString().toUpperCase();
+      else
+        return t;
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
