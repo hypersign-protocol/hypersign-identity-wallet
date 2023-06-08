@@ -460,12 +460,12 @@ export default {
           }
 
           const intersectionSchemasIds = credentialSchemasIds.filter(x => schemaIds.indexOf(x) > -1)
-
+          const intersectionSchemasIdSet=new Set(intersectionSchemasIds)
           if (intersectionSchemasIds.length <= 0) {
             throw new Error('Credential not found for schemaIds ' + schemaId.join(','))
           }
           
-          if (intersectionSchemasIds.length < schemaIds.length) {
+          if (intersectionSchemasIdSet.size < schemaIds.length) {
             const rest = schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0)
             const msg= rest ? rest.join(',') : ''
             throw new Error('Credential not found for schemaIds ' + msg)
