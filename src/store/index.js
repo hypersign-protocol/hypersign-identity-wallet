@@ -72,6 +72,7 @@ const initialState = {
         dids: {
         }
     },
+    certificateImage:""
 };
 
 const store = new Vuex.Store({
@@ -115,7 +116,7 @@ const store = new Vuex.Store({
                 tokens: { all },
                 invites,
                 notificationSettings,
-                hypersign
+                hypersign,                
             }) => ({
                 migrations,
                 current,
@@ -137,7 +138,7 @@ const store = new Vuex.Store({
                 tokens: { all },
                 invites,
                 notificationSettings,
-                hypersign
+                hypersign,                
             }),
         ),
         // observables,

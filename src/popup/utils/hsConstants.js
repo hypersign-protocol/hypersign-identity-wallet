@@ -10,6 +10,7 @@ export const WALLET_URL = process.env.VUE_APP_WALLET_URL || "https://wallet-stag
 // export const WALLET_URL=process.env.VUE_APP_WALLET_URL || "http://localhost:4999/chrome/popup/popup#/";
 // export const BUSINESSCARD_SCHEMA='sch:hid:testnet:zFc19V37DPHmdysvPDJJdeHQTLPWzuSVZq4Tn9GPXcEj2:1.0'
 export const BUSINESSCARD_SCHEMA='sch:hid:testnet:zDt4ZZwoA5vBV3t7tn8Y4KNKjH4fBDkwYxLfQK1nJC8BR:1.0'
+export const CERTIFICATECARD_SCHEMA='sch:hid:testnet:z5M9E2dCW4t74Zv4d4QfQj3uTo64bmoQvES3v24JwksXi:1.0'
 export const AUTH_SERVER_FAUCET_PATH = "hs/api/v2/faucet/"
 export const WALLET_TYPE = process.env.VUE_APP_HS_WALLET_TYPE || "web"
 export const HYPERSIGN_AUTH_PROVIDER = {

@@ -122,6 +122,8 @@ export default {
     },
     removeHSVerifiableCredential(state, payload) {
         ////HS_TODO
+        // console.log('in mutation')
+        // return
         state.hypersign.credentials = state.hypersign.credentials.filter((el) => el.id !== payload.id);
   
     },
@@ -199,4 +201,7 @@ export default {
     setLoginTargetLocation(state, location) {
         state.loginTargetLocation = location;
     },
+    setImageData(state,payload){
+        state.certificateImage = payload
+    }
 };

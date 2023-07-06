@@ -48,11 +48,11 @@
       <Loader v-if="loading" />
     </div>
     <div>
+      <img :src="imgS" alt="" srcset="">
       <Button v-if="share" v-on:click="shareCredential">Share</Button>
         <Button  @click="deleteCredential">
           <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">Delete</span>
-        </Button>
-      
+        </Button>      
       <Loader v-if="loading" />
 
     </div>
@@ -66,10 +66,12 @@ import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import hidWalletInstance from '../../utils/hidWallet';
-import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE, SUPERHERO_HS_AUTH_BASE_URL, BUSINESSCARD_SCHEMA } from '../../utils/hsConstants'
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE, SUPERHERO_HS_AUTH_BASE_URL, BUSINESSCARD_SCHEMA,CERTIFICATECARD_SCHEMA } from '../../utils/hsConstants'
 import Axios from 'axios';
+import html2canvas from 'html2canvas';
 import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
-
+import logoImage from "../../../icons/hypersign.jpg"
+import { EventBus } from '../../utils/eventBus';
 export default {
   components: { QrIcon, CloseIcon },
   data() {
@@ -84,7 +86,8 @@ export default {
         formattedIssuanceDate: "",
         formattedSchemaName: "",
         schemaId: ""
-      }
+      },
+      imgS:''
     };
   },
   created() {
@@ -102,6 +105,9 @@ export default {
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
       const credentialSchema = this.verifiableCredential.credentialSchema.id
       if (credentialSchema === BUSINESSCARD_SCHEMA) {
+        this.share = true
+      }
+      if(credentialSchema === CERTIFICATECARD_SCHEMA){
         this.share = true
       }
       this.credDetials.schemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim();
@@ -164,13 +170,90 @@ export default {
         }
       });
 
-      // console.log(result.data.record);
+      console.log(result.data.record);
       const id = result.data.record._id;
       this.loading = false;
-      return this.$router.push({ name: 'sharedCredential', params: { vp: id } });
+      if (this.verifiableCredential.credentialSchema.id === BUSINESSCARD_SCHEMA) {
+        console.log(this.verifiableCredential.credentialSchema.id)
+        console.log('in bussiness card')
+        return this.$router.push({ name: 'sharedCredential', params: { vp: id } });
+      }
+      if(this.verifiableCredential.credentialSchema.id === CERTIFICATECARD_SCHEMA){
+        console.log(this.verifiableCredential.credentialSchema.id)
+        console.log('in certificate card')
+// Create a div element and set its inner HTML
+var div = document.createElement('div');
+div.style.width = '337px';
+div.style.height = '450px';
+div.innerHTML = `<div class="cred-card-body" style="padding: 12px; color: rgb(80, 54, 101); font-size: small;">
+  <div class="container" align="center">
+    <table class="cert" style="border: 5px solid #b2bbc1; border-right: 5px solid #b2bbc1; border-left: 5px solid #b2bbc1; width: 100%; font-family: arial; color: rgb(80, 54, 101);">
+      <tr>
+        <td align="center" class="crt_logo">
+        <img src="${logoImage}" style="margin-top:5px;" width="30px" height="30px" alt="logo">
+
+        </td>
+      </tr>
+      <tr>
+        <td align="center">      
+          <h1 class="crt_title" style="margin-top: 5px; letter-spacing: 1px; color: rgb(80, 54, 101) !important;">HID</h1>
+          <h2 style="font-size: larger; color: rgb(80, 54, 101);">CERTIFICATE</h2>
+          <p style="margin-bottom: 0;">This Certificate is awarded to</p>
+          <h1 class="crt_user" style="font-family: 'Satisfy', cursive; font-size: 40px; margin-top: 0; margin-bottom: 0;">${this.verifiableCredential.credentialSubject.candidateName}</h1>
+          <h3 class="afterName" style="font-weight: 100; color: rgb(80, 54, 101); margin-top: 0; margin-bottom: 0;">For participating in ${this.credDetials.formattedSchemaName}<br> organized by <br> ${this.verifiableCredential.credentialSubject.issuerName}</h3>
+          <h3 style="margin-bottom: 0;">Awarded as ${this.verifiableCredential.credentialSubject.award}</h3>
+          <div style="display: flex;">
+          <div style="display: inline; text-align: center;">
+            <h3 style="margin-right: auto;" class="ml-4">Organizer</h3>
+            <span>${this.verifiableCredential.credentialSubject.issuerName}</span>
+          </div>
+          <div style="margin-left: auto; text-align: center;">
+            <h3 class="mr-4">Date</h3>
+            <span>${this.verifiableCredential.credentialSubject.issueDate}</span>
+          </div>
+        </div>
+        </td>
+        <tr>
+      </tr>
+      </tr>      
+    </table>
+  </div>
+</div>`;
+
+        // Append the div element to the document body
+        document.body.appendChild(div);
+
+        // Create a canvas element
+        var canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+
+        const getCanvas = await this.generateCertificate(div)
+        console.log(getCanvas)
+        document.body.removeChild(canvas);
+        document.body.removeChild(div);
+        this.imgS = getCanvas
+        this.$store.commit('setImageData',getCanvas)
+        const response = await Axios.get('http://localhost:4000/proxy');
+
+        console.log(response.data)      
+        return this.$router.push({ name: 'certificateCard', params: { vp: id } });
+      }
+      
 
     }
     ,
+    async generateCertificate(element) {
+      console.log(element)
+  try {
+    const canvas = await html2canvas(element);
+    console.log(canvas)
+    // Convert canvas to PNG image data
+    const imageData = canvas.toDataURL();       
+    return imageData
+  } catch (error) {
+    console.error('Error generating certificate:', error);
+  }
+},
     toUpper(t) {
       if (t)
         return t.toString().toUpperCase();

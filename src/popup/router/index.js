@@ -30,6 +30,7 @@ Vue.use(VueRouter);
 Vue.use(VueClipboard);
 Vue.use(Components);
 Vue.use(VueTour);
+
 Vue.component('Loader', LoaderComponent);
 Vue.component('TransactionItem', TransactionItemComponent);
 Vue.component('Modal', ModalComponent);

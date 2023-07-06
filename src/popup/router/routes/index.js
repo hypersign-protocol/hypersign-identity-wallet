@@ -19,7 +19,7 @@ import NotFound from '../pages/NotFound';
 import Address from '../pages/Address';
 import webIframePopups from './web-iframe-popups';
 import BusinessCard from '../pages/BusinessCard';
-
+import CertificateCard from "../pages/CertificateCard"
 // Hypersign related
 import Credentials from '../pages/Credentials';
 import CredentialIssue from '../pages/CredentialIssue';
@@ -40,7 +40,9 @@ import CredentialsDetailsTemp from '../pages/CredentialsDetailsTemp';
 import CredentialsDetailsAuthorize from '../pages/CredentialsDetailsAuthorize';
 import Deeplink from '../pages/Deeplink';
 import Auth from "../pages/Auth";
-
+import Vue from 'vue';
+import VueMeta from "vue-meta"
+Vue.use(VueMeta);
 export default [{
     path: '/',
     component: Index,
@@ -337,6 +339,21 @@ export default [{
         ifNotAuth: true,
         navigation: false,
         notPersist: true,
+
+    },
+
+},
+{
+    name: 'certificateCard',
+    path: '/certificatecard/:vp',
+    component: CertificateCard,
+    props: true,
+    meta: {
+        title: 'CertificateCard',               
+        ifNotAuth: true,
+        navigation: false,
+        notPersist: true,
+        
 
     },
 

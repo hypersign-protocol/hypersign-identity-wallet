@@ -145,6 +145,7 @@ export default {
       }
     },
     moveTo(path){
+      console.log(path)
       this.$router.push(path);
     },
     // formattedExpiryDate(expDate, issDate = ''){
