@@ -139,7 +139,6 @@ export default {
                         didDoc.verificationMethod.push(didDocument.verificationMethod[0])
                         didDoc.authentication.push(didDocument.authentication[0]);
                         didDoc.assertionMethod.push(didDocument.assertionMethod[0])
-                        didDoc.keyAgreement.push(didDocument.keyAgreement[0]);
                         didDoc.capabilityInvocation.push(didDocument.capabilityInvocation[0]);
                         didDoc.capabilityDelegation.push(didDocument.capabilityDelegation[0]);
                     }
