@@ -97,8 +97,8 @@ export default {
                 // Generating dummy key
                 const kp = await this.hsSDK.did.generateKeys();
                 let didDoc = await this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase});
+                didDoc.keyAgreement = [];
                 // let didDoc = JSON.parse(didDocString);
-
                 const { controllers, alsoKnownAs, serviceEndpoint } = this.didRaw;
 
                 if(!Array.isArray(controllers)){
