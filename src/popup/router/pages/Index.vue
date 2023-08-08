@@ -163,6 +163,7 @@ export default {
         const publicKeyMultibase = kp.publicKeyMultibase
 
         const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
+        didDoc.keyAgreement = [];
         // const didDoc = JSON.parse(didDocString);
 
         const did = didDoc.id;
