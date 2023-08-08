@@ -97,8 +97,8 @@ export default {
                 // Generating dummy key
                 const kp = await this.hsSDK.did.generateKeys();
                 let didDoc = await this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase});
+                didDoc.keyAgreement = [];
                 // let didDoc = JSON.parse(didDocString);
-
                 const { controllers, alsoKnownAs, serviceEndpoint } = this.didRaw;
 
                 if(!Array.isArray(controllers)){
@@ -139,7 +139,6 @@ export default {
                         didDoc.verificationMethod.push(didDocument.verificationMethod[0])
                         didDoc.authentication.push(didDocument.authentication[0]);
                         didDoc.assertionMethod.push(didDocument.assertionMethod[0])
-                        didDoc.keyAgreement.push(didDocument.keyAgreement[0]);
                         didDoc.capabilityInvocation.push(didDocument.capabilityInvocation[0]);
                         didDoc.capabilityDelegation.push(didDocument.capabilityDelegation[0]);
                     }
