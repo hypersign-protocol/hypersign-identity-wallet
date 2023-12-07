@@ -3,17 +3,19 @@
     <div v-if="!isProviderPresent">
       <div class="popup popup-no-padding">
         <Loader v-if="loading" />
-        <div v-if="!backedUpSeed && !tourRunning" class="noti" data-cy="seed-notif">
-        </div>
+        <div v-if="!backedUpSeed && !tourRunning" class="noti" data-cy="seed-notif"></div>
         <div class="tour__step1">
           <AccountInfo />
           <!-- <BalanceInfo /> -->
         </div>
         <div class="submenu-bg">
           <div class="box-club">
-
-            <BoxButton :text="$t('pages.appVUE.profile')" to="/profile" style="font-size: smaller; color: white"
-              class="tour__step9">
+            <BoxButton
+              :text="$t('pages.appVUE.profile')"
+              to="/profile"
+              style="font-size: smaller; color: white"
+              class="tour__step9"
+            >
               <Profile width="24.5" height="24.5" slot="icon" />
             </BoxButton>
 
@@ -21,40 +23,38 @@
               <DidIcon slot="icon" />
             </BoxButton>
 
-            <BoxButton :text="$t('pages.appVUE.credential')" style="font-size: smaller; color: white" to="/credential"
-              class="tour__step10">
+            <BoxButton
+              :text="$t('pages.appVUE.credential')"
+              style="font-size: smaller; color: white"
+              to="/credential"
+              class="tour__step10"
+            >
               <Credential width="24.5" height="24.5" slot="icon" color="white" />
             </BoxButton>
-
-
           </div>
 
-
-
           <div class="box-club">
-
-
-            <BoxButton :text="$t('pages.appVUE.transfer')" to="/transfer" style="font-size: smaller; color: white"
-              class="tour__step9">
+            <BoxButton
+              :text="$t('pages.appVUE.transfer')"
+              to="/transfer"
+              style="font-size: smaller; color: white"
+              class="tour__step9"
+            >
               <Transfer height="24.5" slot="icon" />
             </BoxButton>
 
-            <BoxButton :text="$t('pages.appVUE.myTransactions')" to="/transactions"
-              style="font-size: smaller; color: white">
+            <BoxButton
+              :text="$t('pages.appVUE.myTransactions')"
+              to="/transactions"
+              style="font-size: smaller; color: white"
+            >
               <Transactions height="24.5" width="25" slot="icon" />
             </BoxButton>
 
             <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
               <Settings slot="icon" />
             </BoxButton>
-
-
           </div>
-
-
-
-
-
         </div>
         <!-- <RecentTransactions /> -->
         <div style="justify-content: center; display: flex">
@@ -84,12 +84,12 @@ import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
 import AccountInfo from '../components/AccountInfo';
 import BalanceInfo from '../components/BalanceInfo';
 import BoxButton from '../components/BoxButton';
-import { didResolver } from '../../utils/resolver'
+import { didResolver } from '../../utils/resolver';
 import axios from 'axios';
 import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
 import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import syncMixin from '../../../mixins/syncMixin'
+import syncMixin from '../../../mixins/syncMixin';
 import removeAccountMixin from '../../../mixins/removeAccount';
 
 export default {
@@ -104,7 +104,7 @@ export default {
     Transfer,
     Transactions,
     DidIcon,
-    BalanceInfo
+    BalanceInfo,
   },
   data() {
     return {
@@ -116,12 +116,12 @@ export default {
       credentialUrl: '',
       loading: false,
       verifiableCredential: {},
-      hsAuthDid: "",
+      hsAuthDid: '',
       isProviderPresent: false,
-      verifiableCredentials: []
+      verifiableCredentials: [],
     };
   },
-  mixins: [syncMixin, verifyTokenMixin,removeAccountMixin],
+  mixins: [syncMixin, verifyTokenMixin, removeAccountMixin],
   computed: {
     ...mapState([, 'tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
@@ -129,50 +129,43 @@ export default {
 
   async created() {
     try {
-
       try {
-
-
         // For backward compatiblity
-        // Make users loging if they have old did wallet. [did:hs]. So that they can create a new DID for our testnet, 
-
+        // Make users loging if they have old did wallet. [did:hs]. So that they can create a new DID for our testnet,
 
         if (this.hypersign.did.includes('did:hs')) {
-          console.log('Inside if check')
+          console.log('Inside if check');
           await this.$store.dispatch('reset');
           await this.$router.push('/');
-          localStorage.removeItem('authToken')
+          localStorage.removeItem('authToken');
 
           this.$store.commit('setMainLoading', false);
           this.$store.commit('switchLoggedIn', false);
         } else {
-          console.log('Inside else  check')
+          console.log('Inside else  check');
         }
 
-        this.verifyToken()
-          .then(data => {
-            if (data !== undefined) {
-              const response = data.response
-              if (response.status === 401) {               
-                this.$store.commit('setMainLoading', false);
-                this.$store.commit('switchLoggedIn', false);
-                this.removeAccountSilent()
-
-              }
+        this.verifyToken().then(data => {
+          if (data !== undefined) {
+            const response = data.response;
+            if (response.status === 401) {
+              this.$store.commit('setMainLoading', false);
+              this.$store.commit('switchLoggedIn', false);
+              this.removeAccountSilent();
             }
-          })
-
+          }
+        });
       } catch (e) {
-        console.log(e.message)
+        console.log(e.message);
       }
 
-      const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+      const isRegisterFlow = localStorage.getItem('isRegisterFlow');
       if (isRegisterFlow) {
         this.isProviderPresent = true;
       }
 
       // console.log("trying to Get 3rdPartyAuthVC")
-      const vcStr = localStorage.getItem("3rdPartyAuthVC");
+      const vcStr = localStorage.getItem('3rdPartyAuthVC');
       if (vcStr) {
         // console.log("vcStr is present");
         const vc = JSON.parse(vcStr);
@@ -189,50 +182,43 @@ export default {
         const res = await axios.get(HS_AUTH_DID_URL);
 
         if (!res) {
-          throw new Error("Could not fetch auth did.")
+          throw new Error('Could not fetch auth did.');
         }
 
         this.$store.commit('addHypersignAuthDid', res.data.message);
         this.hsAuthDid = res.data.message;
-
       } else {
         this.hsAuthDid = this.hypersign.hsAuthDID;
       }
 
-      localStorage.setItem("isMobileWallet", false);
+      localStorage.setItem('isMobileWallet', false);
       //Only for deeplinking
       if (this.$route.query.url && this.$route.query.url != '') {
         const JSONData = decodeURI(this.$route.query.url);
         this.receiveOrGiveCredential(JSONData);
       }
-
-
-
     } catch (e) {
       if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
     }
   },
   methods: {
-
     async scan() {
-      localStorage.setItem("isMobileWallet", true)
+      localStorage.setItem('isMobileWallet', true);
       const QRData = await this.$store.dispatch('modals/open', {
         name: 'read-qr-code',
         title: this.$t('pages.credential.scan'),
-      })
+      });
 
-      if (QRData)
-        this.receiveOrGiveCredential(QRData);
+      if (QRData) this.receiveOrGiveCredential(QRData);
     },
     isPrivateDid() {
-      const didList = this.hypersign.dids
-      let status
-      Object.values(didList).forEach((did) => {
+      const didList = this.hypersign.dids;
+      let status;
+      Object.values(didList).forEach(did => {
         if (did.didDoc.id === this.hypersign.did) {
-          status = did.status
-
+          status = did.status;
         }
-      })
+      });
       return status === 'private' ? true : false;
     },
 
@@ -242,7 +228,8 @@ export default {
         data = JSON.parse(QRJsonString);
         // console.log(data);
         switch (data.QRType) {
-          case 'ISSUE_CRED': { // change it to ACCEPT_CRED
+          case 'ISSUE_CRED': {
+            // change it to ACCEPT_CRED
             this.credentialUrl = data.url;
             let cred = await this.fetchCredential();
             this.credentialsQRData(cred);
@@ -252,104 +239,121 @@ export default {
             this.credentialDetailsQRdata(data);
             break;
           }
-          case 'ISSUE_SCHEMA': { // sign schema and send to blockchain
+          case 'ISSUE_SCHEMA': {
+            // sign schema and send to blockchain
             if (this.isPrivateDid()) {
               const selection = await this.$store
                 .dispatch('modals/open', {
                   name: 'confirm',
                   title: this.$t('modals.changeDid.title'),
                   msg: this.$t('modals.changeDid.msg'),
-
-                }).catch(() => false);
+                })
+                .catch(() => false);
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                return
+                return;
               } else {
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Schema')
+                throw new Error(
+                  'Sorry, Selected DID is private. Please select a public DID to issue Schema',
+                );
               }
             }
-            const orgDid = data.data.author
-            const resolvedDidDoc = await didResolver(orgDid)
-            const { didDocument } = resolvedDidDoc
-            const { controller } = didDocument
+            const orgDid = data.data.author;
+            const resolvedDidDoc = await didResolver(orgDid);
+            const { didDocument } = resolvedDidDoc;
+            const { controller } = didDocument;
             if (!controller.includes(this.hypersign.did)) {
-              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue Schema')
+              throw new Error(
+                'Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue Schema',
+              );
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push(`/schema`);
             break;
           }
-          case 'ISSUE_CREDENTIAL': { // sign credentials and send to blockchain            
+          case 'ISSUE_CREDENTIAL': {
+            // sign credentials and send to blockchain
             if (this.isPrivateDid()) {
               const selection = await this.$store
                 .dispatch('modals/open', {
                   name: 'confirm',
                   title: this.$t('modals.changeDid.title'),
                   msg: this.$t('modals.changeDid.msg'),
-
-                }).catch(() => false);
+                })
+                .catch(() => false);
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                return
+                return;
               } else {
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue credential')
+                throw new Error(
+                  'Sorry, Selected DID is private. Please select a public DID to issue credential',
+                );
               }
             }
-            const orgDid = data.data.issuerDid
-            const resolvedDidDoc = await didResolver(orgDid)
-            const { didDocument } = resolvedDidDoc
+            const orgDid = data.data.issuerDid;
+            const resolvedDidDoc = await didResolver(orgDid);
+            const { didDocument } = resolvedDidDoc;
             if (didDocument === null) {
-              throw new Error('Sorry, Issuer DID is not registered on blockchain. Please select a DID which is registered on blockchain to issue credential')
+              throw new Error(
+                'Sorry, Issuer DID is not registered on blockchain. Please select a DID which is registered on blockchain to issue credential',
+              );
             }
-            const { controller } = didDocument
+            const { controller } = didDocument;
             if (!controller.includes(this.hypersign.did)) {
-              throw new Error('Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue credential')
+              throw new Error(
+                'Sorry, You are not the controller of this DID. Please select a DID which is controller of this DID to issue credential',
+              );
             }
 
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push(`/signcredential`);
             break;
           }
-          case 'ISSUE_DID': { // sign did and send to blockchain
+          case 'ISSUE_DID': {
+            // sign did and send to blockchain
 
             if (this.isPrivateDid()) {
-
               const selection = await this.$store
                 .dispatch('modals/open', {
                   name: 'confirm',
                   title: this.$t('modals.changeDid.title'),
                   msg: this.$t('modals.changeDid.msg'),
-
-                }).catch(() => false);
+                })
+                .catch(() => false);
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                return
+                return;
               } else {
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to issue Did')
+                throw new Error(
+                  'Sorry, Selected DID is private. Please select a public DID to issue Did',
+                );
               }
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push('/signdid');
             break;
           }
-          case 'UPDATE_DID': { // sign did and send to blockchain
+          case 'UPDATE_DID': {
+            // sign did and send to blockchain
             if (this.isPrivateDid()) {
               const selection = await this.$store
                 .dispatch('modals/open', {
                   name: 'confirm',
                   title: this.$t('modals.changeDid.title'),
                   msg: this.$t('modals.changeDid.msg'),
-
-                }).catch(() => false);
+                })
+                .catch(() => false);
               if (selection) {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
-                return
+                return;
               } else {
-                throw new Error('Sorry, Selected DID is private. Please select a public DID to update Did')
+                throw new Error(
+                  'Sorry, Selected DID is private. Please select a public DID to update Did',
+                );
               }
             }
             this.$store.commit('addRequestingAppInfo', data);
@@ -360,7 +364,6 @@ export default {
             throw new Error('Invalid QR code type');
           }
         }
-
       } catch (e) {
         // console.log(e);
         this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
@@ -369,7 +372,7 @@ export default {
 
     async fetchCredential() {
       if (!this.credentialUrl) {
-        throw new Error("Credential Url is null or empty");
+        throw new Error('Credential Url is null or empty');
       }
       this.credentialUrl = this.credentialUrl + '&did=' + this.hypersign.did;
       this.loading = true;
@@ -392,11 +395,10 @@ export default {
           throw new Error('Credential can not be null or empty');
         }
         // TODO: Check if this credential already exsits in wallet: otherwise reject
-        const credInWallet = this.hypersign.credentials.find((x) => x.id == cred.id);
+        const credInWallet = this.hypersign.credentials.find(x => x.id == cred.id);
         if (credInWallet) {
           throw new Error('The credential already exist in your wallet');
         }
-
 
         // console.log({
         //   hs_app_did: this.hypersign.did,
@@ -420,7 +422,6 @@ export default {
 
     async credentialDetailsQRdata(qrData) {
       try {
-
         /**Sample QR data; It sould be called presenation query */
         /*
         {
@@ -447,40 +448,44 @@ export default {
         this.$store.commit('addRequestingAppInfo', qrData);
 
         if (Array.isArray(schemaId)) {
-          //// Doc: more than one credentials are requested 
-          //// All schemas must exists, otherwise it will fail 
+          //// Doc: more than one credentials are requested
+          //// All schemas must exists, otherwise it will fail
           const schemaIds = schemaId;
-          const credentialSchemasIds = this.hypersign.credentials.map(x => getSchemaIdFromSchemaUrl(x['@context'][1].hs))
+          const credentialSchemasIds = this.hypersign.credentials.map(
+            x => x['credentialSchema']['id'],
+          );
           // console.log({
-            // credentialSchemasIds
+          // credentialSchemasIds
           // })
 
           if (this.hypersign.credentials <= 0) {
             throw new Error('No credential found');
           }
 
-          const intersectionSchemasIds = credentialSchemasIds.filter(x => schemaIds.indexOf(x) > -1)
-          const intersectionSchemasIdSet=new Set(intersectionSchemasIds)
+          const intersectionSchemasIds = credentialSchemasIds.filter(
+            x => schemaIds.indexOf(x) > -1,
+          );
+          const intersectionSchemasIdSet = new Set(intersectionSchemasIds);
           if (intersectionSchemasIds.length <= 0) {
-            throw new Error('Credential not found for schemaIds ' + schemaId.join(','))
+            throw new Error('Credential not found for schemaIds ' + schemaId.join(','));
           }
-          
+
           if (intersectionSchemasIdSet.size < schemaIds.length) {
-            const rest = schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0)
-            const msg= rest ? rest.join(',') : ''
-            throw new Error('Credential not found for schemaIds ' + msg)
+            const rest = schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0);
+            const msg = rest ? rest.join(',') : '';
+            throw new Error('Credential not found for schemaIds ' + msg);
           }
 
           this.verifiableCredentials = this.hypersign.credentials.filter(x => {
-            const credentialSchemaUrl = x['@context'][1].hs;
-            const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+            // const credentialSchemaUrl = x['@context'][1].hs;
+            const credentialSchemaId = x['credentialSchema']['id']; //getSchemaIdFromSchemaUrl(credentialSchemaUrl);
             if (intersectionSchemasIds.indexOf(credentialSchemaId) >= 0) {
               return x;
             }
-          })
+          });
 
           if (this.verifiableCredentials.length <= 0) {
-            throw new Error('Credential not found')
+            throw new Error('Credential not found');
           }
 
           const filteredCredentialIds = this.verifiableCredentials.map(x => x.id);
@@ -494,21 +499,23 @@ export default {
           //// Doc: else not interpting the existing flow
 
           // Here we are searching the wallet for credential
-          this.verifiableCredential = this.hypersign.credentials.find((x) => {
-            const credentialSchemaUrl = x['@context'][1].hs;
-            const credentialSchemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+          this.verifiableCredential = this.hypersign.credentials.find(x => {
+            // const credentialSchemaUrl = x['@context'][1].hs;
+            const credentialSchemaId = x['credentialSchema']['id']; // getSchemaIdFromSchemaUrl(credentialSchemaUrl);
 
             if (credentialSchemaId === schemaId) {
-              if (x.issuer === appDid) { // check if the app company issued this credential ;;  the registration flow
+              if (x.issuer === appDid) {
+                // check if the app company issued this credential ;;  the registration flow
                 return x;
               }
 
-              if (x.issuer === this.hsAuthDid) { // of the issuer is Hypersign Auth server? ;; without registration flow
+              if (x.issuer === this.hsAuthDid) {
+                // of the issuer is Hypersign Auth server? ;; without registration flow
                 return x;
               }
             }
             // // if (x.issuer === appDid && credentialSchemaId === schemaId) return x; // we need to fix this later: should we not include x.issuer === appDid check as well?
-            // if (credentialSchemaId === schemaId) return x; 
+            // if (credentialSchemaId === schemaId) return x;
           });
 
           // If not, we throw an error
@@ -516,17 +523,12 @@ export default {
 
           this.$router.push(`/credential/authorize/${this.verifiableCredential.id}`);
         }
-
-
-
       } catch (e) {
         // console.log(e);
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       }
     },
-
-
   },
 };
 </script>
