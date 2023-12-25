@@ -5,7 +5,7 @@
 
 Tested on version
 ```
-Node version: v14.0.7
+Node version: v18.17.0
 NPM version : v16.14.13
 ```
 
