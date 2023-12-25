@@ -106,7 +106,6 @@
 </template>
 
 <script>
-import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import { IN_FRAME } from '../../utils/helper';
 import Claim from '../../../icons/claim.svg?vue-component';
 import Heart from '../../../icons/heart.svg?vue-component';
@@ -115,7 +114,6 @@ import RightArrow from '../../../icons/right-arrow.svg?vue-component';
 import Button from '../components/Button';
 import CheckBox from '../components/CheckBox';
 import Platforms from '../components/Platforms';
-import { hypersignSDK } from '../../utils/hypersign';
 
 export default {
   components: {
@@ -141,63 +139,6 @@ export default {
     // console.log("DEPLOYED");
   },
   methods: {
-    async createWallet() {
-      this.mnemonic = generateMnemonic();
-      const seed = mnemonicToSeed(this.mnemonic).toString('hex');
-      const address = await this.$store.dispatch('generateWallet', { seed });
-      this.$store.commit('setMnemonic', this.mnemonic);
-      const keypair = {
-        publicKey: address,
-        privateKey: seed,
-      };
-
-      ////HYPERSIGN Related
-      ////////////////////////////////////////////////
-      try {
-        this.loading = true;
-        // We will not use native aeternity keys, instead will use hypersign keys.
-        // The reason to do this, because giving flexibility to use different algorithm for keys
-        // const newKeyPair = await hypersignSDK.did.generateKeys({seed});
-        // const hskeys = {
-        //   publicKey: newKeyPair.publicKey.publicKeyBase58,
-        //   privateKey: newKeyPair.privateKeyBase58,
-        // };
-
-        // const HS_CORE_DID_REGISTER = `${HS_NODE_BASE_URL}${HS_NODE_DID_REGISTER_API}`;
-
-        const {didDoc, keys, did} = await hypersignSDK.did.getDid({user: { name: "vishwas"}});
-        const res = await hypersignSDK.did.register(didDoc);
-        this.$store.dispatch('setHSkeys', {
-              keys,
-              did,
-            });
-        this.loading = false;
-
-        //console.log(HS_CORE_DID_REGISTER);
-        // await axios
-        //   .get(`${HS_CORE_DID_REGISTER}?publicKey=${hskeys.publicKey}`)
-        //   .then(result => {
-        //     result = result.data;
-        //     if (!result) throw new Error('Could not fetch from hypersign');
-        //     if (result && result.error) throw new Error(result.error);
-        //     const { keys, did } = result.message;
-        //     keys['privateKeyBase58'] = hskeys.privateKey;
-        //     this.$store.dispatch('setHSkeys', {
-        //       keys,
-        //       did,
-        //     });
-        //     this.loading = false;
-        //   })
-        //   .catch(console.error);
-      } catch (e) {
-        this.loading = false;
-      }
-      ////HYPERSIGN Related
-      ////////////////////////////////////////////////
-
-      await this.$store.dispatch('setLogin', { keypair });
-      this.next();
-    },
     prev() {
       this.step -= 1;
     },

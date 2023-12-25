@@ -1,1 +1,40 @@
-body,html{background:#16161d!important}#info{position:absolute;top:50%;left:50%;-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform:translate(-50%,-50%);text-align:center;color:#fff}#info .logo{margin-bottom:25px}#info p{font-size:20px}#info .loader{border:8px solid #f3f3f3;border-top:8px solid #ccc;border-radius:50%;width:70px;height:70px;animation:spin 2s linear infinite;margin:0 auto}@keyframes spin{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/sass-loader/dist/cjs.js??clonedRuleSet-4.use[2]!../node_modules/vue-loader/lib/index.js??vue-loader-options!./redirect/App.vue?vue&type=style&index=0&id=7c3d44dc&lang=scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+body,
+html {
+  background: #16161d !important;
+}
+#info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+}
+#info .logo {
+  margin-bottom: 25px;
+}
+#info p {
+  font-size: 20px;
+}
+#info .loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #ccc; /* Blue */
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 2s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin {
+0% {
+    transform: rotate(0deg);
+}
+100% {
+    transform: rotate(360deg);
+}
+}

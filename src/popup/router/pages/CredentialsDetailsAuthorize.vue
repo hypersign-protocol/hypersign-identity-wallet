@@ -90,7 +90,8 @@ import hidWalletInstance from '../../utils/hidWallet';
 import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
-const HypersignSSISdk = require('hs-ssi-sdk');
+// const HypersignSSISdk = require('hs-ssi-sdk');
+import HypersignSSISdk from 'hs-ssi-sdk';
 
 export default {
   components: { QrIcon, CloseIcon, VerifiedIcon },

@@ -99,8 +99,8 @@
   </div>
 </template>
 <script>
-const HypersignSSISdk = require('hs-ssi-sdk');
-const vCardsJS = require('vcards-js');
+// const HypersignSSISdk = require('hs-ssi-sdk');
+import vCardsJS from 'vcards-js';
 import BoxButton from '../components/BoxButton';
 import TwitterIcon from '../../../icons/twitter-svgrepo-com.svg?vue-component';
 import TelegramIcon from '../../../icons/telegram-svgrepo-com.svg?vue-component';

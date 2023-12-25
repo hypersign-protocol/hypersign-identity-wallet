@@ -1,9 +1,15 @@
 <template>
   <div class="popup">
-    <Button  @click="generateNewDid" data-cy="generate-new-did"  style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;">
+    <Button
+      @click="generateNewDid"
+      data-cy="generate-new-did"
+      style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;"
+    >
       <CreateIcon></CreateIcon>
     </Button>
-    <span class="altText" v-if="Object.keys(hypersign.dids).length == 0">No DID found. Create one for you.</span>
+    <span class="altText" v-if="Object.keys(hypersign.dids).length == 0"
+      >No DID found. Create one for you.</span
+    >
     <!-- <div class=""  v-else>
       <ul v-for="did in Object.keys(hypersign.dids)" :key="hypersign.dids[did].didDoc.id" style="color: white;text-align: left;background-color: black;border-radius: 5px;list-style-type: none;  margin-top: 10px;padding: 10px;">
         <p>
@@ -20,10 +26,13 @@
       </ul>
     </div> -->
     <Panel v-else>
-      <PanelItem v-for="did in Object.keys(hypersign.dids)" :key="hypersign.dids[did].didDoc.id"
+      <PanelItem
+        v-for="did in Object.keys(hypersign.dids)"
+        :key="hypersign.dids[did].didDoc.id"
         :to="`/did/${hypersign.dids[did].didDoc.id}`"
         :title="`${did.substring(0, 20).toUpperCase()}...`"
-        :info="`${hypersign.dids[did].status.toUpperCase()}`" />
+        :info="`${hypersign.dids[did].status.toUpperCase()}`"
+      />
     </Panel>
 
     <Loader v-if="loading" />
@@ -41,13 +50,18 @@ import PanelItem from '../components/PanelItem';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
 import axios from 'axios';
-import { toFormattedDate, toStringShorner } from '../../utils/helper'
+import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import hidWalletInstance from '../../utils/hidWallet';
 import { generateMnemonicToHDSeed } from '../../utils/SSIWallet';
-import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants'
+import {
+  HYPERSIGN_AUTH_PROVIDER,
+  HIDNODE_RPC,
+  HIDNODE_REST,
+  HIDNODE_NAMESPACE,
+} from '../../utils/hsConstants';
 
-// import HypersignSsiSDK  from 'hs-ssi-sdk'
-const HypersignSsiSDK = require('hs-ssi-sdk');
+import HypersignSsiSDK from 'hs-ssi-sdk';
+// const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
   mixins: [removeAccountMixin],
@@ -68,25 +82,32 @@ export default {
   },
   created() {
     //Only for deeplinking
-    if (this.$route.query.url && this.$route.query.url != '')
-      this.deeplink(this.$route.query.url)
+    if (this.$route.query.url && this.$route.query.url != '') this.deeplink(this.$route.query.url);
   },
 
   methods: {
     async generateNewDid(index = -1) {
       try {
         this.loading = true;
-        let hdIndex=this.hypersign.dids[Object.keys(this.hypersign.dids).at(-1)].hdPathIndex!==undefined?(this.hypersign.dids[Object.keys(this.hypersign.dids).at(-1)].hdPathIndex) + 1:0;
-        if(index!==-1){
-          hdIndex=index;
-        }        
+        let hdIndex =
+          this.hypersign.dids[Object.keys(this.hypersign.dids).at(-1)].hdPathIndex !== undefined
+            ? this.hypersign.dids[Object.keys(this.hypersign.dids).at(-1)].hdPathIndex + 1
+            : 0;
+        if (index !== -1) {
+          hdIndex = index;
+        }
         await hidWalletInstance.generateWallet(this.mnemonic);
-        const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+        const hsSdk = new HypersignSsiSDK(
+          hidWalletInstance.offlineSigner,
+          HIDNODE_RPC,
+          HIDNODE_REST,
+          HIDNODE_NAMESPACE,
+        );
         await hsSdk.init();
-        const seedHd = await generateMnemonicToHDSeed(this.mnemonic,hdIndex);
+        const seedHd = await generateMnemonicToHDSeed(this.mnemonic, hdIndex);
         const kp = await hsSdk.did.generateKeys({ seed: seedHd });
-        const privateKeyMultibase = kp.privateKeyMultibase
-        const publicKeyMultibase = kp.publicKeyMultibase
+        const privateKeyMultibase = kp.privateKeyMultibase;
+        const publicKeyMultibase = kp.publicKeyMultibase;
 
         const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
         didDoc.keyAgreement = [];
@@ -98,29 +119,23 @@ export default {
           keys: kp,
           did: didDoc.id,
           didDoc,
-          status: "private",
+          status: 'private',
           hdPathIndex: hdIndex, // TODO remove hardcoded path index
-          selected: false // true/false
+          selected: false, // true/false
         });
         this.loading = false;
-
       } catch (e) {
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
         this.loading = false;
-
       }
-
     },
     toFormattedDate(dateStr) {
       const d = new Date(dateStr);
       return d.toDateString();
     },
-
-
   },
 };
 </script>
-
 
 <style lang="scss" scoped>
 @import '../../../common/variables';
@@ -179,7 +194,7 @@ export default {
     color: $text-color;
   }
 
-  p>svg {
+  p > svg {
     margin-right: 10px;
   }
 
@@ -223,7 +238,7 @@ export default {
   .text-center {
     text-align: center;
   }
-  .smallBtn{
+  .smallBtn {
     display: flex;
     justify-content: center;
     width: 14%;

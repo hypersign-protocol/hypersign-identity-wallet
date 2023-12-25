@@ -57,7 +57,8 @@
   </div>
 </template>
 <script>
-const HypersignSSISdk = require('hs-ssi-sdk');
+// const HypersignSSISdk = require('hs-ssi-sdk');
+import HypersignSSISdk from 'hs-ssi-sdk';
 
 import { mapGetters, mapState } from 'vuex';
 import QrIcon from '../../../icons/qr-code.svg?vue-component';
