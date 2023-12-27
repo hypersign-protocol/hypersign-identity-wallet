@@ -60,6 +60,7 @@
         "jdenticon": "^2.2.0",
         "lodash-es": "^4.17.15",
         "mini-css-extract-plugin": "^2.7.6",
+        "node-polyfill-webpack-plugin": "^3.0.0",
         "qrcode.vue": "^1.6.3",
         "request": "^2.88.2",
         "rxjs": "^6.6.3",
