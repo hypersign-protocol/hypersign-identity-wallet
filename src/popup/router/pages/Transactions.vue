@@ -2,9 +2,22 @@
   <div class="popup">
     <span class="altText" v-if="transactions.length == 0">No transaction found.</span>
     <Panel v-else>
-      <PanelItem v-for="tx in transactions"
-        :to="`/transaction/0x${tx.txhash}?data=${JSON.stringify({ type: tx.type, txhash: tx.txhash, timestamp: tx.timestamp, height: tx.height, fee: getFee(tx), gas: `${tx.gas_used} / ${tx.gas_wanted}` })}`"
-        :title="toStringShortner(tx.txhash)" :info="tx.type + ' | ' + tx.timestamp" />
+      <PanelItem
+        v-for="tx in transactions"
+        :to="
+          `/transaction/0x${tx.txhash}?data=${JSON.stringify({
+            type: tx.type,
+            txhash: tx.txhash,
+            timestamp: tx.timestamp,
+            height: tx.height,
+            fee: getFee(tx),
+            gas: `${tx.gas_used} / ${tx.gas_wanted}`,
+          })}`
+        "
+        :title="toStringShortner(tx.txhash)"
+        :info="tx.type + ' | ' + tx.timestamp"
+        v-bind:key="tx.txhash"
+      />
     </Panel>
     <Loader v-if="loading" />
   </div>
@@ -15,36 +28,34 @@ import { mapState, mapGetters } from 'vuex';
 import removeAccountMixin from '../../../mixins/removeAccount';
 import axios from 'axios';
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { HIDNODE_REST } from '../../utils/hsConstants'
+import { HIDNODE_REST } from '../../utils/hsConstants';
 import hidWalletInstance from '../../utils/hidWallet';
-
 
 import PanelItem from '../components/PanelItem';
 import Panel from '../components/Panel';
 
-
 export default {
   mixins: [removeAccountMixin],
-  components: { Panel, PanelItem},
+  components: { Panel, PanelItem },
   data() {
     return {
-      walletAddress:"", 
+      walletAddress: '',
       transactions: [],
-      basicTxData: {},     
+      basicTxData: {},
       form: {
         url: '',
         amount: '',
       },
       loading: false,
       credentialDetail: {
-        formattedSchemaName: "",
-        formattedIssuanceDate: "",
-      }
+        formattedSchemaName: '',
+        formattedIssuanceDate: '',
+      },
     };
   },
   props: ['address'],
   computed: {
-    ...mapState(['saveErrorLog','mnemonic']),
+    ...mapState(['saveErrorLog', 'mnemonic']),
     ...mapGetters(['hypersign']),
     validUrl() {
       return this.form.url != '';
@@ -52,37 +63,35 @@ export default {
   },
   async created() {
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.walletAddress = await hidWalletInstance.getWalletAddress()
+    this.walletAddress = await hidWalletInstance.getWalletAddress();
     this.fetchWalletTxs();
   },
 
-  methods: {  
-
-    toStringShortner(str){
-      return '0x' + toStringShorner(str, 22, 10)
+  methods: {
+    toStringShortner(str) {
+      return '0x' + toStringShorner(str, 22, 10);
     },
 
     async fetchOutTxs() {
-
-      const txListHeSentURL = `${HIDNODE_REST}/cosmos/tx/v1beta1/txs?events=message.sender='${this.walletAddress}'`
+      const txListHeSentURL = `${HIDNODE_REST}/cosmos/tx/v1beta1/txs?events=message.sender='${this.walletAddress}'`;
 
       let response = await axios.get(txListHeSentURL);
       response = response.data;
       const { tx_responses } = response;
 
       tx_responses.map(x => {
-        return x['type'] = 'OUT'
-      })
+        return (x['type'] = 'OUT');
+      });
 
       return tx_responses;
     },
 
-    getFee(tx){
-      if(tx && tx.tx){
-        if(tx.tx.auth_info){
-          if(tx.tx.auth_info.fee){
+    getFee(tx) {
+      if (tx && tx.tx) {
+        if (tx.tx.auth_info) {
+          if (tx.tx.auth_info.fee) {
             const fee = tx.tx.auth_info.fee.amount[0];
-            if(fee){
+            if (fee) {
               return fee.amount + fee.denom;
             }
           }
@@ -92,41 +101,35 @@ export default {
     },
 
     async fetchInTxs() {
-
-
-      const txListHeReceivedURL = `${HIDNODE_REST}/cosmos/tx/v1beta1/txs?events=transfer.recipient='${this.walletAddress}'` 
-
+      const txListHeReceivedURL = `${HIDNODE_REST}/cosmos/tx/v1beta1/txs?events=transfer.recipient='${this.walletAddress}'`;
 
       let response = await axios.get(txListHeReceivedURL);
       response = response.data;
       const { tx_responses } = response;
 
       tx_responses.map(x => {
-        return x['type'] = 'IN'
-      })
-
+        return (x['type'] = 'IN');
+      });
 
       return tx_responses;
-
     },
 
     async fetchWalletTxs() {
       this.transactions = [];
       this.loading = true;
-      const outTxs = this.fetchOutTxs()
-      const inTxs = this.fetchInTxs()
-      const results = await Promise.all([inTxs, outTxs])
+      const outTxs = this.fetchOutTxs();
+      const inTxs = this.fetchInTxs();
+      const results = await Promise.all([inTxs, outTxs]);
       this.transactions = results[0].concat(results[1]);
-      this.loading =  false;
+      this.loading = false;
     },
   },
 };
 </script>
 
-
 <style lang="scss" scoped>
 @import '../../../common/variables';
-.altText{
+.altText {
   color: #80808091;
   font-size: larger;
 }
@@ -136,7 +139,7 @@ export default {
   padding: 5px;
 }
 
-.scan-text{
+.scan-text {
   margin-left: 20px;
   margin-bottom: 2px;
   // float: right;
