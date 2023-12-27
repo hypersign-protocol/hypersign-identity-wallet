@@ -53,22 +53,21 @@
 <script>
 import 'vue-select/dist/vue-select.css';
 
-import Input from '../components/Input';
 import vSelect from 'vue-select';
-
-import registration from '../../../mixins/registration';
-import hidWalletInstance from '../../utils/hidWallet';
 import { mapState } from 'vuex';
+import Axios from 'axios';
+import { HypersignSSISdk as HypersignSsiSDK } from 'hs-ssi-sdk';
+import Input from '../components/Input';
+
+import hidWalletInstance from '../../utils/hidWallet';
 import {
   HIDNODE_REST,
-  HYPERSIGN_AUTH_PROVIDER,
   BUSINESSCARD_SCHEMA,
   HIDNODE_RPC,
   HIDNODE_NAMESPACE,
 } from '../../utils/hsConstants';
-import Axios from 'axios';
 // const HypersignSsiSDK = require('hs-ssi-sdk');
-import HypersignSSISdk from 'hs-ssi-sdk';
+
 export default {
   mixins: [],
   components: { Input, vSelect },
@@ -146,11 +145,10 @@ export default {
             this.$emit('closeMenu');
             this.$router.push(`/did`);
             return;
-          } else {
-            throw new Error(
-              'Sorry, Selected DID is private. Please select a public DID to issue Schema',
-            );
           }
+          throw new Error(
+            'Sorry, Selected DID is private. Please select a public DID to issue Schema',
+          );
         }
 
         this.loading = true;
@@ -162,12 +160,12 @@ export default {
         });
 
         await hidWalletInstance.generateWallet(this.mnemonic);
-        const hsSdk = new HypersignSsiSDK(
-          hidWalletInstance.offlineSigner,
-          HIDNODE_RPC,
-          HIDNODE_REST,
-          HIDNODE_NAMESPACE,
-        );
+        const hsSdk = new HypersignSsiSDK({
+          offlineSigner: hidWalletInstance.offlineSigner,
+          nodeRestEndpoint: HIDNODE_REST,
+          nodeRpcEndpoint: HIDNODE_RPC,
+          namespace: HIDNODE_NAMESPACE,
+        });
         await hsSdk.init();
 
         const expirationDate = new Date('12/11/2027');
@@ -183,7 +181,7 @@ export default {
           credential: vc,
           issuerDid: this.hypersign.didDoc.id,
           privateKey: this.hypersign.keys.privateKeyMultibase,
-          verificationMethodId: this.hypersign.didDoc.id + '#key-1',
+          verificationMethodId: `${this.hypersign.didDoc.id}#key-1`,
         });
 
         //    console.log(signedVc);
@@ -203,7 +201,7 @@ export default {
           status = did.status;
         }
       });
-      return status === 'private' ? true : false;
+      return status === 'private';
     },
 
     async onSelect(event) {
@@ -211,7 +209,7 @@ export default {
         this.selected = event;
         this.loading = true;
         if (this.selected.value != null && this.selected.value.includes('sch:hid:testnet')) {
-          const url = HIDNODE_REST + 'hypersign-protocol/hidnode/ssi/schema/' + event.value;
+          const url = `${HIDNODE_REST}hypersign-protocol/hidnode/ssi/schema/${event.value}`;
           const resp = await Axios.get(url);
           this.schemaId = resp.data.schema[0].id;
           this.schema = resp.data.schema[0].schema;
@@ -272,7 +270,7 @@ export default {
                   break;
 
                 default:
-                  value.placeholder = 'Enter ' + key.toLowerCase();
+                  value.placeholder = `Enter ${key.toLowerCase()}`;
                   break;
               }
               return { key, value };

@@ -5,7 +5,7 @@
       data-cy="generate-new-did"
       style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;"
     >
-      <CreateIcon></CreateIcon>
+      <img src="../../../icons/topup-icon.svg" />
     </Button>
     <span class="altText" v-if="Object.keys(hypersign.dids).length == 0"
       >No DID found. Create one for you.</span
@@ -41,31 +41,20 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import CreateIcon from '../../../icons/topup-icon.svg?vue-component';
+import { HypersignSSISdk as HypersignSsiSDK } from 'hs-ssi-sdk';
 import removeAccountMixin from '../../../mixins/removeAccount';
-import CheckBox from '../components/CheckBox';
 import Panel from '../components/Panel';
 import PanelItem from '../components/PanelItem';
-import Textarea from '../components/Textarea';
 import Button from '../components/Button';
-import axios from 'axios';
-import { toFormattedDate, toStringShorner } from '../../utils/helper';
 import hidWalletInstance from '../../utils/hidWallet';
 import { generateMnemonicToHDSeed } from '../../utils/SSIWallet';
-import {
-  HYPERSIGN_AUTH_PROVIDER,
-  HIDNODE_RPC,
-  HIDNODE_REST,
-  HIDNODE_NAMESPACE,
-} from '../../utils/hsConstants';
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 
-import HypersignSsiSDK from 'hs-ssi-sdk';
 // const HypersignSsiSDK = require('hs-ssi-sdk');
 
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea, CreateIcon },
+  components: { Panel, Button, PanelItem },
   data() {
     return {
       loading: false,
@@ -77,12 +66,12 @@ export default {
     ...mapGetters(['hypersign']),
     ...mapState(['mnemonic']),
     validUrl() {
-      return this.form.url != '';
+      return this.form.url !== '';
     },
   },
   created() {
-    //Only for deeplinking
-    if (this.$route.query.url && this.$route.query.url != '') this.deeplink(this.$route.query.url);
+    // Only for deeplinking
+    if (this.$route.query.url && this.$route.query.url !== '') this.deeplink(this.$route.query.url);
   },
 
   methods: {
@@ -97,17 +86,17 @@ export default {
           hdIndex = index;
         }
         await hidWalletInstance.generateWallet(this.mnemonic);
-        const hsSdk = new HypersignSsiSDK(
-          hidWalletInstance.offlineSigner,
-          HIDNODE_RPC,
-          HIDNODE_REST,
-          HIDNODE_NAMESPACE,
-        );
+        const hsSdk = new HypersignSsiSDK({
+          offlineSigner: hidWalletInstance.offlineSigner,
+          nodeRpcEndpoint: HIDNODE_RPC,
+          nodeRestEndpoint: HIDNODE_REST,
+          namespace: HIDNODE_NAMESPACE,
+        });
         await hsSdk.init();
         const seedHd = await generateMnemonicToHDSeed(this.mnemonic, hdIndex);
         const kp = await hsSdk.did.generateKeys({ seed: seedHd });
-        const privateKeyMultibase = kp.privateKeyMultibase;
-        const publicKeyMultibase = kp.publicKeyMultibase;
+        const { privateKeyMultibase } = kp;
+        const { publicKeyMultibase } = kp;
 
         const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
         didDoc.keyAgreement = [];

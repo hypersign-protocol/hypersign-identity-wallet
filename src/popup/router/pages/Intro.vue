@@ -4,7 +4,7 @@
       <div v-show="step === 1">
         <img v-if="iframe" src="../../../icons/iframe/receive.svg" />
         <h2 v-else>
-          <Claim /> {{ $t('pages.intro.receive') }}
+          <img src="../../../icons/claim.svg" /> {{ $t('pages.intro.receive') }}
           <span class="ml-10 secondary-text"> {{ $t('pages.appVUE.aeid') }} </span>
         </h2>
         <div class="text-info">
@@ -17,7 +17,7 @@
       <div v-show="step === 2">
         <img v-if="iframe" src="../../../icons/iframe/send.svg" />
         <h2 v-else>
-          <Heart /> {{ $t('pages.send.send') }}
+          <img src="../../../icons/heart.svg" /> {{ $t('pages.send.send') }}
           <span class="ml-10 secondary-text">{{ $t('pages.appVUE.aeid') }}</span>
         </h2>
         <div class="text-info">
@@ -46,13 +46,25 @@
       </div>
 
       <div class="dotstyle dotstyle-fillup" v-show="step < 4" data-cy="onboarding-steps">
-        <LeftArrow @click="step = step - 1" class="left-arrow" v-show="step > 1" data-cy="prev" />
+        <img
+          src="../../../icons/left-arrow.svg"
+          @click="step = step - 1"
+          class="left-arrow"
+          v-show="step > 1"
+          data-cy="prev"
+        />
         <ul>
           <li @click="step = 1" :class="step === 1 ? 'current' : ''"><a></a></li>
           <li @click="step = 2" :class="step === 2 ? 'current' : ''"><a></a></li>
           <li @click="step = 3" :class="step === 3 ? 'current' : ''"><a></a></li>
         </ul>
-        <RightArrow @click="step = step + 1" class="right-arrow" v-show="step < 3" data-cy="next" />
+        <img
+          src="../../../icons/right-arrow.svg"
+          @click="step = step + 1"
+          class="right-arrow"
+          v-show="step < 3"
+          data-cy="next"
+        />
         <button class="skip-button" @click="step = 3" v-show="step < 3" data-cy="skip">
           {{ $t('pages.intro.skip') }}
         </button>
@@ -107,21 +119,15 @@
 
 <script>
 import { IN_FRAME } from '../../utils/helper';
-import Claim from '../../../icons/claim.svg?vue-component';
-import Heart from '../../../icons/heart.svg?vue-component';
-import LeftArrow from '../../../icons/left-arrow.svg?vue-component';
-import RightArrow from '../../../icons/right-arrow.svg?vue-component';
+
 import Button from '../components/Button';
 import CheckBox from '../components/CheckBox';
 import Platforms from '../components/Platforms';
 
 export default {
   components: {
-    Claim,
-    Heart,
     Button,
-    LeftArrow,
-    RightArrow,
+
     CheckBox,
     Platforms,
   },

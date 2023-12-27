@@ -16,11 +16,11 @@
               style="font-size: smaller; color: white"
               class="tour__step9"
             >
-              <Profile width="24.5" height="24.5" slot="icon" />
+              <img src="../../../icons/profile.svg" width="24.5" height="24.5" slot="icon" />
             </BoxButton>
 
             <BoxButton :text="$t('pages.appVUE.Did')" to="/did">
-              <DidIcon slot="icon" />
+              <img src="../../../icons/activity-icon.svg" slot="icon" />
             </BoxButton>
 
             <BoxButton
@@ -29,7 +29,13 @@
               to="/credential"
               class="tour__step10"
             >
-              <Credential width="24.5" height="24.5" slot="icon" color="white" />
+              <img
+                src="../../../icons/credential.svg"
+                width="24.5"
+                height="24.5"
+                slot="icon"
+                color="white"
+              />
             </BoxButton>
           </div>
 
@@ -40,7 +46,7 @@
               style="font-size: smaller; color: white"
               class="tour__step9"
             >
-              <Transfer height="24.5" slot="icon" />
+              <img src="../../../icons/invite.svg" height="24.5" slot="icon" />
             </BoxButton>
 
             <BoxButton
@@ -48,11 +54,11 @@
               to="/transactions"
               style="font-size: smaller; color: white"
             >
-              <Transactions height="24.5" width="25" slot="icon" />
+              <img src="../../../icons/hamburger.svg" height="24.5" width="25" slot="icon" />
             </BoxButton>
 
             <BoxButton :text="$t('pages.appVUE.settings')" to="/settings">
-              <Settings slot="icon" />
+              <img src="../../../icons/settings-icon.svg" slot="icon" />
             </BoxButton>
           </div>
         </div>
@@ -72,39 +78,21 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import Settings from '../../../icons/settings-icon.svg?vue-component';
+import axios from 'axios';
 
-import Profile from '../../../icons/profile.svg?vue-component';
-import Transfer from '../../../icons/invite.svg?vue-component';
-import Transactions from '../../../icons/hamburger.svg?vue-component';
-import DidIcon from '../../../icons/activity-icon.svg?vue-component';
-
-import Credential from '../../../icons/credential.svg?vue-component';
-import QrIcon from '../../../icons/qr-code-white.svg?vue-component';
 import AccountInfo from '../components/AccountInfo';
-import BalanceInfo from '../components/BalanceInfo';
 import BoxButton from '../components/BoxButton';
 import { didResolver } from '../../utils/resolver';
-import axios from 'axios';
 import verifyTokenMixin from '../../../mixins/verifyTokenMixin';
 import { HS_AUTH_DID_URL } from '../../utils/hsConstants';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import syncMixin from '../../../mixins/syncMixin';
 import removeAccountMixin from '../../../mixins/removeAccount';
 
 export default {
   name: 'Account',
   components: {
-    QrIcon,
-    Settings,
     AccountInfo,
     BoxButton,
-    Credential,
-    Profile,
-    Transfer,
-    Transactions,
-    DidIcon,
-    BalanceInfo,
   },
   data() {
     return {
@@ -123,7 +111,7 @@ export default {
   },
   mixins: [syncMixin, verifyTokenMixin, removeAccountMixin],
   computed: {
-    ...mapState([, 'tourRunning', 'backedUpSeed']),
+    ...mapState(['tourRunning', 'backedUpSeed']),
     ...mapGetters(['hypersign']),
   },
 
@@ -146,9 +134,9 @@ export default {
         }
 
         this.verifyToken().then(data => {
+          console.log(data);
           if (data !== undefined) {
-            const response = data.response;
-            if (response.status === 401) {
+            if (data?.status === 401) {
               this.$store.commit('setMainLoading', false);
               this.$store.commit('switchLoggedIn', false);
               this.removeAccountSilent();
@@ -192,7 +180,7 @@ export default {
       }
 
       localStorage.setItem('isMobileWallet', false);
-      //Only for deeplinking
+      // Only for deeplinking
       if (this.$route.query.url && this.$route.query.url != '') {
         const JSONData = decodeURI(this.$route.query.url);
         this.receiveOrGiveCredential(JSONData);
@@ -219,7 +207,7 @@ export default {
           status = did.status;
         }
       });
-      return status === 'private' ? true : false;
+      return status === 'private';
     },
 
     async receiveOrGiveCredential(QRJsonString) {
@@ -231,7 +219,7 @@ export default {
           case 'ISSUE_CRED': {
             // change it to ACCEPT_CRED
             this.credentialUrl = data.url;
-            let cred = await this.fetchCredential();
+            const cred = await this.fetchCredential();
             this.credentialsQRData(cred);
             break;
           }
@@ -253,11 +241,10 @@ export default {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
                 return;
-              } else {
-                throw new Error(
-                  'Sorry, Selected DID is private. Please select a public DID to issue Schema',
-                );
               }
+              throw new Error(
+                'Sorry, Selected DID is private. Please select a public DID to issue Schema',
+              );
             }
             const orgDid = data.data.author;
             const resolvedDidDoc = await didResolver(orgDid);
@@ -286,11 +273,10 @@ export default {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
                 return;
-              } else {
-                throw new Error(
-                  'Sorry, Selected DID is private. Please select a public DID to issue credential',
-                );
               }
+              throw new Error(
+                'Sorry, Selected DID is private. Please select a public DID to issue credential',
+              );
             }
             const orgDid = data.data.issuerDid;
             const resolvedDidDoc = await didResolver(orgDid);
@@ -326,11 +312,10 @@ export default {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
                 return;
-              } else {
-                throw new Error(
-                  'Sorry, Selected DID is private. Please select a public DID to issue Did',
-                );
               }
+              throw new Error(
+                'Sorry, Selected DID is private. Please select a public DID to issue Did',
+              );
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push('/signdid');
@@ -350,11 +335,10 @@ export default {
                 this.$emit('closeMenu');
                 this.$router.push(`/did`);
                 return;
-              } else {
-                throw new Error(
-                  'Sorry, Selected DID is private. Please select a public DID to update Did',
-                );
               }
+              throw new Error(
+                'Sorry, Selected DID is private. Please select a public DID to update Did',
+              );
             }
             this.$store.commit('addRequestingAppInfo', data);
             this.$router.push('/updatedid');
@@ -374,9 +358,9 @@ export default {
       if (!this.credentialUrl) {
         throw new Error('Credential Url is null or empty');
       }
-      this.credentialUrl = this.credentialUrl + '&did=' + this.hypersign.did;
+      this.credentialUrl = `${this.credentialUrl}&did=${this.hypersign.did}`;
       this.loading = true;
-      let response = await axios.get(this.credentialUrl);
+      const response = await axios.get(this.credentialUrl);
       this.loading = false;
       if (response.status === 200) {
         const { data } = response;
@@ -384,9 +368,8 @@ export default {
           throw new Error('Some error occurred while accepting the credential');
         }
         return data;
-      } else {
-        throw new Error('Some error occurred while accepting the credential');
       }
+      throw new Error('Some error occurred while accepting the credential');
     },
 
     async credentialsQRData(cred) {
@@ -422,7 +405,7 @@ export default {
 
     async credentialDetailsQRdata(qrData) {
       try {
-        /**Sample QR data; It sould be called presenation query */
+        /** Sample QR data; It sould be called presenation query */
         /*
         {
             "QRType": "REQUEST_CRED",
@@ -448,12 +431,10 @@ export default {
         this.$store.commit('addRequestingAppInfo', qrData);
 
         if (Array.isArray(schemaId)) {
-          //// Doc: more than one credentials are requested
-          //// All schemas must exists, otherwise it will fail
+          // // Doc: more than one credentials are requested
+          // // All schemas must exists, otherwise it will fail
           const schemaIds = schemaId;
-          const credentialSchemasIds = this.hypersign.credentials.map(
-            x => x['credentialSchema']['id'],
-          );
+          const credentialSchemasIds = this.hypersign.credentials.map(x => x.credentialSchema.id);
           // console.log({
           // credentialSchemasIds
           // })
@@ -467,18 +448,18 @@ export default {
           );
           const intersectionSchemasIdSet = new Set(intersectionSchemasIds);
           if (intersectionSchemasIds.length <= 0) {
-            throw new Error('Credential not found for schemaIds ' + schemaId.join(','));
+            throw new Error(`Credential not found for schemaIds ${schemaId.join(',')}`);
           }
 
           if (intersectionSchemasIdSet.size < schemaIds.length) {
             const rest = schemaIds.filter(x => intersectionSchemasIds.indexOf(x) < 0);
             const msg = rest ? rest.join(',') : '';
-            throw new Error('Credential not found for schemaIds ' + msg);
+            throw new Error(`Credential not found for schemaIds ${msg}`);
           }
 
           this.verifiableCredentials = this.hypersign.credentials.filter(x => {
             // const credentialSchemaUrl = x['@context'][1].hs;
-            const credentialSchemaId = x['credentialSchema']['id']; //getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+            const credentialSchemaId = x.credentialSchema.id; // getSchemaIdFromSchemaUrl(credentialSchemaUrl);
             if (intersectionSchemasIds.indexOf(credentialSchemaId) >= 0) {
               return x;
             }
@@ -496,12 +477,12 @@ export default {
 
           this.$router.push(`/credential/authorize/${filteredCredentialIds.join(',')}`);
         } else {
-          //// Doc: else not interpting the existing flow
+          // // Doc: else not interpting the existing flow
 
           // Here we are searching the wallet for credential
           this.verifiableCredential = this.hypersign.credentials.find(x => {
             // const credentialSchemaUrl = x['@context'][1].hs;
-            const credentialSchemaId = x['credentialSchema']['id']; // getSchemaIdFromSchemaUrl(credentialSchemaUrl);
+            const credentialSchemaId = x.credentialSchema.id; // getSchemaIdFromSchemaUrl(credentialSchemaUrl);
 
             if (credentialSchemaId === schemaId) {
               if (x.issuer === appDid) {

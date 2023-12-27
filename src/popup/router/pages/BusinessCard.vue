@@ -33,33 +33,65 @@
         <div class="box-club">
           <span @click="externalLink(vcard.socialUrls.twitter)">
             <BoxButton v-if="vcard.socialUrls.twitter" text="Twitter" class="tour__step9">
-              <TwitterIcon width="30" height="30" slot="icon" />
+              <img
+                src="../../../icons/twitter-svgrepo-com.svg"
+                width="30"
+                height="30"
+                slot="icon"
+              />
             </BoxButton>
           </span>
           <span @click="externalLink(vcard.socialUrls.telegram)">
             <BoxButton v-if="vcard.socialUrls.telegram" text="Telegram">
-              <TelegramIcon width="30" height="30" slot="icon" />
+              <img
+                src="../../../icons/telegram-svgrepo-com.svg"
+                width="30"
+                height="30"
+                slot="icon"
+              />
             </BoxButton>
           </span>
 
           <span @click="saveAs()">
             <BoxButton text="Save Contact" class="tour__step10">
-              <PhoneIcon width="30" height="30" slot="icon" color="white" />
+              <img
+                src="../../../icons/telephone-call-svgrepo-com.svg"
+                width="30"
+                height="30"
+                slot="icon"
+                color="white"
+              />
             </BoxButton>
           </span>
           <span @click="externalLink(vcard.socialUrls.discord)">
             <BoxButton v-if="vcard.socialUrls.discord" text="Discord" class="tour__step9">
-              <DiscordIcon width="30" height="30" slot="icon" />
+              <img
+                src="../../../icons/discord-svgrepo-com.svg"
+                width="30"
+                height="30"
+                slot="icon"
+              />
             </BoxButton>
           </span>
           <span @click="externalLink(vcard.socialUrls.linkedIn)">
             <BoxButton v-if="vcard.socialUrls.linkedIn" text="LinkedIn">
-              <LinkedInIcon width="30" height="30" slot="icon" />
+              <img
+                src="../../../icons/linkedin-svgrepo-com.svg"
+                width="30"
+                height="30"
+                slot="icon"
+              />
             </BoxButton>
           </span>
           <span @click="externalLink(vcard.socialUrls.facebook)">
             <BoxButton v-if="vcard.socialUrls.facebook" text="Facebook" class="tour__step10">
-              <FacebookIcon width="30" height="30" slot="icon" color="white" />
+              <img
+                src="../../../icons/facebook-svgrepo-com.svg"
+                width="30"
+                height="30"
+                slot="icon"
+                color="white"
+              />
             </BoxButton>
           </span>
         </div>
@@ -91,7 +123,7 @@
           <div>
             <div class="copied-alert" v-if="copied">{{ $t('pages.account.copied') }}</div>
             <code class="copyicon" @click="copy">{{ short_link }}</code>
-            <CopyIcon class="copyicon" slot="icon" @click="copy"></CopyIcon>
+            <img src="../../../icons/copy.svg" class="copyicon" slot="icon" @click="copy"></CopyIcon>
           </div>
         </div>
       </SmallModal>
@@ -101,40 +133,21 @@
 <script>
 // const HypersignSSISdk = require('hs-ssi-sdk');
 import vCardsJS from 'vcards-js';
-import BoxButton from '../components/BoxButton';
-import TwitterIcon from '../../../icons/twitter-svgrepo-com.svg?vue-component';
-import TelegramIcon from '../../../icons/telegram-svgrepo-com.svg?vue-component';
-import PhoneIcon from '../../../icons/telephone-call-svgrepo-com.svg?vue-component';
-
-import DiscordIcon from '../../../icons/discord-svgrepo-com.svg?vue-component';
-import LinkedInIcon from '../../../icons/linkedin-svgrepo-com.svg?vue-component';
-import FacebookIcon from '../../../icons/facebook-svgrepo-com.svg?vue-component';
-
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VueQr from 'vue-qr';
+import Axios from 'axios';
+import BoxButton from '../components/BoxButton';
 
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import CopyIcon from '../../../icons/copy.svg?vue-component';
 
 import SmallModal from '../components/SmallModal.vue';
 
 import { WALLET_URL, SUPERHERO_HS_AUTH_BASE_URL } from '../../utils/hsConstants';
-import Axios from 'axios';
 
 export default {
   components: {
     SmallModal,
-    QrIcon,
     VueQr,
-    CopyIcon,
     BoxButton,
-    TwitterIcon,
-    TelegramIcon,
-    PhoneIcon,
-    DiscordIcon,
-    LinkedInIcon,
-    FacebookIcon,
   },
   data() {
     return {
@@ -165,7 +178,7 @@ export default {
       this.loading = true;
       this.vp = this.$route.params.vp;
 
-      const fetcedVp = await Axios.get(SUPERHERO_HS_AUTH_BASE_URL + 'shared/vp/' + this.vp);
+      const fetcedVp = await Axios.get(`${SUPERHERO_HS_AUTH_BASE_URL}shared/vp/${this.vp}`);
 
       this.vp = fetcedVp.data.vp;
       this.sortUrl = fetcedVp.data._id;
@@ -187,10 +200,10 @@ export default {
         this.verifiableCredential.issuanceDate,
       );
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; // toStringShorner(this.verifiableCredential.type[1], 26, 15);
       // const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
       this.credDetials.schemaId = toStringShorner(
-        this.verifiableCredential['credentialSchema']['id'],
+        this.verifiableCredential.credentialSchema.id,
         32,
         15,
       );
@@ -199,23 +212,23 @@ export default {
     const credSub = this.vp.verifiableCredential[0].credentialSubject;
     // console.log("credSub", credSub);
     const arr = Object.keys(credSub).map(key => [key, credSub[key]]);
-    var vcard = vCardsJS();
+    const vcard = vCardsJS();
     arr.forEach(async element => {
       switch (element[0]) {
         case 'facebook':
-          vcard.socialUrls['facebook'] = element[1];
+          vcard.socialUrls.facebook = element[1];
           break;
         case 'twitter':
-          vcard.socialUrls['twitter'] = element[1];
+          vcard.socialUrls.twitter = element[1];
           break;
         case 'linkedIn':
-          vcard.socialUrls['linkedIn'] = element[1];
+          vcard.socialUrls.linkedIn = element[1];
           break;
         case 'telegram':
-          vcard.socialUrls['telegram'] = element[1];
+          vcard.socialUrls.telegram = element[1];
           break;
         case 'discord':
-          vcard.socialUrls['discord'] = element[1];
+          vcard.socialUrls.discord = element[1];
           break;
         case 'workAddresslabel':
           vcard.workAddress.label = element[1];
@@ -276,7 +289,7 @@ export default {
     this.vcf = vcard.getFormattedString(); // console.log("vcf", this.vcf);
     this.loading = false;
 
-    this.link = WALLET_URL + 'businesscard/' + this.sortUrl;
+    this.link = `${WALLET_URL}businesscard/${this.sortUrl}`;
     this.qrdata = this.link;
     // console.log(this.vcf);
     this.showQr = true;
@@ -328,7 +341,7 @@ export default {
 
     toUpper(t) {
       if (t) return t.toString().toUpperCase();
-      else return t;
+      return t;
     },
   },
 };

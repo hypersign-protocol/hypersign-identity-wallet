@@ -29,21 +29,13 @@
 </template>
 <script>
 import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import {
-  HYPERSIGN_AUTH_PROVIDER,
-  HIDNODE_RPC,
-  HIDNODE_REST,
-  HIDNODE_NAMESPACE,
-} from '../../utils/hsConstants';
+import { HypersignSSISdk as HypersignSsiSDK } from 'hs-ssi-sdk';
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 import hidWalletInstance from '../../utils/hidWallet';
 
-import HypersignSsiSDK from 'hs-ssi-sdk';
 // const HypersignSsiSDK = require('hs-ssi-sdk');
 export default {
-  components: { QrIcon },
+  components: {},
   data() {
     return {
       did: '',
@@ -72,7 +64,8 @@ export default {
           try {
             await this.resolveDid();
           } catch (e) {
-            if (e.response.data.code == 3) {
+            console.log(e);
+            if (e.response.data.code === 3) {
               console.log(e.response.data.message);
             }
           }
@@ -92,15 +85,15 @@ export default {
   methods: {
     async resolveDid(did_id) {
       await hidWalletInstance.generateWallet(this.mnemonic);
-      const hsSdk = new HypersignSsiSDK(
-        hidWalletInstance.offlineSigner,
-        HIDNODE_RPC,
-        HIDNODE_REST,
-        HIDNODE_NAMESPACE,
-      );
+      const hsSdk = new HypersignSsiSDK({
+        offlineSigner: hidWalletInstance.offlineSigner,
+        nodeRestEndpoint: HIDNODE_REST,
+        nodeRpcEndpoint: HIDNODE_RPC,
+        namespace: HIDNODE_NAMESPACE,
+      });
       await hsSdk.init();
       const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({
-        did: did_id ? did_id : this.did,
+        did: did_id || this.did,
       });
       if (didDocumentMetadata === null) {
         this.status = 'Unregistred';
@@ -147,14 +140,14 @@ export default {
         if (register) {
           this.$emit('closeMenu');
           this.loading = true;
-          const hsSdk = new HypersignSsiSDK(
-            hidWalletInstance.offlineSigner,
-            HIDNODE_RPC,
-            HIDNODE_REST,
-            HIDNODE_NAMESPACE,
-          );
+          const hsSdk = new HypersignSsiSDK({
+            offlineSigner: hidWalletInstance.offlineSigner,
+            nodeRestEndpoint: HIDNODE_REST,
+            nodeRpcEndpoint: HIDNODE_RPC,
+            namespace: HIDNODE_NAMESPACE,
+          });
           await hsSdk.init();
-          const verificationMethodId = this.didDoc.id + '#key-1';
+          const verificationMethodId = `${this.didDoc.id}#key-1`;
           const publicKeyMultibase = this.didDoc.id.split(':').at(-1);
           this.didDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultibase;
           const tx = await hsSdk.did.register({
@@ -176,7 +169,7 @@ export default {
 
     toUpper(t) {
       if (t) return t.toString().toUpperCase();
-      else return t;
+      return t;
     },
   },
 };

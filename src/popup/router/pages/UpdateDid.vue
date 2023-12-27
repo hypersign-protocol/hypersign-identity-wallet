@@ -13,16 +13,22 @@
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="signAndSendToBlockchain()">
-          <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.authorize')
-          }}</span>
+          <img
+            src="../../../icons/badges/verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="reject()">
-          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.decline')
-          }}</span>
+          <img
+            src="../../../icons/badges/not-verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
         </Button>
       </div>
     </div>
@@ -40,14 +46,11 @@ textarea {
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { HypersignSSISdk } from 'hs-ssi-sdk';
+import axios from 'axios';
 import hidWalletInstance from '../../utils/hidWallet';
 // const HypersignSSISdk = require('hs-ssi-sdk');
-import HypersignSSISdk from 'hs-ssi-sdk';
 import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
-import axios from 'axios';
 
 export default {
   name: 'IssueSchema',
@@ -55,7 +58,7 @@ export default {
     ...mapGetters(['hypersign']),
     ...mapState(['mnemonic']),
   },
-  components: { QrIcon, CloseIcon, VerifiedIcon },
+  components: {},
   beforeDestroy() {
     this.reject();
   },
@@ -112,12 +115,12 @@ export default {
 
         // Generating dummy key
         this.updatedDid.didDocument.controller = this.didRaw.controllers;
-        let verificationMethod = [];
-        let authentication = [];
-        let assertionMethod = [];
-        let keyAgreement = [];
-        let capabilityInvocation = [];
-        let capabilityDelegation = [];
+        const verificationMethod = [];
+        const authentication = [];
+        const assertionMethod = [];
+        const keyAgreement = [];
+        const capabilityInvocation = [];
+        const capabilityDelegation = [];
 
         for (let i = 0; i < this.didRaw.controllers.length; i++) {
           const { didDocument } = await this.hsSDK.did.resolve({ did: this.didRaw.controllers[i] });
@@ -135,7 +138,7 @@ export default {
         this.updatedDid.didDocument.capabilityInvocation = capabilityInvocation;
         this.updatedDid.didDocument.capabilityDelegation = capabilityDelegation;
 
-        const versionId = this.updatedDid.didDocumentMetadata.versionId;
+        const { versionId } = this.updatedDid.didDocumentMetadata;
         const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id;
 
         const result = await this.hsSDK.did.update({
@@ -151,7 +154,7 @@ export default {
 
         if (result) {
           this.$store.dispatch('modals/open', { name: 'default', msg: 'Successfully DID Updated' });
-          /// call the sutatus API of the studio/dappp server to for updating the status in db.
+          // / call the sutatus API of the studio/dappp server to for updating the status in db.
           const { serviceEndpoint } = this.hypersign.requestingAppInfo;
           if (serviceEndpoint) {
             try {

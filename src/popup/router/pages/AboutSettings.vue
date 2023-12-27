@@ -1,12 +1,15 @@
 <template>
   <div class="popup">
-      <img src="../../../icons/hypersign-logo.png" class="logo" />
+    <img src="../../../icons/hypersign-logo.png" class="logo" />
     <p style="color:#3e3e3e">
       {{ $t('pages.aboutSettings.systemName') }}
       <span class="version">
         <a
           @click="
-            openUrl(`https://github.com/hypersign-protocol/hypersign-identity-wallet/commit/${commitHash}`, true)
+            openUrl(
+              `https://github.com/hypersign-protocol/hypersign-identity-wallet/commit/${commitHash}`,
+              true,
+            )
           "
         >
           {{ commitHash.slice(0, 7) }}</a
@@ -30,14 +33,11 @@
 </template>
 
 <script>
-import Logo from '../../../icons/hypersign-logo.png?vue-component';
 import openUrl from '../../utils/openUrl';
 import { BUG_REPORT_URL } from '../../utils/constants';
 
 export default {
-  components: {
-    Logo,
-  },
+  components: {},
   data() {
     return {
       extensionVersion: `v.${process.env.npm_package_version}`,

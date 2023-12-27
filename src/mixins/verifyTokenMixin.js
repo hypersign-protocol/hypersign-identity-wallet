@@ -1,16 +1,16 @@
-import edvService from "../popup/utils/edvService"
+import EdvService from '../popup/utils/edvService';
+
 export default {
-    methods: {
-        async verifyToken() {
-            try {
+  methods: {
+    async verifyToken() {
+      try {
+        const edvServiceInstance = new EdvService();
 
-                const edvServiceInstance = new edvService()
-
-                const data = await edvServiceInstance.verifyToken()
-                //    console.log(data);
-            } catch (error) {
-                return error
-            }
-        }
+        const data = await edvServiceInstance.verifyToken();
+        return data;
+      } catch (error) {
+        return error.response;
+      }
     },
-}
+  },
+};

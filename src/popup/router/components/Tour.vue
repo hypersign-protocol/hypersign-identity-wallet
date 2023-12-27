@@ -38,7 +38,7 @@
     <div class="tour-actions" v-if="tourRunning" :class="!started ? 'not-started' : ''">
       <div class="container">
         <div class="tour-welcome-message">
-          <Hero />
+          <img src="../../../icons/hero.svg" />
           <div>
             <h3>{{ $t('onboarding.heading') }}</h3>
             <p class="step-content">{{ $t('onboarding.sub-heading') }}</p>
@@ -55,16 +55,17 @@
           }}</Button>
         </div>
       </div>
-    </div>{{nodeStatus}}
+    </div>
+    {{ nodeStatus }}
     <div
       class="tour-start"
       v-if="!$route.path === '/account' && isLoggedIn && !tourRunning && tourStartBar"
       @click="toggleTour"
     >
       <div class="container">
-        <StartOnboarding class="start-onboarding" />
+        <img src="../../../icons/start-onboarding.svg" class="start-onboarding" />
         <span>{{ $t('onboarding.tutorial') }}</span>
-        <div class="close"><Close /></div>
+        <div class="close"><img src="../../../icons/close.svg" /></div>
       </div>
     </div>
   </div>
@@ -72,16 +73,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import Hero from '../../../icons/hero.svg?vue-component';
-import StartOnboarding from '../../../icons/start-onboarding.svg?vue-component';
-import Close from '../../../icons/close.svg?vue-component';
 
 export default {
-  components: {
-    Hero,
-    StartOnboarding,
-    Close,
-  },
+  components: {},
   data: () => ({
     started: false,
     steps: [
@@ -115,7 +109,7 @@ export default {
         params: {
           placement: 'top',
         },
-      }
+      },
     ],
   }),
   computed: {

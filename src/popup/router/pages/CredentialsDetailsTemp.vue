@@ -26,16 +26,22 @@
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="acceptCredential">
-          <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.accept')
-          }}</span>
+          <img
+            src="../../../icons/badges/verified-big.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.accept') }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="rejectCredential">
-          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.reject')
-          }}</span>
+          <img
+            src="../../../icons/badges/not-verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.reject') }}</span>
         </Button>
       </div>
     </div>
@@ -47,22 +53,19 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
+import Axios from 'axios';
+
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import edvService from '../../utils/edvService';
 import {
   HS_VC_STATUS_PATH,
   HS_VC_STATUS_CHECK_ATTEMPT,
   HS_VC_STATUS_CHECK_INTERVAL,
 } from '../../utils/hsConstants';
-import Axios from 'axios';
 import syncMixin from '../../../mixins/syncMixin';
 import initiateWorker from '../../utils/registerWorker';
+
 export default {
-  components: { QrIcon, CloseIcon, VerifiedIcon },
+  components: {},
   data() {
     return {
       count: 0,
@@ -87,7 +90,7 @@ export default {
   created() {
     this.count = HS_VC_STATUS_CHECK_ATTEMPT;
     this.iteration = 0;
-    const credentialId = this.$route.params.credentialId;
+    const { credentialId } = this.$route.params;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentialsTemp.find(x => x.id == credentialId);
       if (!this.verifiableCredential) this.rejectCredential();
@@ -98,10 +101,10 @@ export default {
         this.verifiableCredential.issuanceDate,
       );
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; // toStringShorner(this.verifiableCredential.type[1], 26, 15);
       // const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
       this.credDetials.schemaId = toStringShorner(
-        this.verifiableCredential['credentialSchema']['id'].trim(),
+        this.verifiableCredential.credentialSchema.id.trim(),
         32,
         15,
       );
@@ -121,7 +124,7 @@ export default {
   methods: {
     toUpper(t) {
       if (t) return t.toString().toUpperCase();
-      else return t;
+      return t;
     },
     async delay(delayInms) {
       return new Promise(resolve => setTimeout(resolve, delayInms));
@@ -143,14 +146,16 @@ export default {
           return;
         }
         await this.delay(HS_VC_STATUS_CHECK_INTERVAL);
-        return await this.checkStatus(verifiableCredential);
+        await this.checkStatus(verifiableCredential);
       }
-
       console.log(JSON.stringify(res.data.vc, null, 2));
-      if (!res.data.vc.revoked && !res.data.vc.suspended) {
+      if (
+        !res.data.vc.credentialStatus.credentialStatusDocument.revoked &&
+        !res.data.vc.credentialStatus.credentialStatusDocument.suspended
+      ) {
         this.accepted = true;
+        return res.data.vc;
       }
-      return res;
     },
 
     async acceptCredential() {
@@ -158,7 +163,7 @@ export default {
       try {
         this.credStatus = await this.checkStatus(this.verifiableCredential);
         console.log(this.credStatus);
-        if (this.credStatus == undefined) {
+        if (this.credStatus === undefined) {
           this.$store.dispatch('modals/open', {
             name: 'default',
             msg: 'Credential Status not found.',
@@ -169,6 +174,7 @@ export default {
         }
         this.loading = false;
       } catch (error) {
+        console.log(error);
         this.loading = false;
         this.$store.dispatch('modals/open', {
           name: 'default',
@@ -183,9 +189,9 @@ export default {
       this.accepted = true;
 
       // here
-      /// decide if the 3rd party auth is enabled or not
-      /// if no, then go to /credential page
-      /// if yes, the go to /account page
+      // / decide if the 3rd party auth is enabled or not
+      // / if no, then go to /credential page
+      // / if yes, the go to /account page
       // if(!localStorage.getItem("3rdPartyAuthVC")){
       //   this.$router.push('/credential');
       // }else{
@@ -208,9 +214,9 @@ export default {
         if (this.password) {
           const worker = initiateWorker();
           syncMixin.methods.syncSW(worker, this.$store);
-          this.$router.push('/account?url=' + url);
+          this.$router.push(`/account?url=${url}`);
         } else {
-          this.$router.push('/askpinbackup?url=' + url);
+          this.$router.push(`/askpinbackup?url=${url}`);
         }
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')

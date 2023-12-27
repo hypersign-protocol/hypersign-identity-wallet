@@ -32,12 +32,9 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import ExpandedAngleArrow from '../../../icons/expanded-angle-arrow.svg?vue-component';
 
 export default {
-  components: {
-    ExpandedAngleArrow,
-  },
+  components: {},
   data: () => ({ dropdown: false }),
   computed: {
     ...mapState(['current', 'currencies']),

@@ -20,14 +20,11 @@
 </template>
 
 <script>
-import { IN_FRAME } from '../../utils/helper';
-import Logo from '../../../icons/hypersign-logo.png?vue-component';
-import SuperheroLogo from '../../../icons/hypersign-logo.png?vue-component';
-import CheckBox from '../components/CheckBox';
-import Button from '../components/Button';
-import Platforms from '../components/Platforms';
 import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
-import Input from '../components/Input-light';
+import { HypersignSSISdk as HypersignSsiSDK } from 'hs-ssi-sdk';
+import { IN_FRAME } from '../../utils/helper';
+
+import Button from '../components/Button';
 import registration from '../../../mixins/registration';
 import {
   HYPERSIGN_AUTH_PROVIDER,
@@ -38,13 +35,11 @@ import {
 import webAuth from '../../utils/auth0Connection';
 import hidWalletInstance from '../../utils/hidWallet';
 import { generateMnemonicToHDSeed } from '../../utils/SSIWallet';
-// import HypersignSsiSDK  from 'hs-ssi-sdk'
 // const HypersignSsiSDK = require('hs-ssi-sdk');
-import HypersignSSISdk from 'hs-ssi-sdk';
 
 export default {
   mixins: [registration],
-  components: { Logo, Input, SuperheroLogo, CheckBox, Button, Platforms },
+  components: { Button },
   data: () => ({
     termsAgreed: false,
     IS_WEB: process.env.PLATFORM === 'web',
@@ -109,14 +104,14 @@ export default {
     loginWithGoogle() {
       webAuth.authorize({
         connection: 'google-oauth2',
-        redirectUri: window.location.origin + '/auth/google?',
+        redirectUri: `${window.location.origin}/auth/google?`,
       });
     },
     gotoRestore() {
       this.$router.push('restoreWallet');
     },
     isemail(email) {
-      var emailReg = /^[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/;
+      const emailReg = /^[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/;
       return emailReg.test(email);
     },
 
@@ -132,23 +127,23 @@ export default {
       }
 
       this.loading = true;
-      /// Generate HID wallet and recharge it using faucet
+      // / Generate HID wallet and recharge it using faucet
       this.mnemonic = generateMnemonic();
       await hidWalletInstance.generateWallet(this.mnemonic);
 
       // console.log('before rechargewallet')
       //  await hidWalletInstance.rechargeWallet();
 
-      /// Use the HID wallet with SSI sdk
+      // / Use the HID wallet with SSI sdk
       // console.log({
       //   HIDNODE_NAMESPACE
       // })
-      const hsSdk = new HypersignSsiSDK(
-        hidWalletInstance.offlineSigner,
-        HIDNODE_RPC,
-        HIDNODE_REST,
-        HIDNODE_NAMESPACE,
-      );
+      const hsSdk = new HypersignSsiSDK({
+        offlineSigner: hidWalletInstance.offlineSigner,
+        nodeRestEndpoint: HIDNODE_REST,
+        nodeRpcEndpoint: HIDNODE_RPC,
+        namespace: HIDNODE_NAMESPACE,
+      });
       await hsSdk.init();
       const seed = mnemonicToSeed(this.mnemonic).toString('hex');
       const address = await hidWalletInstance.getWalletAddress();
@@ -158,14 +153,14 @@ export default {
         publicKey: address,
         privateKey: seed,
       };
-      ////HYPERSIGN Related
-      ////////////////////////////////////////////////
+      // //HYPERSIGN Related
+      // //////////////////////////////////////////////
       try {
         const seedHd = await generateMnemonicToHDSeed(this.mnemonic);
         const kp = await hsSdk.did.generateKeys({ seed: seedHd });
 
-        const privateKeyMultibase = kp.privateKeyMultibase;
-        const publicKeyMultibase = kp.publicKeyMultibase;
+        const { privateKeyMultibase } = kp;
+        const { publicKeyMultibase } = kp;
 
         const didDoc = await hsSdk.did.generate({ publicKeyMultibase });
         didDoc.keyAgreement = [];
@@ -231,8 +226,8 @@ export default {
       } finally {
         this.loading = false;
       }
-      ////HYPERSIGN Related
-      ////////////////////////////////////////////////
+      // //HYPERSIGN Related
+      // //////////////////////////////////////////////
     },
   },
 };

@@ -1,4 +1,5 @@
 const path = require('path');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require('webpack');
 const ejs = require('ejs');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -10,10 +11,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 const commitHash = require('child_process')
   .execSync('git rev-parse HEAD')
-  .toString().trim();
+  .toString()
+  .trim();
 const sass = require('sass');
+const loader = require('sass-loader');
+const { name } = require('file-loader');
+const { use } = require('chai');
 const genManifest = require('./src/manifest');
-
 
 const parseBool = val => (val ? JSON.parse(val) : false);
 const RUNNING_IN_TESTS = parseBool(process.env.RUNNING_IN_TESTS);
@@ -57,12 +61,14 @@ const getConfig = platform => {
     },
     resolve: {
       extensions: ['.js', '.vue'],
+      alias: {
+        stream: 'stream-browserify',
+      },
       fallback: {
         crypto: false, // Avoid overriding the 'fs' module,
         path: false,
         fs: false,
-        stream: false,
-        timers: false
+        timers: false,
       },
     },
     ...(platform === 'extension-firefox' && {
@@ -83,22 +89,22 @@ const getConfig = platform => {
     }),
     module: {
       rules: [
-        {
-          test: /\.(png|jpe?g|gif|ico)$/,
-          type: 'asset/resource',
-          generator: {
-            filename: 'assets/[name].[hash][ext]',
-          },
-          // use: [
-          //   {
-          //     loader: 'url-loader',
-          //     options: {
-          //       name: '[name].[contenthash].[ext]',
-          //       outputPath: 'assets/', // Specify the output directory for images
-          //     },
-          //   },
-          // ],
-        },
+        // {
+        //   test: /\.(png|jpe?g|gif|ico)$/,
+        //   type: 'asset/resource',
+        //   generator: {
+        //     filename: 'assets/[name].[contenthash][ext]',
+        //   },
+        //   // use: [
+        //   //   {
+        //   //     loader: 'url-loader',
+        //   //     options: {
+        //   //       name: '[name].[contenthash].[ext]',
+        //   //       outputPath: 'assets/', // Specify the output directory for images
+        //   //     },
+        //   //   },
+        //   // ],
+        // },
         {
           test: /\.vue$/,
           use: ['vue-loader'],
@@ -139,22 +145,81 @@ const getConfig = platform => {
         //   test: /\.sass$/,
         //   use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax'],
         // },
+        // {
+        //   test: /\.svg$/,
+        //   resourceQuery: /vue-component/,
+        //   // type: 'asset/resource',
+        //   generator: {
+        //     filename: 'assets/[name].[contenthash][ext]',
+        //   },
+        //   use: ['vue-loader', 'vue-svg-loader'],
+        //   // use: [
+        //   //   {
+        //   //     loader: 'vue-svg-loader',
+        //   //     options: {
+        //   //       outputPath: 'assets/',
+        //   //       name: '[name].[contenthash].[ext]',
+        //   //     },
+        //   //   },
+        //   // ],
+        // },
         {
-          test: /\.svg$/i,
-          // resourceQuery: /vue-component/,
-          type: 'asset/resource',
-          generator: {
-            filename: 'assets/[name].[hash][ext]',
-          },
-          // use: ['vue-svg-loader'],
+          test: /\.(png|jpg|gif|svg|ico)$/,
+          oneOf: [
+            {
+              test: /\.svg$/i,
+              resourceQuery: /vue-component/,
+              use: [
+                'vue-loader',
+                'babel-loader',
+                {
+                  loader: 'vue-svg-loader',
+                  options: {
+                    // Your specific options for inlining SVGs
+                    // Example options:
+                    svg: {
+                      plugins: [
+                        { removeViewBox: false },
+                        { inlinestyles: { onlymatchedonce: false } },
+                        { removexmlns: true },
+                        { removedimensions: true },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              // type: 'asset',
+              use: [
+                {
+                  loader: 'url-loader',
+                  options: {
+                    name: '[name].[contenthash].[ext]',
+                    esModule: false,
+                    limit: 4096,
+                    outputPath: 'assets/',
+                  },
+                },
+              ],
+              // generator: {
+              //   filename: 'assets/[name].[contenthash][ext]',
+              // },
+            },
+          ],
         },
       ],
     },
+
     plugins: [
+      new NodePolyfillPlugin({
+        includeAliases: ['stream', 'process', 'Buffer'],
+      }),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
       }),
       new VueLoaderPlugin(),
+
       new MiniCssExtractPlugin({
         filename: '[name].css',
         chunkFilename: '[id].css',
@@ -169,7 +234,7 @@ const getConfig = platform => {
           npm_package_version: JSON.stringify(process.env.npm_package_version),
           NETWORK: JSON.stringify(process.env.NETWORK),
           RUNNING_IN_TESTS,
-          COMMIT_HASH: JSON.stringify(commitHash)
+          COMMIT_HASH: JSON.stringify(commitHash),
         },
       }),
       ...(platform.startsWith('extension-')

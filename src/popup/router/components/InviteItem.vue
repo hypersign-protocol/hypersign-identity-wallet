@@ -12,7 +12,9 @@
     </div>
     <div class="invite-link">
       <span>{{ link }}</span>
-      <button class="invite-link-copy" v-clipboard:copy="link"><CopyIcon /></button>
+      <button class="invite-link-copy" v-clipboard:copy="link">
+        <img src="../../../icons/copy.svg" />
+      </button>
     </div>
     <div class="centered-buttons" v-if="!topUp">
       <Button v-if="inviteLinkBalance > 0" bold @click="claim">{{
@@ -40,7 +42,6 @@ import { mapState, mapGetters } from 'vuex';
 import { AmountFormatter, Crypto } from '@aeternity/aepp-sdk/es';
 import AmountSend from './AmountSend';
 import Button from './Button';
-import CopyIcon from '../../../icons/copy.svg?vue-component';
 import { formatDate } from '../../utils';
 
 export default {
@@ -48,7 +49,7 @@ export default {
     secretKey: { type: String, required: true },
     createdAt: { type: Number, required: true },
   },
-  components: { Button, AmountSend, CopyIcon },
+  components: { Button, AmountSend },
   filters: { formatDate },
   data: () => ({ topUp: false, topUpAmount: 0, inviteLinkBalance: 0 }),
   computed: {

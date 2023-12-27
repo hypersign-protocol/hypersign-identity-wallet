@@ -49,7 +49,12 @@
     <div>
       <Button v-if="share" v-on:click="shareCredential">Share</Button>
       <Button @click="deleteCredential">
-        <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">Delete</span>
+        <img
+          src="../../../icons/badges/not-verified.svg"
+          width="20"
+          height="20"
+          class="scan-icon"
+        /><span class="scan-text">Delete</span>
       </Button>
 
       <Loader v-if="loading" />
@@ -58,12 +63,11 @@
 </template>
 <script>
 // const HypersignSSISdk = require('hs-ssi-sdk');
-import HypersignSSISdk from 'hs-ssi-sdk';
+import { HypersignSSISdk } from 'hs-ssi-sdk';
 
 import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
+import Axios from 'axios';
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
 import hidWalletInstance from '../../utils/hidWallet';
 import {
   HIDNODE_RPC,
@@ -72,11 +76,9 @@ import {
   SUPERHERO_HS_AUTH_BASE_URL,
   BUSINESSCARD_SCHEMA,
 } from '../../utils/hsConstants';
-import Axios from 'axios';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 
 export default {
-  components: { QrIcon, CloseIcon },
+  components: {},
   data() {
     return {
       share: false,
@@ -93,7 +95,7 @@ export default {
     };
   },
   created() {
-    const credentialId = this.$route.params.credentialId;
+    const { credentialId } = this.$route.params;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
       if (this.verifiableCredential === undefined) {
@@ -106,13 +108,13 @@ export default {
         this.verifiableCredential.issuanceDate,
       );
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; // toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
       const credentialSchema = this.verifiableCredential.credentialSchema.id;
       if (credentialSchema === BUSINESSCARD_SCHEMA) {
         this.share = true;
       }
-      this.credDetials.schemaId = this.verifiableCredential['credentialSchema']['id'].trim();
+      this.credDetials.schemaId = this.verifiableCredential.credentialSchema.id.trim();
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
   },
@@ -144,12 +146,12 @@ export default {
       this.loading = true;
 
       await hidWalletInstance.generateWallet(this.mnemonic);
-      this.hsSDK = new HypersignSSISdk(
-        hidWalletInstance.offlineSigner,
-        HIDNODE_RPC,
-        HIDNODE_REST,
-        HIDNODE_NAMESPACE,
-      );
+      this.hsSDK = new HypersignSSISdk({
+        offlineSigner: hidWalletInstance.offlineSigner,
+        nodeRpcEndpoint: HIDNODE_RPC,
+        nodeRestEndpoint: HIDNODE_REST,
+        namespace: HIDNODE_NAMESPACE,
+      });
       await this.hsSDK.init();
 
       const vp_unsigned = await this.hsSDK.vp.getPresentation({
@@ -157,7 +159,7 @@ export default {
         holderDid: this.hypersign.did,
       });
 
-      const verificationMethodId = this.hypersign.did + '#key-1';
+      const verificationMethodId = `${this.hypersign.did}#key-1`;
       const vp_signed = await this.hsSDK.vp.signPresentation({
         presentation: vp_unsigned,
         holderDidDocSigned: this.hypersign.didDoc,
@@ -168,7 +170,7 @@ export default {
 
       const result = await Axios({
         method: 'post',
-        url: SUPERHERO_HS_AUTH_BASE_URL + 'share',
+        url: `${SUPERHERO_HS_AUTH_BASE_URL}share`,
         data: {
           vp: vp_signed,
         },
@@ -181,7 +183,7 @@ export default {
     },
     toUpper(t) {
       if (t) return t.toString().toUpperCase();
-      else return t;
+      return t;
     },
   },
 };

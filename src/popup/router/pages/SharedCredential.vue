@@ -21,7 +21,7 @@
         <div class="copied-alert" v-if="copied">{{ $t('pages.account.copied') }}</div>
 
         <code class="copyicon" @click="copy">{{ short_link }}</code>
-        <CopyIcon class="copyicon" slot="icon" @click="copy"></CopyIcon>
+        <img src="../../../icons/copy.svg" class="copyicon" slot="icon" @click="copy"></CopyIcon>
         <div if="showQr">
           <VueQr
             v-if="qrdata != ''"
@@ -49,19 +49,14 @@
 // const HypersignSSISdk = require('hs-ssi-sdk');
 import vCardsJS from 'vcards-js';
 
-import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
 import VueQr from 'vue-qr';
-
-import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import hidWalletInstance from '../../utils/hidWallet';
-import { WALLET_URL, SUPERHERO_HS_AUTH_BASE_URL } from '../../utils/hsConstants';
-import CopyIcon from '../../../icons/copy.svg?vue-component';
 import Axios from 'axios';
 
+import { toFormattedDate, toStringShorner } from '../../utils/helper';
+import { WALLET_URL, SUPERHERO_HS_AUTH_BASE_URL } from '../../utils/hsConstants';
+
 export default {
-  components: { QrIcon, VueQr, CopyIcon },
+  components: { VueQr },
   data() {
     return {
       verifiableCredential: {},
@@ -90,7 +85,7 @@ export default {
       this.loading = true;
       this.vp = this.$route.params.vp;
 
-      const fetcedVp = await Axios.get(SUPERHERO_HS_AUTH_BASE_URL + 'shared/vp/' + this.vp);
+      const fetcedVp = await Axios.get(`${SUPERHERO_HS_AUTH_BASE_URL}shared/vp/${this.vp}`);
       this.vp = fetcedVp.data.vp;
       this.sortUrl = fetcedVp.data._id;
     } catch (error) {
@@ -108,10 +103,10 @@ export default {
         this.verifiableCredential.issuanceDate,
       );
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; // toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
       this.credDetials.schemaId = toStringShorner(
-        this.verifiableCredential['credentialSchema']['id'],
+        this.verifiableCredential.credentialSchema.id,
         32,
         15,
       );
@@ -120,23 +115,23 @@ export default {
     const credSub = this.vp.verifiableCredential[0].credentialSubject;
     // console.log("credSub", credSub);
     const arr = Object.keys(credSub).map(key => [key, credSub[key]]);
-    var vcard = vCardsJS();
+    const vcard = vCardsJS();
     arr.forEach(element => {
       switch (element[0]) {
         case 'facebook':
-          vcard.socialUrls['facebook'] = element[1];
+          vcard.socialUrls.facebook = element[1];
           break;
         case 'twitter':
-          vcard.socialUrls['twitter'] = element[1];
+          vcard.socialUrls.twitter = element[1];
           break;
         case 'linkedIn':
-          vcard.socialUrls['linkedIn'] = element[1];
+          vcard.socialUrls.linkedIn = element[1];
           break;
         case 'telegram':
-          vcard.socialUrls['telegram'] = element[1];
+          vcard.socialUrls.telegram = element[1];
           break;
         case 'discord':
-          vcard.socialUrls['discord'] = element[1];
+          vcard.socialUrls.discord = element[1];
           break;
         case 'workAddresslabel':
           vcard.workAddress.label = element[1];
@@ -171,7 +166,7 @@ export default {
     this.vcf = vcard.getFormattedString(); // console.log("vcf", this.vcf);
     this.loading = false;
 
-    this.link = WALLET_URL + 'businesscard/' + this.sortUrl;
+    this.link = `${WALLET_URL}businesscard/${this.sortUrl}`;
     this.qrdata = this.vcf;
     // console.log(this.vcf);
     this.showQr = true;
@@ -214,7 +209,7 @@ export default {
 
     toUpper(t) {
       if (t) return t.toString().toUpperCase();
-      else return t;
+      return t;
     },
   },
 };

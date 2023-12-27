@@ -1,8 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.hypersign.cordova",
-    "sha256_cert_fingerprints": ["A7:ED:5B:A4:56:17:C6:DF:B9:68:1E:B2:22:0E:76:75:EF:84:70:AB:57:42:8A:54:1F:93:20:6E:5F:BA:9D:47"]
-  }
-}]

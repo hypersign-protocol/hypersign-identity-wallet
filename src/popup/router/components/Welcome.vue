@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class="wrapper center">
-      <Logo class="logo" />
+      <img src="../../../icons/logo.svg" class="logo" />
       <p class="f-24 primary-title">
         {{ $t('pages.welcome.send') }}
         <span class="secondary-text">{{ $t('pages.appVUE.aeid') }}</span>
@@ -12,11 +12,7 @@
 </template>
 
 <script>
-import Logo from '../../../icons/logo.svg?vue-component';
-
 export default {
-  components: {
-    Logo,
-  },
+  components: {},
 };
 </script>

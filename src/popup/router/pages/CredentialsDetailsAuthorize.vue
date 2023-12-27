@@ -60,16 +60,22 @@
 
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="authorize">
-          <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.authorize')
-          }}</span>
+          <img
+            src="../../../icons/badges/verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="reject">
-          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.decline')
-          }}</span>
+          <img
+            src="../../../icons/badges/not-verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
         </Button>
       </div>
     </div>
@@ -81,20 +87,18 @@
 </template>
 <script>
 import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
+import { HypersignSSISdk } from 'hs-ssi-sdk';
+
 import hidWalletInstance from '../../utils/hidWallet';
 import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
 // const HypersignSSISdk = require('hs-ssi-sdk');
-import HypersignSSISdk from 'hs-ssi-sdk';
 
 export default {
-  components: { QrIcon, CloseIcon, VerifiedIcon },
+  components: {},
   data() {
     return {
       hsSDK: null,
@@ -110,15 +114,15 @@ export default {
   },
   async created() {
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(
-      hidWalletInstance.offlineSigner,
-      HIDNODE_RPC,
-      HIDNODE_REST,
-      HIDNODE_NAMESPACE,
-    );
+    this.hsSDK = new HypersignSSISdk({
+      offlineSigner: hidWalletInstance.offlineSigner,
+      nodeRestEndpoint: HIDNODE_REST,
+      nodeRpcEndpoint: HIDNODE_RPC,
+      namespace: HIDNODE_NAMESPACE,
+    });
     await this.hsSDK.init();
 
-    const credentialId = this.$route.params.credentialId;
+    const { credentialId } = this.$route.params;
 
     if (credentialId) {
       const credentialIdCommaSepStr = credentialId;
@@ -172,19 +176,23 @@ export default {
         }
         this.loading = true;
         const verifyUrl = url.origin + url.pathname;
-        const vp_unsigned = await this.hsSDK.vp.getPresentation({
+        const vp_unsigned = await this.hsSDK.vp.generate({
           verifiableCredentials: this.verifiableCredentials,
           holderDid: this.hypersign.did,
         });
-        const verificationMethodId = this.hypersign.did + '#key-1';
-        const vp_signed = await this.hsSDK.vp.signPresentation({
+        const verificationMethodId = `${this.hypersign.did}#key-1`;
+        console.log(vp_unsigned);
+        const vp_signed = await this.hsSDK.vp.sign({
           presentation: vp_unsigned,
           holderDidDocSigned: this.hypersign.didDoc,
-          privateKey: this.hypersign.keys.privateKeyMultibase,
+          privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
           challenge,
           domain: serviceEndpoint,
           verificationMethodId,
         });
+
+        console.log(vp_signed);
+
 
         const body = {
           challenge,

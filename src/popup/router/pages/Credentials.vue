@@ -5,7 +5,7 @@
       :to="`/credential/issue/`"
       style="display: flex;justify-content: center;width: 14%;padding: 6px;margin-right: 1%;"
     >
-      <CreateIcon></CreateIcon>
+      <img src="../../../icons/topup-icon.svg" />
     </Button>
     <span class="altText" v-if="hypersign.credentials.length == 0"
       >No credential found. Scan QR to get credentials.</span
@@ -71,21 +71,15 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import removeAccountMixin from '../../../mixins/removeAccount';
-import CheckBox from '../components/CheckBox';
-import Panel from '../components/Panel';
-import PanelItem from '../components/PanelItem';
-import Textarea from '../components/Textarea';
-import Button from '../components/Button';
 import axios from 'axios';
+import removeAccountMixin from '../../../mixins/removeAccount';
+
 import { HS_VC_STATUS_PATH } from '../../utils/hsConstants';
-import CreateIcon from '../../../icons/topup-icon.svg?vue-component';
 import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
+
 export default {
   mixins: [removeAccountMixin],
-  components: { CheckBox, Panel, Button, PanelItem, QrIcon, Textarea, CreateIcon },
+  components: {},
   data() {
     return {
       form: {
@@ -108,7 +102,7 @@ export default {
     },
   },
   async created() {
-    //Only for deeplinking
+    // Only for deeplinking
     if (localStorage.getItem('3rdPartyAuthVCUnregistred')) {
       this.verifiableCredential = JSON.parse(localStorage.getItem('3rdPartyAuthVCUnregistred'));
       localStorage.removeItem('3rdPartyAuthVCUnregistred');
@@ -140,16 +134,14 @@ export default {
     shortner(str, max, len) {
       if (str && str.length > max) {
         return toStringShorner(str, max, len);
-      } else {
-        return str;
       }
+      return str;
     },
     schemaIdFormatted(credentialSchemaUrl) {
       if (credentialSchemaUrl) {
         return toStringShorner(credentialSchemaUrl.trim(), 24, 4);
-      } else {
-        return '';
       }
+      return '';
     },
     moveTo(path) {
       this.$router.push(path);
@@ -167,7 +159,7 @@ export default {
     // },
     formattedDate(date) {
       const d = new Date(date);
-      return d.toLocaleDateString(); //`${month}/${day}/${year}`
+      return d.toLocaleDateString(); // `${month}/${day}/${year}`
     },
     toFormattedDate(dateStr) {
       const d = new Date(dateStr);
@@ -175,7 +167,7 @@ export default {
     },
     async scan() {
       try {
-        //console.log('scanning...')
+        // console.log('scanning...')
         this.form.url = await this.$store.dispatch('modals/open', {
           name: 'read-qr-code',
           title: this.$t('pages.credential.scanCredential'),
@@ -188,7 +180,7 @@ export default {
     },
 
     async fetchCredential() {
-      this.form.url = this.form.url + '&did=' + this.hypersign.did;
+      this.form.url = `${this.form.url}&did=${this.hypersign.did}`;
       this.loading = true;
       let response = await axios.get(this.form.url);
       if (response) {
@@ -203,7 +195,7 @@ export default {
 
     async deeplink(url) {
       try {
-        //console.log('deeplink...')
+        // console.log('deeplink...')
         this.form.url = url;
         await this.fetchCredential();
       } catch (e) {
@@ -213,7 +205,7 @@ export default {
     },
 
     async acceptCredential(credential) {
-      //console.log('acceptCredential...')
+      // console.log('acceptCredential...')
       if (this.hypersign.did != credential.credentialSubject.id)
         throw new Error('This credential is not being issued to you');
       const confirmed = await this.$store
