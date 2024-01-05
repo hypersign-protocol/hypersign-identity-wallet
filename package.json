@@ -11,7 +11,7 @@
         "lint": "npm run lint:vue && npm run lint:css",
         "prettier": "prettier \"src/**/*.{js,vue}\" \"tests/**/*.{js,vue}\"",
         "prettier:write": "npm run prettier -- --write",
-        "build": "cross-env NODE_ENV=production webpack ",
+        "build": "cross-env NODE_ENV=production webpack  && cp  dist/web/root/404.html dist/web/root/index.html ",
         "build:dev": "cross-env NODE_ENV=development webpack --stats-error-details",
         "build-zip": "node scripts/build-zip.js",
         "watch": "npm run build -- --watch",
