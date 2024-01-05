@@ -16,7 +16,7 @@ export default {
   props: {
     resolve: { type: Function, required: true },
     title: { type: String, required: false },
-    msg: { type: String, required: false },
+    msg: { type: String || Object, required: false },
     type: { type: String, required: false },
   },
   components: { Modal, Button },

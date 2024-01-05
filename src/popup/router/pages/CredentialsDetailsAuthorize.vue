@@ -3,18 +3,26 @@
     <div v-if="!isProviderPresent">
       <div class="">
         <div class="appInfo">
-          <div class="row" style="  color: black;padding: 10px;border: 1px solid #8080801a;margin-bottom: 3%;border-radius: 5px;background: #80808026;">
+          <div
+            class="row"
+            style="  color: black;padding: 10px;border: 1px solid #8080801a;margin-bottom: 3%;border-radius: 5px;background: #80808026;"
+          >
             <div class="col-md-2" style="float: left;margin-right: 10px;">
-              <img src='../../../icons/org.png' style="height: 40px;width: 40px;"/>
+              <img src="../../../icons/org.png" style="height: 40px;width: 40px;" />
             </div>
             <div class="col-md-8" style="font-size: small; text-align: left;">
-              <div style="font-weight: bold;"> {{hypersign.requestingAppInfo.appName}}</div>
-              <div style="color: gray;" v-if="hypersign.requestingAppInfo.domain"> {{hypersign.requestingAppInfo.domain}}</div>
+              <div style="font-weight: bold;">{{ hypersign.requestingAppInfo.appName }}</div>
+              <div style="color: gray;" v-if="hypersign.requestingAppInfo.domain">
+                {{ hypersign.requestingAppInfo.domain }}
+              </div>
             </div>
           </div>
-          <div class="row" style="color: black;text-align: left;word-break: break-word;font-size: small;">
+          <div
+            class="row"
+            style="color: black;text-align: left;word-break: break-word;font-size: small;"
+          >
             <div class="col-md-10" style="padding: 5px" v-if="hypersign.requestingAppInfo.reason">
-              {{hypersign.requestingAppInfo.reason}}
+              {{ hypersign.requestingAppInfo.reason }}
             </div>
             <div class="col-md-10" style="padding: 5px" v-else>
               Requesting the following information to give you the service
@@ -24,36 +32,50 @@
             is requesting information:</p> -->
         </div>
 
-
-        <div class=""  style="max-height: 500px;overflow-y: scroll;">
-          <div class="card" v-for="eachCred in credsDetials" style="overflow: unset;margin-bottom: 4%;">
-            <div class="card-header" style="text-align: left; color: black;border: 1px solid #80808042;padding: 8px;border-radius: 5px;background: whitesmoke;">
-               {{eachCred.formattedSchemaName}}</div>
+        <div class="" style="max-height: 500px;overflow-y: scroll;">
+          <div
+            class="card"
+            v-for="eachCred in credsDetials"
+            style="overflow: unset;margin-bottom: 4%;"
+          >
+            <div
+              class="card-header"
+              style="text-align: left; color: black;border: 1px solid #80808042;padding: 8px;border-radius: 5px;background: whitesmoke;"
+            >
+              {{ eachCred.formattedSchemaName }}
+            </div>
             <div class="card-body" style="border: 1px solid #80808042;border-radius: 5px;">
               <ul class="list-group credential-item">
                 <li class="list-group-item" v-for="claim in eachCred.claims" :key="claim">
-                  <div class="list-title">{{ claim }}: </div>
+                  <div class="list-title">{{ claim }}:</div>
                   <div>{{ eachCred.credentialSubject[claim] }}</div>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-        
-        
-        
+
         <Loader v-if="loading" />
       </div>
 
-
       <div class="scanner d-flex">
-        <Button class="scan"  data-cy="scan-button" @click="authorize">
-          <VerifiedIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
+        <Button class="scan" data-cy="scan-button" @click="authorize">
+          <img
+            src="../../../icons/badges/verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.authorize') }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
-        <Button class="scan"  data-cy="scan-button" @click="reject">
-          <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
+        <Button class="scan" data-cy="scan-button" @click="reject">
+          <img
+            src="../../../icons/badges/not-verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.decline') }}</span>
         </Button>
       </div>
     </div>
@@ -61,58 +83,59 @@
       <Loader v-if="loading" />
       Presenting Your Credential...
     </div>
-    
   </div>
 </template>
 <script>
 import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
 import Url from 'url-parse';
 import axios from 'axios';
+import { HypersignSSISdk } from 'hs-ssi-sdk';
+
 import hidWalletInstance from '../../utils/hidWallet';
-import {  HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE  } from '../../utils/hsConstants'
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 
-
-
-import {toFormattedDate, toStringShorner} from '../../utils/helper'
-const HypersignSSISdk = require('hs-ssi-sdk');
-
+import { toFormattedDate, toStringShorner } from '../../utils/helper';
+// const HypersignSSISdk = require('hs-ssi-sdk');
 
 export default {
-  components: { QrIcon,CloseIcon,VerifiedIcon },
+  components: {},
   data() {
     return {
       hsSDK: null,
       verifiableCredentials: [],
-      credsDetials:[], 
+      credsDetials: [],
       claims: [],
       loading: false,
       isProviderPresent: false,
     };
   },
   beforeDestroy() {
-    this.reject()
+    this.reject();
   },
   async created() {
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+    this.hsSDK = new HypersignSSISdk({
+      offlineSigner: hidWalletInstance.offlineSigner,
+      nodeRestEndpoint: HIDNODE_REST,
+      nodeRpcEndpoint: HIDNODE_RPC,
+      namespace: HIDNODE_NAMESPACE,
+    });
     await this.hsSDK.init();
 
-    const credentialId = this.$route.params.credentialId;
+    const { credentialId } = this.$route.params;
 
     if (credentialId) {
       const credentialIdCommaSepStr = credentialId;
-      let credIds = credentialIdCommaSepStr.split(',')
-      
-      if(credIds &&  credIds.length > 0){
+      let credIds = credentialIdCommaSepStr.split(',');
 
-        credIds = credIds.filter(x => x != null || x != '' || x != undefined)
+      if (credIds && credIds.length > 0) {
+        credIds = credIds.filter(x => x != null || x != '' || x != undefined);
 
-        this.verifiableCredentials = this.hypersign.credentials.filter(x =>  credIds.indexOf(x.id) >= 0);
-        if(!this.verifiableCredentials || this.verifiableCredentials.length <= 0){
-            throw new Error('No credenital found')
+        this.verifiableCredentials = this.hypersign.credentials.filter(
+          x => credIds.indexOf(x.id) >= 0,
+        );
+        if (!this.verifiableCredentials || this.verifiableCredentials.length <= 0) {
+          throw new Error('No credenital found');
         }
 
         this.verifiableCredentials.forEach(credential => {
@@ -122,91 +145,97 @@ export default {
             formattedIssuer: toStringShorner(credential.issuer, 32, 15),
             formattedSchemaName: credential.type[1],
             claims: Object.keys(credential.credentialSubject),
-            credentialSubject: credential.credentialSubject
-          })
-        })        
+            credentialSubject: credential.credentialSubject,
+          });
+        });
       } else {
-        console.error('No credIds passed')
+        console.error('No credIds passed');
         return;
       }
     }
 
-    const isRegisterFlow = localStorage.getItem("isRegisterFlow")
-    if(isRegisterFlow){
-        this.isProviderPresent = true;
-        this.authorize();
+    const isRegisterFlow = localStorage.getItem('isRegisterFlow');
+    if (isRegisterFlow) {
+      this.isProviderPresent = true;
+      this.authorize();
     }
   },
   computed: {
     ...mapGetters(['hypersign']),
-    ...mapState(['mnemonic'])
+    ...mapState(['mnemonic']),
   },
-  methods: {    
+  methods: {
     async authorize() {
-      try {  
-            let { serviceEndpoint, challenge } = this.hypersign.requestingAppInfo;
-              
-            const url = Url(serviceEndpoint, true);
-            // TODO: need to remove this later. this is depreciated
-            if(!challenge){
-              challenge = url.query.challenge;
-            }
-            this.loading= true;
-            const verifyUrl = url.origin + url.pathname;
-            const vp_unsigned = await this.hsSDK.vp.getPresentation(
-              {verifiableCredentials: this.verifiableCredentials,
-              holderDid:  this.hypersign.did}
-            );
-            const verificationMethodId=this.hypersign.did + '#key-1';
-            const vp_signed = await this.hsSDK.vp.signPresentation(
-             { presentation: vp_unsigned,
-                holderDidDocSigned: this.hypersign.didDoc,
-                privateKey: this.hypersign.keys.privateKeyMultibase,
-                challenge,
-                verificationMethodId
-              }
-            );
+      try {
+        let { serviceEndpoint, challenge } = this.hypersign.requestingAppInfo;
 
-            const body = {
-              challenge,
-              vp: JSON.stringify(vp_signed),
-              holderDidDocSigned: JSON.stringify( this.hypersign.didDoc),
-            };
+        const url = Url(serviceEndpoint, true);
+        // TODO: need to remove this later. this is depreciated
+        if (!challenge) {
+          challenge = url.query.challenge;
+        }
+        this.loading = true;
+        const verifyUrl = url.origin + url.pathname;
+        const vp_unsigned = await this.hsSDK.vp.generate({
+          verifiableCredentials: this.verifiableCredentials,
+          holderDid: this.hypersign.did,
+        });
+        const verificationMethodId = `${this.hypersign.did}#key-1`;
+        console.log(vp_unsigned);
+        const vp_signed = await this.hsSDK.vp.sign({
+          presentation: vp_unsigned,
+          holderDidDocSigned: this.hypersign.didDoc,
+          privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
+          challenge,
+          domain: serviceEndpoint,
+          verificationMethodId,
+        });
 
-            const response = await axios.post(verifyUrl, body);
-            if(response.status === 200){
-              const isMobileWallet = JSON.parse(localStorage.getItem("isMobileWallet"));
-              if(!isMobileWallet){
-                return window.close();
-              }
-              await this.$store.dispatch('modals/open', {
-                name: 'default',
-                msg: 'Credential successfully verified. Go back to the application.',
-              });
-            } else {
-              throw new Error("Could not authorize the user. Reload the login page and try again")
-            }
-          
+        console.log(vp_signed);
+
+
+        const body = {
+          challenge,
+          vp: JSON.stringify(vp_signed),
+          holderDidDocSigned: JSON.stringify(this.hypersign.didDoc),
+        };
+
+        const response = await axios.post(verifyUrl, body);
+        if (response.status === 200) {
+          const isMobileWallet = JSON.parse(localStorage.getItem('isMobileWallet'));
+          if (!isMobileWallet) {
+            return window.close();
+          }
+          await this.$store.dispatch('modals/open', {
+            name: 'default',
+            msg: 'Credential successfully verified. Go back to the application.',
+          });
+        } else {
+          throw new Error('Could not authorize the user. Reload the login page and try again');
+        }
       } catch (e) {
         if (e.message) {
-          if(e.message.indexOf(401) >= 0 || e.message.indexOf(403) >= 0){
-            this.$store.dispatch('modals/open', { name: 'default', msg: "Could not authorize the user. Reload the login page and try again" })  
+          if (e.message.indexOf(401) >= 0 || e.message.indexOf(403) >= 0) {
+            this.$store.dispatch('modals/open', {
+              name: 'default',
+              msg: 'Could not authorize the user. Reload the login page and try again',
+            });
           } else {
-            this.$store.dispatch('modals/open', { name: 'default', msg: e.message })
+            this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
           }
         }
       } finally {
-        this.loading=false;
+        this.loading = false;
         this.reject();
       }
     },
-    async reject () {
+    async reject() {
       this.$store.commit('clearRequestingAppInfo');
       this.$router.push('/account');
-      localStorage.removeItem("qrDataQueryUrl");
-      localStorage.removeItem("3rdPartyAuthVC");
-      localStorage.removeItem("isRegisterFlow")
-    }
+      localStorage.removeItem('qrDataQueryUrl');
+      localStorage.removeItem('3rdPartyAuthVC');
+      localStorage.removeItem('isRegisterFlow');
+    },
   },
 };
 </script>
@@ -219,12 +248,12 @@ export default {
   padding-bottom: 5%;
 }
 
-.scan { 
+.scan {
   border-radius: 49px;
   text-align: center;
 }
 .scanner {
-  bottom:15px;
+  bottom: 15px;
   width: 50%;
   border-radius: 49px;
 }
@@ -251,9 +280,8 @@ export default {
 .list-title {
   color: $text-color;
   font-size: 12px;
-  text-transform:capitalize;
+  text-transform: capitalize;
 }
-
 
 .list-group {
   padding: 0 !important;

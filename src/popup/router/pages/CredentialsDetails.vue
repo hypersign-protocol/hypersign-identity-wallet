@@ -13,35 +13,34 @@
       </div> -->
       <ul class="list-group">
         <li class="list-group-item">
-          <div class="list-title">CREDENTIAL ID: </div>
+          <div class="list-title">CREDENTIAL ID:</div>
           <div>{{ verifiableCredential.id }}</div>
         </li>
         <li class="list-group-item">
-          <div class="list-title">CREDENTIAL TYPE: </div>
+          <div class="list-title">CREDENTIAL TYPE:</div>
           <div>{{ credDetials.formattedSchemaName }}</div>
         </li>
         <li class="list-group-item">
-          <div class="list-title">SCHEMA ID: </div>
+          <div class="list-title">SCHEMA ID:</div>
           <div>{{ credDetials.schemaId }}</div>
         </li>
         <li class="list-group-item">
-          <div class="list-title">ISSUER DID: </div>
-            <div>{{ verifiableCredential.issuer }}</div>
+          <div class="list-title">ISSUER DID:</div>
+          <div>{{ verifiableCredential.issuer }}</div>
         </li>
         <li class="list-group-item" style="height: 66px;">
           <div style="float:left; width: 50%">
-            <div class="list-title">ISSUANCE DATE: </div>
+            <div class="list-title">ISSUANCE DATE:</div>
             <div>{{ formattedDate(verifiableCredential.issuanceDate) }}</div>
           </div>
           <div style="float:right; width: 50%; text-align: right;">
-            <div class="list-title">EXPIRY DATE: </div>
+            <div class="list-title">EXPIRY DATE:</div>
             <div>{{ formattedDate(verifiableCredential.expirationDate) }}</div>
           </div>
         </li>
 
-
         <li class="list-group-item" v-for="claim in claims" :key="claim">
-          <div class="list-title">{{ toUpper(claim) }}: </div>
+          <div class="list-title">{{ toUpper(claim) }}:</div>
           <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
         </li>
       </ul>
@@ -49,29 +48,37 @@
     </div>
     <div>
       <Button v-if="share" v-on:click="shareCredential">Share</Button>
-        <Button  @click="deleteCredential">
-          <CloseIcon width="20" height="20" class="scan-icon"/><span class="scan-text">Delete</span>
-        </Button>
-      
-      <Loader v-if="loading" />
+      <Button @click="deleteCredential">
+        <img
+          src="../../../icons/badges/not-verified.svg"
+          width="20"
+          height="20"
+          class="scan-icon"
+        /><span class="scan-text">Delete</span>
+      </Button>
 
+      <Loader v-if="loading" />
     </div>
   </div>
 </template>
 <script>
-const HypersignSSISdk = require('hs-ssi-sdk');
+// const HypersignSSISdk = require('hs-ssi-sdk');
+import { HypersignSSISdk } from 'hs-ssi-sdk';
 
 import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import hidWalletInstance from '../../utils/hidWallet';
-import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE, SUPERHERO_HS_AUTH_BASE_URL, BUSINESSCARD_SCHEMA } from '../../utils/hsConstants'
 import Axios from 'axios';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
+import { toFormattedDate, toStringShorner } from '../../utils/helper';
+import hidWalletInstance from '../../utils/hidWallet';
+import {
+  HIDNODE_RPC,
+  HIDNODE_REST,
+  HIDNODE_NAMESPACE,
+  SUPERHERO_HS_AUTH_BASE_URL,
+  BUSINESSCARD_SCHEMA,
+} from '../../utils/hsConstants';
 
 export default {
-  components: { QrIcon, CloseIcon },
+  components: {},
   data() {
     return {
       share: false,
@@ -79,106 +86,107 @@ export default {
       claims: [],
       loading: false,
       credDetials: {
-        formattedIssuer: "",
-        formattedExpirationDate: "",
-        formattedIssuanceDate: "",
-        formattedSchemaName: "",
-        schemaId: ""
-      }
+        formattedIssuer: '',
+        formattedExpirationDate: '',
+        formattedIssuanceDate: '',
+        formattedSchemaName: '',
+        schemaId: '',
+      },
     };
   },
   created() {
-    const credentialId = this.$route.params.credentialId;
+    const { credentialId } = this.$route.params;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentials.find(x => x.id == credentialId);
-      if(this.verifiableCredential===undefined){
-        return this.$router.push('/account')
-         
+      if (this.verifiableCredential === undefined) {
+        return this.$router.push('/account');
       }
-      this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate);
-      this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate);
+      this.credDetials.formattedExpirationDate = toFormattedDate(
+        this.verifiableCredential.expirationDate,
+      );
+      this.credDetials.formattedIssuanceDate = toFormattedDate(
+        this.verifiableCredential.issuanceDate,
+      );
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; // toStringShorner(this.verifiableCredential.type[1], 26, 15);
       const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-      const credentialSchema = this.verifiableCredential.credentialSchema.id
+      const credentialSchema = this.verifiableCredential.credentialSchema.id;
       if (credentialSchema === BUSINESSCARD_SCHEMA) {
-        this.share = true
+        this.share = true;
       }
-      this.credDetials.schemaId = getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim();
+      this.credDetials.schemaId = this.verifiableCredential.credentialSchema.id.trim();
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
   },
   computed: {
     ...mapGetters(['hypersign']),
-    ...mapState(['mnemonic'])
-
+    ...mapState(['mnemonic']),
   },
   methods: {
-    formattedDate(date){
-      const d =  new Date(date)      
-      return d.toLocaleDateString() 
+    formattedDate(date) {
+      const d = new Date(date);
+      return d.toLocaleDateString();
     },
-     deleteCredential() {
+    deleteCredential() {
       // console.log("deleteCredential");
       try {
-        this.loading = true
-        this.$store.dispatch('removeHSVerifiableCredential', this.verifiableCredential)
-        this.$store.dispatch('modals/open', { name: 'default', msg: 'Credential deleted successfully' });
-        this.$router.push({ name: 'credential' })
-        this.loading = false
+        this.loading = true;
+        this.$store.dispatch('removeHSVerifiableCredential', this.verifiableCredential);
+        this.$store.dispatch('modals/open', {
+          name: 'default',
+          msg: 'Credential deleted successfully',
+        });
+        this.$router.push({ name: 'credential' });
+        this.loading = false;
       } catch (error) {
-        this.loading = false
-
+        this.loading = false;
       }
     },
     async shareCredential() {
       this.loading = true;
 
       await hidWalletInstance.generateWallet(this.mnemonic);
-      this.hsSDK = new HypersignSSISdk(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+      this.hsSDK = new HypersignSSISdk({
+        offlineSigner: hidWalletInstance.offlineSigner,
+        nodeRpcEndpoint: HIDNODE_RPC,
+        nodeRestEndpoint: HIDNODE_REST,
+        namespace: HIDNODE_NAMESPACE,
+      });
       await this.hsSDK.init();
 
-      const vp_unsigned = await this.hsSDK.vp.getPresentation(
-        {
-          verifiableCredentials: [this.verifiableCredential],
-          holderDid: this.hypersign.did
-        }
-      );
+      const vp_unsigned = await this.hsSDK.vp.getPresentation({
+        verifiableCredentials: [this.verifiableCredential],
+        holderDid: this.hypersign.did,
+      });
 
-      const verificationMethodId = this.hypersign.did + '#key-1';
-      const vp_signed = await this.hsSDK.vp.signPresentation(
-        {
-          presentation: vp_unsigned,
-          holderDidDocSigned: this.hypersign.didDoc,
-          privateKey: this.hypersign.keys.privateKeyMultibase,
-          challenge: "123",
-          verificationMethodId
-        }
-      );
+      const verificationMethodId = `${this.hypersign.did}#key-1`;
+      const vp_signed = await this.hsSDK.vp.signPresentation({
+        presentation: vp_unsigned,
+        holderDidDocSigned: this.hypersign.didDoc,
+        privateKey: this.hypersign.keys.privateKeyMultibase,
+        challenge: '123',
+        verificationMethodId,
+      });
 
       const result = await Axios({
         method: 'post',
-        url: SUPERHERO_HS_AUTH_BASE_URL + 'share',
+        url: `${SUPERHERO_HS_AUTH_BASE_URL}share`,
         data: {
-          vp: vp_signed
-        }
+          vp: vp_signed,
+        },
       });
 
       // console.log(result.data.record);
       const id = result.data.record._id;
       this.loading = false;
       return this.$router.push({ name: 'sharedCredential', params: { vp: id } });
-
-    }
-    ,
+    },
     toUpper(t) {
-      if (t)
-        return t.toString().toUpperCase();
-      else
-        return t;
+      if (t) return t.toString().toUpperCase();
+      return t;
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -211,7 +219,6 @@ export default {
   border-radius: 5px;
   overflow-x: hidden;
   max-height: 700px;
-
 }
 
 .cred-card {
@@ -297,7 +304,7 @@ export default {
     color: $text-color;
   }
 
-  p>svg {
+  p > svg {
     margin-right: 10px;
   }
 

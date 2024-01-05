@@ -1,7 +1,7 @@
 <template>
   <ul class="sidebar-menu" @click="menuClickHandler" data-cy="sidebar-menu">
     <li class="menu-close">
-      <Close @click="closeMenu" data-cy="close-menu" />
+      <img src="../../../icons/close.svg" @click="closeMenu" data-cy="close-menu" />
     </li>
     <li class="account-icon-holder">
       <div class="flex flex-align-center flex-justify-between">
@@ -30,15 +30,15 @@
       </router-link>
     </li>
     <li>
-            <router-link to="/backupWallet" data-cy="backupWallet">
-              {{ $t('pages.appVUE.backup') }}
-            </router-link>
-          </li>
-          <li>
-            <span data-cy="remove-account" @click="removeAccount">
-              {{ $t('pages.appVUE.removeAccount') }}
-            </span>
-          </li>
+      <router-link to="/backupWallet" data-cy="backupWallet">
+        {{ $t('pages.appVUE.backup') }}
+      </router-link>
+    </li>
+    <li>
+      <span data-cy="remove-account" @click="removeAccount">
+        {{ $t('pages.appVUE.removeAccount') }}
+      </span>
+    </li>
     <!-- <li>
       <router-link to="/send" data-cy="send">
         {{ $t('pages.appVUE.withdraw') }}
@@ -49,7 +49,7 @@
         {{ $t('pages.appVUE.activity') }}
       </router-link>
     </li> -->
-    
+
     <!-- <li>
       <router-link to="/names" data-cy="names">
         {{ $t('pages.appVUE.names') }}
@@ -70,14 +70,12 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import Close from '../../../icons/close.svg?vue-component';
-import Arrow from '../../../icons/arrow-current-color.svg?vue-component';
 import UserAvatar from './UserAvatar';
 import removeAccountMixin from '../../../mixins/removeAccount';
 
 export default {
   mixins: [removeAccountMixin],
-  components: { Close, Arrow, UserAvatar },
+  components: { UserAvatar },
   computed: mapGetters(['account', 'activeAccountName']),
   data: () => ({ showSettingsDropdown: false, showTokensDropdown: false, balances: null }),
   watch: {

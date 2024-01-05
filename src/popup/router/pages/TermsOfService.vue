@@ -27,8 +27,8 @@
       by using it, we consider these actions implicit agreement to the <b>TERMS OF USE</b>. These
       <b>TERMS OF USE</b> represent a binding agreement between you, the legal entity you represent
       and the legal entity that registered you (collectively „<b>YOU</b>“) and
-      <b>Hypersign.id (“Hypersign”, “we”, “us”</b> or <b>“our”)</b> in connection to your use
-      of the <b>Hypersign Wallet application.</b>.
+      <b>Hypersign.id (“Hypersign”, “we”, “us”</b> or <b>“our”)</b> in connection to your use of the
+      <b>Hypersign Wallet application.</b>.
     </p>
     <p>
       Please, do not use the application provided by <b>Hypersign</b>, if you do not agree to the
@@ -43,9 +43,7 @@
       <b>TERMS</b>, <b>YOU</b> are agreeing to be bound by the modifications. If you don’t agree to
       be bound by the modified <b>TERMS</b>, then you should discontinue any use of the
       <b>Wallet</b>. Please contact <b>Hypersign</b> via an email to
-      <a @click="openUrl('mailto:connect@hypermine.in', true)"
-        >connect@hypermine.in</a
-      >
+      <a @click="openUrl('mailto:connect@hypermine.in', true)">connect@hypermine.in</a>
       for the provision of information about the steps for termination of your use. Please check the
       Effective Date above to determine if there have been any changes since <b>YOU</b> have last
       reviewed these <b>TERMS</b>.
@@ -61,8 +59,18 @@
         @click="toggleAccordionItem(index)"
         data-cy="accordion-item"
       >
-        <ArrowDown class="icon" v-if="item.open" data-cy="accordion-item-open" />
-        <ArrowRight class="icon" v-else data-cy="accordion-item-close" />
+        <img
+          src="../../../icons/arrow-down.svg"
+          class="icon"
+          v-if="item.open"
+          data-cy="accordion-item-open"
+        />
+        <img
+          src="../../../icons/arrow-right.svg"
+          class="icon"
+          v-else
+          data-cy="accordion-item-close"
+        />
         <span>{{ item.title }}</span>
       </p>
       <div
@@ -79,9 +87,9 @@
             &ldquo;us&rdquo;, &ldquo;our&rdquo; </strong
           >or<strong> &ldquo;the company&rdquo;</strong>) is a company with seat and registered
           address at: Dr. Grass Str. 12, 9490 Vaduz, Liechtenstein, with email address for
-          communication related to the <strong>Hypersign Wallet</strong>:
-          connect@hypermine.in. <strong>Hypersign</strong> is the company, which created
-          and developed <strong>Hypersign Wallet</strong>.
+          communication related to the <strong>Hypersign Wallet</strong>: connect@hypermine.in.
+          <strong>Hypersign</strong> is the company, which created and developed
+          <strong>Hypersign Wallet</strong>.
         </p>
         <p>
           1.2. &ldquo;<strong>USER</strong>&ldquo; or &ldquo;<strong>YOU</strong>&ldquo; means a
@@ -754,8 +762,8 @@
           <strong>USERS</strong> should be careful when they download and use the original
           <strong>application</strong>. <strong>USERS</strong> can identity the authentic
           <strong>Wallet</strong> by verifying that the developer on the marketplace is
-          <strong>Hypersign.id / Hypersign.id</strong> and can use the hyperlinks for
-          downloading, incorporated in the present Terms. Due to the fact
+          <strong>Hypersign.id / Hypersign.id</strong> and can use the hyperlinks for downloading,
+          incorporated in the present Terms. Due to the fact
           <strong>&AElig;ternity blockchain</strong> is public and permissionless, any person has
           the possibility to create a &ldquo;<strong>fork</strong>&rdquo;. Any developer can copy
           and develop the source code resulting in the formation of a distinct and separate
@@ -941,15 +949,10 @@
 </template>
 
 <script>
-import ArrowDown from '../../../icons/arrow-down.svg?vue-component';
-import ArrowRight from '../../../icons/arrow-right.svg?vue-component';
 import openUrl from '../../utils/openUrl';
 
 export default {
-  components: {
-    ArrowDown,
-    ArrowRight,
-  },
+  components: {},
   data() {
     return {
       details: [
@@ -1015,7 +1018,6 @@ export default {
 .terms {
   font-weight: 100;
   color: $text-color !important;
-
 }
 .terms--heading {
   margin: 20px;

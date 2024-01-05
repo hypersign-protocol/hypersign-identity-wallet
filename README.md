@@ -5,19 +5,17 @@
 
 Tested on version
 ```
-Node version: v14.0.7
+Node version: v18.17.0
 NPM version : v16.14.13
 ```
 
 ### Build locally
 
 ```
-$ npm install
-$ npm run build
-$ npm run build:Testnet # build for Testnet
-$ npm run build:Mainnet # build for Mainnet
-$ npm run gen:cordova-resources
-$ npx cordova build/run android/ios # to build Cordova application
+$ yarn
+$ yarn build
+$ yarn build:Testnet # build for Testnet
+$ yarn build:Mainnet # build for Mainnet
 ```
 
 ### Develop locally

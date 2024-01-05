@@ -6,7 +6,7 @@
       @click="filtrateTx('date', date_type)"
     >
       <span>{{ $t('pages.transactionDetails.date') }}</span>
-      <FilterArrow :class="direction" />
+      <img src="../../../icons/filter-arrow.svg" :class="direction" />
     </span>
     <span
       v-for="filter in filters"
@@ -19,12 +19,8 @@
 </template>
 
 <script>
-import FilterArrow from '../../../icons/filter-arrow.svg?vue-component';
-
 export default {
-  components: {
-    FilterArrow,
-  },
+  components: {},
   data() {
     return {
       filters: ['sent', 'received', 'withdrawals', 'topups', 'all'],

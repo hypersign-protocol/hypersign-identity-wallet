@@ -179,9 +179,9 @@ main {
 }
 
 .date {
-    margin-left: rem(-48px);
-    margin-right: rem(-48px);
-    padding-left: rem(48px);
+    margin-left: rem(-48px, 16px);
+    margin-right: rem(-48px,  16px);
+    padding-left: rem(48px,  16px);
 }
 
 .input {

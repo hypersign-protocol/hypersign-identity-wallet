@@ -7,14 +7,18 @@
             <span>{{ credDetials.formattedSchemaName }}</span>
           </div>
           <div class="cred-card-body">
-            <span class="cred-card-body-detail">SCHEMA ID: {{ credDetials.schemaId }}</span><br />
-            <span class="cred-card-body-detail">ISSUER ID: {{ credDetials.formattedIssuer }}</span><br />
-            <span class="cred-card-body-detail">ISSUED ON: {{ credDetials.formattedIssuanceDate }}</span><br />
+            <span class="cred-card-body-detail">SCHEMA ID: {{ credDetials.schemaId }}</span
+            ><br />
+            <span class="cred-card-body-detail">ISSUER ID: {{ credDetials.formattedIssuer }}</span
+            ><br />
+            <span class="cred-card-body-detail"
+              >ISSUED ON: {{ credDetials.formattedIssuanceDate }}</span
+            ><br />
           </div>
         </div>
         <ul class="list-group credential-item">
           <li class="list-group-item" v-for="claim in claims" :key="claim">
-            <div class="list-title">{{ toUpper(claim) }}: </div>
+            <div class="list-title">{{ toUpper(claim) }}:</div>
             <div>{{ verifiableCredential.credentialSubject[claim] }}</div>
           </li>
         </ul>
@@ -22,16 +26,22 @@
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="acceptCredential">
-          <VerifiedIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.accept')
-          }}</span>
+          <img
+            src="../../../icons/badges/verified-big.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.accept') }}</span>
         </Button>
       </div>
       <div class="scanner d-flex">
         <Button class="scan" data-cy="scan-button" @click="rejectCredential">
-          <CloseIcon width="20" height="20" class="scan-icon" /><span class="scan-text">{{
-            $t('pages.credential.reject')
-          }}</span>
+          <img
+            src="../../../icons/badges/not-verified.svg"
+            width="20"
+            height="20"
+            class="scan-icon"
+          /><span class="scan-text">{{ $t('pages.credential.reject') }}</span>
         </Button>
       </div>
     </div>
@@ -43,18 +53,19 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import VerifiedIcon from '../../../icons/badges/verified.svg?vue-component';
-import CloseIcon from '../../../icons/badges/not-verified.svg?vue-component';
-import { toFormattedDate, toStringShorner } from '../../utils/helper'
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import edvService from '../../utils/edvService';
-import { HS_VC_STATUS_PATH, HS_VC_STATUS_CHECK_ATTEMPT, HS_VC_STATUS_CHECK_INTERVAL } from '../../utils/hsConstants';
 import Axios from 'axios';
+
+import { toFormattedDate, toStringShorner } from '../../utils/helper';
+import {
+  HS_VC_STATUS_PATH,
+  HS_VC_STATUS_CHECK_ATTEMPT,
+  HS_VC_STATUS_CHECK_INTERVAL,
+} from '../../utils/hsConstants';
 import syncMixin from '../../../mixins/syncMixin';
 import initiateWorker from '../../utils/registerWorker';
+
 export default {
-  components: { QrIcon, CloseIcon, VerifiedIcon },
+  components: {},
   data() {
     return {
       count: 0,
@@ -65,57 +76,59 @@ export default {
       accepted: false,
       isProviderPresent: false,
       credDetials: {
-        formattedIssuer: "",
-        formattedExpirationDate: "",
-        formattedIssuanceDate: "",
-        formattedSchemaName: "",
-        schemaId: ""
-      }
+        formattedIssuer: '',
+        formattedExpirationDate: '',
+        formattedIssuanceDate: '',
+        formattedSchemaName: '',
+        schemaId: '',
+      },
     };
   },
   beforeDestroy() {
-    if (!this.accepted) this.rejectCredential()
+    if (!this.accepted) this.rejectCredential();
   },
   created() {
-
-    this.count = HS_VC_STATUS_CHECK_ATTEMPT
-    this.iteration = 0
-    const credentialId = this.$route.params.credentialId;
+    this.count = HS_VC_STATUS_CHECK_ATTEMPT;
+    this.iteration = 0;
+    const { credentialId } = this.$route.params;
     if (credentialId) {
       this.verifiableCredential = this.hypersign.credentialsTemp.find(x => x.id == credentialId);
-      if (!this.verifiableCredential) this.rejectCredential()
-      this.credDetials.formattedExpirationDate = toFormattedDate(this.verifiableCredential.expirationDate);
-      this.credDetials.formattedIssuanceDate = toFormattedDate(this.verifiableCredential.issuanceDate);
+      if (!this.verifiableCredential) this.rejectCredential();
+      this.credDetials.formattedExpirationDate = toFormattedDate(
+        this.verifiableCredential.expirationDate,
+      );
+      this.credDetials.formattedIssuanceDate = toFormattedDate(
+        this.verifiableCredential.issuanceDate,
+      );
       this.credDetials.formattedIssuer = toStringShorner(this.verifiableCredential.issuer, 32, 15);
-      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; //toStringShorner(this.verifiableCredential.type[1], 26, 15);
-      const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
-      this.credDetials.schemaId = toStringShorner(getSchemaIdFromSchemaUrl(credentialSchemaUrl).trim(), 32, 15);
+      this.credDetials.formattedSchemaName = this.verifiableCredential.type[1]; // toStringShorner(this.verifiableCredential.type[1], 26, 15);
+      // const credentialSchemaUrl = this.verifiableCredential['@context'][1].hs;
+      this.credDetials.schemaId = toStringShorner(
+        this.verifiableCredential.credentialSchema.id.trim(),
+        32,
+        15,
+      );
       this.claims = Object.keys(this.verifiableCredential.credentialSubject);
     }
 
-    const isRegisterFlow = localStorage.getItem("isRegisterFlow")
+    const isRegisterFlow = localStorage.getItem('isRegisterFlow');
     if (isRegisterFlow) {
       this.isProviderPresent = true;
       this.acceptCredential();
     }
   },
-  mixins:[syncMixin],
+  mixins: [syncMixin],
   computed: {
-    ...mapGetters(['hypersign','password']),
-
-
+    ...mapGetters(['hypersign', 'password']),
   },
   methods: {
     toUpper(t) {
-      if (t)
-        return t.toString().toUpperCase();
-      else
-        return t;
+      if (t) return t.toString().toUpperCase();
+      return t;
     },
     async delay(delayInms) {
       return new Promise(resolve => setTimeout(resolve, delayInms));
-    }
-    ,
+    },
     async checkStatus(verifiableCredential) {
       if (this.iteration > this.count) {
         this.loading = false;
@@ -123,62 +136,62 @@ export default {
         return;
       }
       this.iteration += 1;
-      let res
+      let res;
       try {
         res = await Axios.get(`${HS_VC_STATUS_PATH}/${verifiableCredential.id}`);
-
-
       } catch (error) {
         if (error.response.data.error !== null) {
-          this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.error })
+          this.$store.dispatch('modals/open', { name: 'default', msg: error.response.data.error });
           this.$router.push('/account');
           return;
         }
         await this.delay(HS_VC_STATUS_CHECK_INTERVAL);
-        return await this.checkStatus(verifiableCredential);
-
+        await this.checkStatus(verifiableCredential);
       }
-      if (res.data.vc.credStatus.claim.currentStatus == "Live") {
-
+      console.log(JSON.stringify(res.data.vc, null, 2));
+      if (
+        !res.data.vc.credentialStatus.credentialStatusDocument.revoked &&
+        !res.data.vc.credentialStatus.credentialStatusDocument.suspended
+      ) {
         this.accepted = true;
-
+        return res.data.vc;
       }
-      return res
-
     },
 
-
     async acceptCredential() {
-
-
       this.loading = true;
       try {
-
         this.credStatus = await this.checkStatus(this.verifiableCredential);
         console.log(this.credStatus);
-        if (this.credStatus == undefined) {
-          this.$store.dispatch('modals/open', { name: 'default', msg: "Credential Status not found." })
-          const vc = JSON.stringify(this.verifiableCredential)
-          localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
-          return
+        if (this.credStatus === undefined) {
+          this.$store.dispatch('modals/open', {
+            name: 'default',
+            msg: 'Credential Status not found.',
+          });
+          const vc = JSON.stringify(this.verifiableCredential);
+          localStorage.setItem('3rdPartyAuthVCUnregistred', vc);
+          return;
         }
         this.loading = false;
       } catch (error) {
+        console.log(error);
         this.loading = false;
-        this.$store.dispatch('modals/open', { name: 'default', msg: "Credential Status not found." })
-        const vc = localStorage.getItem("3rdPartyAuthVC")
-        localStorage.setItem("3rdPartyAuthVCUnregistred", vc)
-        return this.$router.push("/account");
+        this.$store.dispatch('modals/open', {
+          name: 'default',
+          msg: 'Credential Status not found.',
+        });
+        const vc = localStorage.getItem('3rdPartyAuthVC');
+        localStorage.setItem('3rdPartyAuthVCUnregistred', vc);
+        return this.$router.push('/account');
       }
       this.$store.dispatch('addHSVerifiableCredential', this.verifiableCredential);
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       this.accepted = true;
 
-
-      // here 
-      /// decide if the 3rd party auth is enabled or not
-      /// if no, then go to /credential page
-      /// if yes, the go to /account page
+      // here
+      // / decide if the 3rd party auth is enabled or not
+      // / if no, then go to /credential page
+      // / if yes, the go to /account page
       // if(!localStorage.getItem("3rdPartyAuthVC")){
       //   this.$router.push('/credential');
       // }else{
@@ -186,53 +199,46 @@ export default {
       //   this.$router.push(this.$store.state.loginTargetLocation);
       // }
       this.rejectCredential();
-
-
     },
     async rejectCredential() {
       this.$store.commit('clearHSVerifiableCredentialTemp', []);
       // console.log('rejectCredential:: Moving to account page')
 
-      const url = localStorage.getItem("qrDataQueryUrl");
-      localStorage.removeItem("qrDataQueryUrl");
-      localStorage.removeItem("3rdPartyAuthVC");
+      const url = localStorage.getItem('qrDataQueryUrl');
+      localStorage.removeItem('qrDataQueryUrl');
+      localStorage.removeItem('3rdPartyAuthVC');
 
       if (url) {
-        // console.log('rejectCredential:: url found');        
+        // console.log('rejectCredential:: url found');
         // this.$router.push('/account?url=' + url);
-        if(this.password){
-          const worker=initiateWorker()
-          syncMixin.methods.syncSW(worker,this.$store);
-          this.$router.push('/account?url=' + url);
-
-        }else{
-        this.$router.push('/askpinbackup?url='+url)
+        if (this.password) {
+          const worker = initiateWorker();
+          syncMixin.methods.syncSW(worker, this.$store);
+          this.$router.push(`/account?url=${url}`);
+        } else {
+          this.$router.push(`/askpinbackup?url=${url}`);
         }
         // if(isFromThridParty){
         //   console.log('rejectCredential:: isFromThridParty found')
         //   this.$router.push('/account?url=' + url);
-        // }else{          
+        // }else{
         //   console.log('rejectCredential:: isFromThridParty not found')
         //   this.$router.push("/account");
         // }
       } else {
         // console.log('rejectCredential:: url not found')
-        this.$router.push("/account");
+        this.$router.push('/account');
 
-        if(this.password){
-          const worker=initiateWorker()
-          syncMixin.methods.syncSW(worker,this.$store);
-        }else{
-          this.$router.push('/askpinbackup')
-
+        if (this.password) {
+          const worker = initiateWorker();
+          syncMixin.methods.syncSW(worker, this.$store);
+        } else {
+          this.$router.push('/askpinbackup');
         }
-
       }
 
       //  backup wallet here
-
-
-    }
+    },
   },
 };
 </script>
@@ -344,7 +350,7 @@ export default {
     color: $text-color;
   }
 
-  p>svg {
+  p > svg {
     margin-right: 10px;
   }
 

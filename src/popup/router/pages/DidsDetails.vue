@@ -6,15 +6,20 @@
           <span>{{ status }}</span>
         </div>
         <div class="cred-card-body">
-          <span class="cred-card-body-detail">DID : {{ did }}</span><br />
-
+          <span class="cred-card-body-detail">DID : {{ did }}</span
+          ><br />
         </div>
       </div>
       <div>
         <Button @click="selectDid" data-cy="selectDid" inline dark v-if="hypersign.did !== did">
           Confirm
         </Button>
-        <Button @click="register" data-cy="register-on-chain" v-if="status === 'Unregistred'" inline>
+        <Button
+          @click="register"
+          data-cy="register-on-chain"
+          v-if="status === 'Unregistred'"
+          inline
+        >
           Register
         </Button>
       </div>
@@ -24,47 +29,43 @@
 </template>
 <script>
 import { mapGetters, mapState } from 'vuex';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
-import { toFormattedDate, toStringShorner } from '../../utils/helper';
-import { getSchemaIdFromSchemaUrl } from '../../utils/hypersign';
-import { HYPERSIGN_AUTH_PROVIDER, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants'
+import { HypersignSSISdk as HypersignSsiSDK } from 'hs-ssi-sdk';
+import { HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE } from '../../utils/hsConstants';
 import hidWalletInstance from '../../utils/hidWallet';
 
-// import HypersignSsiSDK  from 'hs-ssi-sdk'
-const HypersignSsiSDK = require('hs-ssi-sdk');
+// const HypersignSsiSDK = require('hs-ssi-sdk');
 export default {
-  components: { QrIcon },
+  components: {},
   data() {
     return {
-
       did: '',
       didDoc: {},
       status: '',
       key: {},
       hdPathIndex: 0,
       loading: false,
-
     };
   },
   async created() {
-
     try {
       this.loading = true;
 
       const DidId = this.$route.params.did;
       if (DidId) {
-
         this.did = Object.keys(this.hypersign.dids).find(x => x == DidId);
         this.didDoc = this.hypersign.dids[this.did].didDoc;
         this.key = this.hypersign.dids[this.did].keys;
         this.hdPathIndex = this.hypersign.dids[this.did].hdPathIndex;
-        this.status = this.toUpper(this.hypersign.dids[this.did].status) === 'PRIVATE' ? 'Unregistred' : 'Registred';
+        this.status =
+          this.toUpper(this.hypersign.dids[this.did].status) === 'PRIVATE'
+            ? 'Unregistred'
+            : 'Registred';
         if (this.toUpper(this.hypersign.dids[this.did].status) === 'PRIVATE') {
           try {
-            await this.resolveDid()
-
+            await this.resolveDid();
           } catch (e) {
-            if (e.response.data.code == 3) {
+            console.log(e);
+            if (e.response.data.code === 3) {
               console.log(e.response.data.message);
             }
           }
@@ -75,9 +76,7 @@ export default {
       if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
 
       this.loading = false;
-
     }
-
   },
   computed: {
     ...mapGetters(['hypersign']),
@@ -86,42 +85,48 @@ export default {
   methods: {
     async resolveDid(did_id) {
       await hidWalletInstance.generateWallet(this.mnemonic);
-      const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+      const hsSdk = new HypersignSsiSDK({
+        offlineSigner: hidWalletInstance.offlineSigner,
+        nodeRestEndpoint: HIDNODE_REST,
+        nodeRpcEndpoint: HIDNODE_RPC,
+        namespace: HIDNODE_NAMESPACE,
+      });
       await hsSdk.init();
-      const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({ did: did_id ? did_id : this.did });
+      const { didDocument, didDocumentMetadata } = await hsSdk.did.resolve({
+        did: did_id || this.did,
+      });
       if (didDocumentMetadata === null) {
-        this.status = 'Unregistred'
+        this.status = 'Unregistred';
       } else {
-        this.status = 'Registred'
+        this.status = 'Registred';
       }
-    }
-    ,
+    },
     async selectDid() {
       try {
-        await this.resolveDid(this.didDoc.id)
+        await this.resolveDid(this.didDoc.id);
         this.$store.dispatch('setHSkeys', {
           keys: this.key,
           did: this.didDoc.id,
           didDoc: this.didDoc,
           status: this.status === 'Registred' ? 'public' : 'private',
           hdPathIndex: this.hdPathIndex, // TODO remove hardcoded path index
-          selected: true
+          selected: true,
         });
         this.$store.dispatch('modals/open', { name: 'default', msg: 'DID selected successfully' });
-
       } catch (e) {
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
-
       }
-
     },
     async register() {
       try {
         await hidWalletInstance.generateWallet(this.mnemonic);
-        const balance = await hidWalletInstance.getBalance()
+        const balance = await hidWalletInstance.getBalance();
         console.log(balance);
         if (balance < 49999) {
-          this.$store.dispatch('modals/open', { name: 'default', msg: 'Insufficient balance. Buy HID and try again' });
+          this.$store.dispatch('modals/open', {
+            name: 'default',
+            msg: 'Insufficient balance. Buy HID and try again',
+          });
           this.loading = false;
           return;
         }
@@ -130,41 +135,44 @@ export default {
             name: 'confirm',
             title: this.$t('modals.registerDid.title'),
             msg: this.$t('modals.registerDid.msg'),
-          }).catch(() => false);
+          })
+          .catch(() => false);
         if (register) {
           this.$emit('closeMenu');
           this.loading = true;
-          const hsSdk = new HypersignSsiSDK(hidWalletInstance.offlineSigner, HIDNODE_RPC, HIDNODE_REST, HIDNODE_NAMESPACE);
+          const hsSdk = new HypersignSsiSDK({
+            offlineSigner: hidWalletInstance.offlineSigner,
+            nodeRestEndpoint: HIDNODE_REST,
+            nodeRpcEndpoint: HIDNODE_RPC,
+            namespace: HIDNODE_NAMESPACE,
+          });
           await hsSdk.init();
-          const verificationMethodId = this.didDoc.id + '#key-1';
-          const publicKeyMultibase = this.didDoc.id.split(':').at(-1)
-          this.didDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultibase
+          const verificationMethodId = `${this.didDoc.id}#key-1`;
+          const publicKeyMultibase = this.didDoc.id.split(':').at(-1);
+          this.didDoc.verificationMethod[0].publicKeyMultibase = publicKeyMultibase;
           const tx = await hsSdk.did.register({
-            didDocument: this.didDoc, privateKeyMultibase: this.key.privateKeyMultibase,
-            verificationMethodId
+            didDocument: this.didDoc,
+            privateKeyMultibase: this.key.privateKeyMultibase,
+            verificationMethodId,
           });
 
-          this.status = 'Registred'
-          this.selectDid()
+          this.status = 'Registred';
+          this.selectDid();
         }
 
         this.loading = false;
-      }
-      catch (e) {
+      } catch (e) {
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
         this.loading = false;
-
       }
     },
 
     toUpper(t) {
-      if (t)
-        return t.toString().toUpperCase();
-      else
-        return t;
+      if (t) return t.toString().toUpperCase();
+      return t;
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -197,7 +205,6 @@ export default {
   border-radius: 5px;
   overflow-x: hidden;
   max-height: 700px;
-
 }
 
 .cred-card {
@@ -283,7 +290,7 @@ export default {
     color: $text-color;
   }
 
-  p>svg {
+  p > svg {
     margin-right: 10px;
   }
 
