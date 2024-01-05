@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wallet-prajna
-          image: pratapmridha/wallet:2
+          image: pratapmridha/wallet:__LATEST_RELEASE_TAG__
           resources:
             limits:
               memory: "256Mi"
