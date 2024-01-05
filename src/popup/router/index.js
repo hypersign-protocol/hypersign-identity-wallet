@@ -12,7 +12,7 @@ import AmountInput from './components/AmountInput';
 import AddressInput from './components/AddressInput';
 import Button from './components/Button';
 import ModalComponent from './components/Modal';
-import '../utils/registerWorker'
+import '../utils/registerWorker';
 
 import * as helper from '../utils/helper';
 import store from '../../store';
@@ -62,7 +62,7 @@ router.beforeEach(async (to, from, next) => {
 
     // console.log(to.path)
     // console.log(to.query.url)
-    if(to.path.indexOf("deeplink") > 0){
+    if (to.path.indexOf("deeplink") > 0) {
       // console.log("BeforeEach:: Path is deeplink and url query exists");
       // console.log("BeforeEach:: Setting qrDataQueryUrl")
       localStorage.setItem("qrDataQueryUrl", to.query.url);

@@ -9,7 +9,12 @@
           <Input placeholder="Enter your password" label="" type="password" v-model="password" />
         </div>
         <div class="margin-20">
-          <Input placeholder="Re-enter your password" label="" type="password" v-model="repassword" />
+          <Input
+            placeholder="Re-enter your password"
+            label=""
+            type="password"
+            v-model="repassword"
+          />
         </div>
 
         <!-- <div class="margin-20">
@@ -46,25 +51,20 @@
 </template>
 
 <script>
-import ListItem from '../components/ListItem';
-import CheckBox from '../components/CheckBox';
-const { encrypt } = require('../../../lib/symmericCrypto');
 import { mapGetters, mapState } from 'vuex';
 import Input from '../components/Input';
-import saveFile from '../../utils/saveFile';
-import edvService from '../../utils/edvService';
+import EdvService from '../../utils/edvService';
 
+const { encrypt } = require('../../../lib/symmericCrypto');
 
 export default {
   components: {
-    ListItem,
-    CheckBox,
     Input,
   },
   data() {
     return {
       loading: false,
-      queryURL:undefined,
+      queryURL: undefined,
       activeBackup: 'cloud',
       modal: {
         visible: false,
@@ -90,7 +90,6 @@ export default {
         show: false,
         content: '',
       },
-      loading: false,
       type: '',
     };
   },
@@ -99,11 +98,9 @@ export default {
     ...mapGetters(['hypersign']),
   },
 
-
-  mounted(){
-    this.$store.commit('setDontGoBack',true)
-    this.queryURL=this.$route.query.url
-
+  mounted() {
+    this.$store.commit('setDontGoBack', true);
+    this.queryURL = this.$route.query.url;
   },
   methods: {
     selectBackupType(backupType) {
@@ -116,21 +113,22 @@ export default {
     async backup() {
       try {
         // Check the password
-      
-        if(!this.password) throw new Error('Please enter a password.');
+
+        if (!this.password) throw new Error('Please enter a password.');
         if (this.password === '') throw new Error('Please enter a password.');
 
-        if (this.password != this.repassword) throw new Error('Password mismatch');
+        if (this.password !== this.repassword) throw new Error('Password mismatch');
 
         if (this.activeBackup === '') throw new Error('Please choose a backup type.');
 
         // Give notificaiton and ask for confirmation
+
         const confirmed = await this.$store
           .dispatch('modals/open', {
             name: 'confirm',
             title: 'Backup Confirmation',
             msg:
-              this.activeBackup == 'cloud'
+              this.activeBackup === 'cloud'
                 ? this.$t('pages.backup-wallet.select-option-2-msg')
                 : this.$t('pages.backup-wallet.select-option-1-msg'),
           })
@@ -149,24 +147,22 @@ export default {
           if (walletDataJson == '') throw new Error('Invalid data');
           // console.log("Password", this.password);
           const encryptedMessage = await encrypt(walletDataJson, this.password);
-          
+
           // const fileName = 'hypersign-identity-wallet-backup.txt';
 
           // cloud
-          if (this.activeBackup == 'cloud') {
-
-            const edvServiceInstance = new edvService();
-            const documentId = 'randomId'
+          if (this.activeBackup === 'cloud') {
+            const edvServiceInstance = new EdvService();
+            const documentId = 'randomId';
             const userData = {
               userId: this.hypersign.profile.email,
               sequenceNo: 0,
               docId: documentId,
-            }
+            };
             const data = {
-              encryptedMessage
-            }
-            await edvServiceInstance.sync(userData, data)
-
+              encryptedMessage,
+            };
+            await edvServiceInstance.sync(userData, data);
 
             // sync with edv
 
@@ -175,27 +171,25 @@ export default {
             // send the file to server...
             // TODO Backup on cloud
           }
-          this.$store.commit('setPassword',this.password)
-          this.$store.commit('setDontGoBack',false)
+          this.$store.commit('setPassword', this.password);
+          this.$store.commit('setDontGoBack', false);
 
           // this.$store.dispatch('modals/open', { name: 'default', msg: 'Backup successful' });
-         if(this.queryURL){
-          this.$router.push('/account?url='+this.queryURL);
-         }else{
-          this.$router.push('/account')
-         }
+          if (this.queryURL) {
+            this.$router.push(`/account?url=${this.queryURL}`);
+          } else {
+            this.$router.push('/account');
+          }
           this.loading = false;
-
         }
         // save into a file
       } catch (e) {
-        this.$store.commit('setDontGoBack',false)
+        this.$store.commit('setDontGoBack', false);
 
         this.loading = false;
         if (e.message) this.$store.dispatch('modals/open', { name: 'default', msg: e.message });
       } finally {
-        this.$store.commit('setDontGoBack',false)
-
+        this.$store.commit('setDontGoBack', false);
       }
     },
   },

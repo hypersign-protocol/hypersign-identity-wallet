@@ -4,7 +4,7 @@
       <div v-show="step === 1">
         <img v-if="iframe" src="../../../icons/iframe/receive.svg" />
         <h2 v-else>
-          <Claim /> {{ $t('pages.intro.receive') }}
+          <img src="../../../icons/claim.svg" /> {{ $t('pages.intro.receive') }}
           <span class="ml-10 secondary-text"> {{ $t('pages.appVUE.aeid') }} </span>
         </h2>
         <div class="text-info">
@@ -17,7 +17,7 @@
       <div v-show="step === 2">
         <img v-if="iframe" src="../../../icons/iframe/send.svg" />
         <h2 v-else>
-          <Heart /> {{ $t('pages.send.send') }}
+          <img src="../../../icons/heart.svg" /> {{ $t('pages.send.send') }}
           <span class="ml-10 secondary-text">{{ $t('pages.appVUE.aeid') }}</span>
         </h2>
         <div class="text-info">
@@ -46,13 +46,25 @@
       </div>
 
       <div class="dotstyle dotstyle-fillup" v-show="step < 4" data-cy="onboarding-steps">
-        <LeftArrow @click="step = step - 1" class="left-arrow" v-show="step > 1" data-cy="prev" />
+        <img
+          src="../../../icons/left-arrow.svg"
+          @click="step = step - 1"
+          class="left-arrow"
+          v-show="step > 1"
+          data-cy="prev"
+        />
         <ul>
           <li @click="step = 1" :class="step === 1 ? 'current' : ''"><a></a></li>
           <li @click="step = 2" :class="step === 2 ? 'current' : ''"><a></a></li>
           <li @click="step = 3" :class="step === 3 ? 'current' : ''"><a></a></li>
         </ul>
-        <RightArrow @click="step = step + 1" class="right-arrow" v-show="step < 3" data-cy="next" />
+        <img
+          src="../../../icons/right-arrow.svg"
+          @click="step = step + 1"
+          class="right-arrow"
+          v-show="step < 3"
+          data-cy="next"
+        />
         <button class="skip-button" @click="step = 3" v-show="step < 3" data-cy="skip">
           {{ $t('pages.intro.skip') }}
         </button>
@@ -106,24 +118,16 @@
 </template>
 
 <script>
-import { generateMnemonic, mnemonicToSeed } from '@aeternity/bip39';
 import { IN_FRAME } from '../../utils/helper';
-import Claim from '../../../icons/claim.svg?vue-component';
-import Heart from '../../../icons/heart.svg?vue-component';
-import LeftArrow from '../../../icons/left-arrow.svg?vue-component';
-import RightArrow from '../../../icons/right-arrow.svg?vue-component';
+
 import Button from '../components/Button';
 import CheckBox from '../components/CheckBox';
 import Platforms from '../components/Platforms';
-import { hypersignSDK } from '../../utils/hypersign';
 
 export default {
   components: {
-    Claim,
-    Heart,
     Button,
-    LeftArrow,
-    RightArrow,
+
     CheckBox,
     Platforms,
   },
@@ -141,63 +145,6 @@ export default {
     // console.log("DEPLOYED");
   },
   methods: {
-    async createWallet() {
-      this.mnemonic = generateMnemonic();
-      const seed = mnemonicToSeed(this.mnemonic).toString('hex');
-      const address = await this.$store.dispatch('generateWallet', { seed });
-      this.$store.commit('setMnemonic', this.mnemonic);
-      const keypair = {
-        publicKey: address,
-        privateKey: seed,
-      };
-
-      ////HYPERSIGN Related
-      ////////////////////////////////////////////////
-      try {
-        this.loading = true;
-        // We will not use native aeternity keys, instead will use hypersign keys.
-        // The reason to do this, because giving flexibility to use different algorithm for keys
-        // const newKeyPair = await hypersignSDK.did.generateKeys({seed});
-        // const hskeys = {
-        //   publicKey: newKeyPair.publicKey.publicKeyBase58,
-        //   privateKey: newKeyPair.privateKeyBase58,
-        // };
-
-        // const HS_CORE_DID_REGISTER = `${HS_NODE_BASE_URL}${HS_NODE_DID_REGISTER_API}`;
-
-        const {didDoc, keys, did} = await hypersignSDK.did.getDid({user: { name: "vishwas"}});
-        const res = await hypersignSDK.did.register(didDoc);
-        this.$store.dispatch('setHSkeys', {
-              keys,
-              did,
-            });
-        this.loading = false;
-
-        //console.log(HS_CORE_DID_REGISTER);
-        // await axios
-        //   .get(`${HS_CORE_DID_REGISTER}?publicKey=${hskeys.publicKey}`)
-        //   .then(result => {
-        //     result = result.data;
-        //     if (!result) throw new Error('Could not fetch from hypersign');
-        //     if (result && result.error) throw new Error(result.error);
-        //     const { keys, did } = result.message;
-        //     keys['privateKeyBase58'] = hskeys.privateKey;
-        //     this.$store.dispatch('setHSkeys', {
-        //       keys,
-        //       did,
-        //     });
-        //     this.loading = false;
-        //   })
-        //   .catch(console.error);
-      } catch (e) {
-        this.loading = false;
-      }
-      ////HYPERSIGN Related
-      ////////////////////////////////////////////////
-
-      await this.$store.dispatch('setLogin', { keypair });
-      this.next();
-    },
     prev() {
       this.step -= 1;
     },

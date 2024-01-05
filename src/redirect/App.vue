@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="info">
-      <Logo class="logo" />
+      <img src="../icons/logo.svg" class="logo" />
       <div class="loader" v-if="!error"></div>
       <p v-if="!error">{{ $t('redirecting') }}</p>
       <p v-if="error">{{ error }}</p>
@@ -10,13 +10,9 @@
 </template>
 
 <script>
-import Logo from '../icons/logo.svg?vue-component';
-
 export default {
   name: 'App',
-  components: {
-    Logo,
-  },
+  components: {},
   data() {
     return {
       error: null,

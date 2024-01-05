@@ -1,4 +1,5 @@
 const path = require('path');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require('webpack');
 const ejs = require('ejs');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -10,10 +11,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 const commitHash = require('child_process')
   .execSync('git rev-parse HEAD')
-  .toString().trim();
-const sass = require('node-sass');
+  .toString()
+  .trim();
+const sass = require('sass');
+const loader = require('sass-loader');
+const { name } = require('file-loader');
+const { use } = require('chai');
 const genManifest = require('./src/manifest');
-
 
 const parseBool = val => (val ? JSON.parse(val) : false);
 const RUNNING_IN_TESTS = parseBool(process.env.RUNNING_IN_TESTS);
@@ -37,10 +41,10 @@ const getConfig = platform => {
         'popup/cameraPermission': './popup/cameraPermission.js',
         'redirect/redirect': './redirect/redirect.js',
       }),
-      ...(['cordova', 'web'].includes(platform) && { popup: './popup/popup.js' }),
+      ...(['web'].includes(platform) && { popup: './popup/popup.js' }),
       ...(platform === 'aepp' && { aepp: '../tests/aepp/aepp.js' }),
     },
-    node: { fs: 'empty', net: 'empty', tls: 'empty' },
+    node: { global: true, __dirname: false, __filename: false },
     output: {
       filename: '[name].js',
       publicPath:
@@ -50,7 +54,6 @@ const getConfig = platform => {
         {
           'extension-chrome': 'dist/chrome',
           'extension-firefox': 'dist/firefox',
-          cordova: 'www',
           web: 'dist/web/root',
           aepp: 'dist/aepp',
         }[platform],
@@ -58,6 +61,15 @@ const getConfig = platform => {
     },
     resolve: {
       extensions: ['.js', '.vue'],
+      alias: {
+        stream: 'stream-browserify',
+      },
+      fallback: {
+        crypto: false, // Avoid overriding the 'fs' module,
+        path: false,
+        fs: false,
+        timers: false,
+      },
     },
     ...(platform === 'extension-firefox' && {
       optimization: {
@@ -77,57 +89,137 @@ const getConfig = platform => {
     }),
     module: {
       rules: [
+        // {
+        //   test: /\.(png|jpe?g|gif|ico)$/,
+        //   type: 'asset/resource',
+        //   generator: {
+        //     filename: 'assets/[name].[contenthash][ext]',
+        //   },
+        //   // use: [
+        //   //   {
+        //   //     loader: 'url-loader',
+        //   //     options: {
+        //   //       name: '[name].[contenthash].[ext]',
+        //   //       outputPath: 'assets/', // Specify the output directory for images
+        //   //     },
+        //   //   },
+        //   // ],
+        // },
         {
           test: /\.vue$/,
-          loaders: 'vue-loader',
+          use: ['vue-loader'],
         },
         {
           test: /\.js$/,
-          loader: 'babel-loader',
+          use: ['babel-loader'],
           exclude: /node_modules/,
         },
         {
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, { loader: 'css-loader', options: { minimize: true } }],
+          use: [MiniCssExtractPlugin.loader, 'css-loader'],
         },
+
         {
-          test: /\.scss$/,
+          test: /\.(scss|sass)$/,
           use: [
             MiniCssExtractPlugin.loader,
-            { loader: 'css-loader', options: { minimize: true } },
-            { loader: 'sass-loader', options: { minimize: true } },
+            'css-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                implementation: require('sass'), // Use 'sass' package
+              },
+            },
           ],
         },
-        {
-          test: /\.sass$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax'],
-        },
+
+        // {
+        //   test: /\.scss$/,
+        //   use: [
+        //     MiniCssExtractPlugin.loader,
+        //     'css-loader',
+        //     'sass-loader'
+        //   ],
+        // },
+        // {
+        //   test: /\.sass$/,
+        //   use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax'],
+        // },
+        // {
+        //   test: /\.svg$/,
+        //   resourceQuery: /vue-component/,
+        //   // type: 'asset/resource',
+        //   generator: {
+        //     filename: 'assets/[name].[contenthash][ext]',
+        //   },
+        //   use: ['vue-loader', 'vue-svg-loader'],
+        //   // use: [
+        //   //   {
+        //   //     loader: 'vue-svg-loader',
+        //   //     options: {
+        //   //       outputPath: 'assets/',
+        //   //       name: '[name].[contenthash].[ext]',
+        //   //     },
+        //   //   },
+        //   // ],
+        // },
         {
           test: /\.(png|jpg|gif|svg|ico)$/,
           oneOf: [
             {
-              test: /\.svg$/,
+              test: /\.svg$/i,
               resourceQuery: /vue-component/,
-              loader: 'vue-svg-loader',
+              use: [
+                'vue-loader',
+                'babel-loader',
+                {
+                  loader: 'vue-svg-loader',
+                  options: {
+                    // Your specific options for inlining SVGs
+                    // Example options:
+                    svg: {
+                      plugins: [
+                        { removeViewBox: false },
+                        { inlinestyles: { onlymatchedonce: false } },
+                        { removexmlns: true },
+                        { removedimensions: true },
+                      ],
+                    },
+                  },
+                },
+              ],
             },
             {
-              loader: 'url-loader',
-              options: {
-                name: '[name].[contenthash].[ext]',
-                esModule: false,
-                limit: 4096,
-                outputPath: 'assets/',
-              },
+              // type: 'asset',
+              use: [
+                {
+                  loader: 'url-loader',
+                  options: {
+                    name: '[name].[contenthash].[ext]',
+                    esModule: false,
+                    limit: 4096,
+                    outputPath: 'assets/',
+                  },
+                },
+              ],
+              // generator: {
+              //   filename: 'assets/[name].[contenthash][ext]',
+              // },
             },
           ],
         },
       ],
     },
+
     plugins: [
+      new NodePolyfillPlugin({
+        includeAliases: ['stream', 'process', 'Buffer'],
+      }),
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
       }),
       new VueLoaderPlugin(),
+
       new MiniCssExtractPlugin({
         filename: '[name].css',
         chunkFilename: '[id].css',
@@ -142,109 +234,102 @@ const getConfig = platform => {
           npm_package_version: JSON.stringify(process.env.npm_package_version),
           NETWORK: JSON.stringify(process.env.NETWORK),
           RUNNING_IN_TESTS,
-          COMMIT_HASH: JSON.stringify(commitHash)
+          COMMIT_HASH: JSON.stringify(commitHash),
         },
       }),
       ...(platform.startsWith('extension-')
         ? [
-            new CopyWebpackPlugin([
-              { from: 'popup/popup.html', to: `popup/popup.html`, transform: transformHtml },
-              {
-                from: 'options/options.html',
-                to: `options/options.html`,
-                transform: transformHtml,
-              },
-              {
-                from: 'phishing/phishing.html',
-                to: `phishing/phishing.html`,
-                transform: transformHtml,
-              },
-              {
-                from: 'popup/CameraRequestPermission.html',
-                to: `popup/CameraRequestPermission.html`,
-                transform: transformHtml,
-              },
-              {
-                from: 'redirect/redirect.html',
-                to: `redirect/index.html`,
-                transform: transformHtml,
-              },
-              { from: 'icons/icon_48.png', to: `icons/icon_48.png` },
-              { from: 'icons/icon_128.png', to: `icons/icon_128.png` },
-              { from: 'icons/request_permission.jpg', to: `icons/request_permission.jpg` },
-              {
-                from: path.join(__dirname, 'src/content-scripts/tipButton.scss'),
-                to: path.join(
-                  __dirname,
-                  {
-                    'extension-chrome': 'dist/chrome/other/tipButton.css',
-                    'extension-firefox': 'dist/firefox/other/tipButton.css',
-                  }[platform],
-                ),
-                transform: (_, f) => sass.renderSync({ file: f }).css.toString(),
-              },
-            ]),
-            new GenerateJsonPlugin(
-              'manifest.json',
-              genManifest(process.env.NODE_ENV === 'production', platform),
-              null,
-              2,
-            ),
-          ]
+          new CopyWebpackPlugin([
+            { from: 'popup/popup.html', to: `popup/popup.html`, transform: transformHtml },
+            {
+              from: 'options/options.html',
+              to: `options/options.html`,
+              transform: transformHtml,
+            },
+            {
+              from: 'phishing/phishing.html',
+              to: `phishing/phishing.html`,
+              transform: transformHtml,
+            },
+            {
+              from: 'popup/CameraRequestPermission.html',
+              to: `popup/CameraRequestPermission.html`,
+              transform: transformHtml,
+            },
+            {
+              from: 'redirect/redirect.html',
+              to: `redirect/index.html`,
+              transform: transformHtml,
+            },
+            { from: 'icons/icon_48.png', to: `icons/icon_48.png` },
+            { from: 'icons/icon_128.png', to: `icons/icon_128.png` },
+            { from: 'icons/request_permission.jpg', to: `icons/request_permission.jpg` },
+            {
+              from: path.join(__dirname, 'src/content-scripts/tipButton.scss'),
+              to: path.join(
+                __dirname,
+                {
+                  'extension-chrome': 'dist/chrome/other/tipButton.css',
+                  'extension-firefox': 'dist/firefox/other/tipButton.css',
+                }[platform],
+              ),
+              transform: (_, f) => sass.renderSync({ file: f }).css.toString(),
+            },
+          ]),
+          new GenerateJsonPlugin(
+            'manifest.json',
+            genManifest(process.env.NODE_ENV === 'production', platform),
+            null,
+            2,
+          ),
+        ]
         : []),
       ...(platform === 'extension-firefox'
         ? [
-            new HtmlWebpackPlugin({
-              template: path.join(__dirname, 'src', 'popup', 'popup-firefox.html'),
-              filename: 'popup/popup.html',
-              excludeChunks: [
-                'other/background',
-                'other/youtube',
-                'other/twitter',
-                'other/inject',
-                'options/options',
-                'phishing/phishing',
-                'popup/cameraPermission',
-              ],
-            }),
-            new HtmlWebpackPlugin({
-              template: path.join(__dirname, 'src', 'options', 'options.html'),
-              filename: 'options/options.html',
-              chunks: ['options/options'],
-            }),
-            new HtmlWebpackPlugin({
-              template: path.join(__dirname, 'src', 'phishing', 'phishing.html'),
-              filename: 'phishing/phishing.html',
-              chunks: ['phishing/phishing'],
-            }),
-          ]
+          new HtmlWebpackPlugin({
+            template: path.join(__dirname, 'src', 'popup', 'popup-firefox.html'),
+            filename: 'popup/popup.html',
+            excludeChunks: [
+              'other/background',
+              'other/youtube',
+              'other/twitter',
+              'other/inject',
+              'options/options',
+              'phishing/phishing',
+              'popup/cameraPermission',
+            ],
+          }),
+          new HtmlWebpackPlugin({
+            template: path.join(__dirname, 'src', 'options', 'options.html'),
+            filename: 'options/options.html',
+            chunks: ['options/options'],
+          }),
+          new HtmlWebpackPlugin({
+            template: path.join(__dirname, 'src', 'phishing', 'phishing.html'),
+            filename: 'phishing/phishing.html',
+            chunks: ['phishing/phishing'],
+          }),
+        ]
         : []),
       ...(platform === 'extension-chrome' &&
-      process.env.HMR === 'true' &&
-      !process.env.RUNNING_IN_TESTS
+        process.env.HMR === 'true' &&
+        !process.env.RUNNING_IN_TESTS
         ? [new ChromeExtensionReloader({ port: 9099 })]
-        : []),
-      ...(['cordova', 'web'].includes(platform)
-        ? [
-            new CopyWebpackPlugin([
-              { from: 'popup/popup.html', to: `index.html`, transform: transformHtml },
-            ]),
-          ]
         : []),
       ...(platform === 'web'
         ? [
-            new CopyWebpackPlugin([{ from: 'web', to: `../` }]),
-            new CopyWebpackPlugin([
-              { from: 'popup/popup.html', to: `404.html`, transform: transformHtml },
-            ]),
-          ]
+          new CopyWebpackPlugin([{ from: 'web', to: `../` }]),
+          new CopyWebpackPlugin([
+            { from: 'popup/popup.html', to: `404.html`, transform: transformHtml },
+          ]),
+        ]
         : []),
       ...(platform === 'aepp'
         ? [
-            new CopyWebpackPlugin([
-              { from: '../tests/aepp/aepp.html', to: `aepp.html`, transform: transformHtml },
-            ]),
-          ]
+          new CopyWebpackPlugin([
+            { from: '../tests/aepp/aepp.html', to: `aepp.html`, transform: transformHtml },
+          ]),
+        ]
         : []),
     ],
   };
@@ -252,5 +337,5 @@ const getConfig = platform => {
 
 module.exports = (process.env.RUNNING_IN_TESTS
   ? ['extension-chrome', 'aepp']
-  : ['extension-chrome', 'extension-firefox', 'cordova', 'web']
+  : ['extension-chrome', 'extension-firefox', 'web']
 ).map(p => getConfig(p));

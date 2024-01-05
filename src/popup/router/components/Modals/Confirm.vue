@@ -22,7 +22,7 @@ export default {
     resolve: { type: Function, required: true },
     reject: { type: Function, required: true },
     title: { type: String, required: false },
-    msg: { type: String, required: false },
+    msg: { type: String || Object, required: false },
   },
   components: { Modal, Button },
   methods: {

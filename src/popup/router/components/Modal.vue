@@ -3,7 +3,12 @@
     <div class="modal--mask">
       <div class="modal--wrapper">
         <div class="modal--container">
-          <Close v-if="close" class="modal--close" @click="$emit('close')" />
+          <img
+            src="../../../icons/close.svg"
+            v-if="close"
+            class="modal--close"
+            @click="$emit('close')"
+          />
           <div v-if="$slots.header" class="modal--header">
             <slot name="header" />
           </div>
@@ -20,15 +25,11 @@
 </template>
 
 <script>
-import Close from '../../../icons/close.svg?vue-component';
-
 export default {
   props: {
     close: { type: Boolean },
   },
-  components: {
-    Close,
-  },
+  components: {},
   mounted() {
     if (document.body.style.overflow) return;
     document.body.style.overflow = 'hidden';

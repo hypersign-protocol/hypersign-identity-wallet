@@ -1,16 +1,22 @@
 <template>
   <div class="header" v-if="showNavigation && !aeppPopup">
     <div class="content" :class="{ isLoggedIn }">
-      <Arrow v-if="title && !tourRunning && !dontGoBack" @click="back" class="back-arrow" data-cy="back-arrow" /> 
-      <button :class="$route.path === '/intro' && !isLoggedIn ? 'intro_style' : ''" v-else>
-      </button>
+      <img
+        src="../../../icons/arrow.svg"
+        v-if="title && !tourRunning && !dontGoBack"
+        @click="back"
+        class="back-arrow"
+        data-cy="back-arrow"
+      />
+      <button :class="$route.path === '/intro' && !isLoggedIn ? 'intro_style' : ''" v-else></button>
       <div class="title">
         <span v-show="title">{{ $t(`pages.titles.${title}`) }}</span>
         <span v-show="!title">{{ $t('pages.titles.home') }}</span>
       </div>
 
       <div v-if="isLoggedIn">
-        <Settings
+        <img
+          src="../../../icons/settings.svg"
           v-if="$route.path === '/notifications'"
           class="settings"
           @click="$router.push('/notification-settings')"
@@ -23,7 +29,7 @@
             <!-- <Bell /> -->
           </span>
           <button @click="$emit('toggle-sidebar')" style="floa">
-            <Hamburger data-cy="hamburger" />
+            <img src="../../../icons/hamburger.svg" data-cy="hamburger" />
           </button>
         </template>
       </div>
@@ -33,15 +39,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import Arrow from '../../../icons/arrow.svg?vue-component';
-import Bell from '../../../icons/bell.svg?vue-component';
-import Hamburger from '../../../icons/hamburger.svg?vue-component';
-import Logo from '../../../icons/logo-small.svg?vue-component';
-import Settings from '../../../icons/settings.svg?vue-component';
-import QrIcon from '../../../icons/qr-code.svg?vue-component';
 
 export default {
-  components: { Arrow, Bell, Hamburger, QrIcon, Settings },
+  components: {},
   data: () => ({
     aeppPopup: window.RUNNING_IN_POPUP,
   }),
@@ -51,7 +51,7 @@ export default {
   //   };
   // },
   computed: {
-    ...mapState(['tourRunning', 'isLoggedIn', 'notifications','dontGoBack']),
+    ...mapState(['tourRunning', 'isLoggedIn', 'notifications', 'dontGoBack']),
     title() {
       return this.$route.meta.title;
     },

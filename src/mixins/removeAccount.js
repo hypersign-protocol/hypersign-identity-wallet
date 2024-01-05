@@ -33,7 +33,7 @@ export default {
         if (process.env.IS_EXTENSION) postMessage({ type: AEX2_METHODS.LOGOUT });
       }
     },
-    async forgetPassword(title,msg) {
+    async forgetPassword(title, msg) {
       const remove = await this.$store
         .dispatch('modals/open', {
           name: 'confirm',
@@ -68,23 +68,22 @@ export default {
           connection: "google-oauth2",
           redirectUri: window.location.origin + "/auth/google?"
         });
-
     },
-    async removeAccountSilent(){
-        if (process.env.PLATFORM === 'web' && IN_FRAME) {
-          const { sdk } = this.$store.state;
-          const { clients } = sdk.getClients();
-          Array.from(clients.values()).forEach(aepp => {
-            aepp.sendMessage(
-              { method: 'connection.close', params: { reason: 'bye' }, jsonrpc: '2.0' },
-              true,
-            );
-            aepp.disconnect();
-          });
-        }
-        await this.$store.dispatch('reset');
-        localStorage.removeItem('authToken')
-        this.loginWithGoogle()
+    async removeAccountSilent() {
+      if (process.env.PLATFORM === 'web' && IN_FRAME) {
+        const { sdk } = this.$store.state;
+        const { clients } = sdk.getClients();
+        Array.from(clients.values()).forEach(aepp => {
+          aepp.sendMessage(
+            { method: 'connection.close', params: { reason: 'bye' }, jsonrpc: '2.0' },
+            true,
+          );
+          aepp.disconnect();
+        });
+      }
+      await this.$store.dispatch('reset');
+      localStorage.removeItem('authToken')
+      this.loginWithGoogle()
     }
   },
 };
