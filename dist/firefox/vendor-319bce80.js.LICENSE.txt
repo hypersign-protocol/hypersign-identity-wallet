@@ -1,0 +1,9 @@
+/*!
+ * Copyright (c) 2018-2021 Digital Bazaar, Inc. All rights reserved.
+ */
+
+/*!
+ * Copyright (c) 2020 Digital Bazaar, Inc. All rights reserved.
+ */
+
+/*! For license information please see context.js.LICENSE.txt */
