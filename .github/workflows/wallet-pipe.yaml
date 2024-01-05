@@ -68,5 +68,12 @@ jobs:
         run: gcloud container clusters get-credentials hypermine-gke --region=asia-south1
       - name: Replace tags
         run: find .deploy/deployment.yaml -type f -exec sed  -i -e "s#__LATEST_RELEASE_TAG__#${{ env.LATEST_RELEASE_TAG }}#" {} \;
+      - name: "Replace secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_ARTIFACT_URL__/${{ secrets.GOOGLE_ARTIFACT_URL }}/g'' {} \;
+      - name: "Replace secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_ARTIFACT_REPO__/${{ secrets.GOOGLE_ARTIFACT_REPO }}/g'' {} \;
+      - name: "Replace secrets"
+        run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_PROJECT_ID__/${{ secrets.GOOGLE_PROJECT_ID }}/g'' {} \;
+
       - name: "Deploy to GKE"
         run: kubectl apply -f .deploy/deployment.yaml

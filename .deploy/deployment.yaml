@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: wallet-prajna
-          image: pratapmridha/wallet:__LATEST_RELEASE_TAG__
+          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/wallet:__LATEST_RELEASE_TAG__
+          imagePullPolicy: Always
           resources:
             limits:
               memory: "256Mi"
