@@ -38,8 +38,10 @@ jobs:
           GOOGLE_PROJECT_ID: ${{secrets.GOOGLE_PROJECT_ID}}
           GOOGLE_ARTIFACT_URL: ${{secrets.GOOGLE_ARTIFACT_URL}}
           GOOGLE_ARTIFACT_REPO: ${{secrets.GOOGLE_ARTIFACT_REPO}}
-        run:
-          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/wallet:${{ env.LATEST_RELEASE_TAG }} /dist/web
+        run: cp dist/web
+
+          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/wallet:${{ env.LATEST_RELEASE_TAG }} .
+
           docker push $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/wallet:${{ env.LATEST_RELEASE_TAG }}
   Deploy:
     needs: [Build]
