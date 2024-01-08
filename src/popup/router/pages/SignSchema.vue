@@ -74,12 +74,12 @@ export default {
     this.schemaRaw = this.hypersign.requestingAppInfo.data;
     // console.log(JSON.stringify(this.schemaRaw))
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(
-      hidWalletInstance.offlineSigner,
-      HIDNODE_RPC,
-      HIDNODE_REST,
-      HIDNODE_NAMESPACE,
-    );
+    this.hsSDK = new HypersignSSISdk({
+      offlineSigner: hidWalletInstance.offlineSigner,
+      nodeRpcEndpoint: HIDNODE_RPC,
+      nodeRestEndpoint: HIDNODE_REST,
+      namespace: HIDNODE_NAMESPACE,
+    });
     await this.hsSDK.init();
     // await this.signAndSendToBlockchain();
   },
@@ -91,7 +91,7 @@ export default {
     async prepareSchema() {
       // using hs-ssi-sdk to g
       const schemaOptions = this.schemaRaw; // JSON.parse(this.schemaRaw)
-      return await this.hsSDK.schema.getSchema({
+      return await this.hsSDK.schema.generate({
         name: schemaOptions.name,
         description: schemaOptions.description,
         author: schemaOptions.author, //orgDid
@@ -104,12 +104,14 @@ export default {
         this.loading = true;
         const schemaToSign = await this.prepareSchema();
         // console.log(schemaToSign);
-        const signature = await this.hsSDK.schema.signSchema({
-          privateKey: this.hypersign.keys.privateKeyMultibase,
+        const signature = await this.hsSDK.schema.sign({
+          privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
           schema: schemaToSign,
+          verificationMethodId:this.hypersign.didDoc.verificationMethod[0].id
         });
         const { assertionMethod } = this.hypersign.didDoc;
         // TODO: This should go into hs-ssi-sdk
+        console.log(signature, assertionMethod);
         let proof = {
           type: 'Ed25519Signature2020',
           created: schemaToSign.authored,
@@ -118,7 +120,7 @@ export default {
           proofPurpose: 'assertion',
         };
 
-        const result = await this.hsSDK.schema.registerSchema({ schema: schemaToSign, proof });
+        const result = await this.hsSDK.schema.register({ schema: signature });
         if (result) {
           this.$store.dispatch('modals/open', { name: 'default', msg: result.transactionHash });
           /// call the sutatus API of the studio/dappp server to for updating the status in db.

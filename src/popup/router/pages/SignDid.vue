@@ -91,12 +91,13 @@ export default {
 
     this.didRaw = this.hypersign.requestingAppInfo.data;
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(
-      hidWalletInstance.offlineSigner,
-      HIDNODE_RPC,
-      HIDNODE_REST,
-      HIDNODE_NAMESPACE,
-    );
+    this.hsSDK = new HypersignSSISdk({
+      offlineSigner: hidWalletInstance.offlineSigner,
+      nodeRpcEndpoint: HIDNODE_RPC,
+      nodeRestEndpoint: HIDNODE_REST,
+
+      namespace: HIDNODE_NAMESPACE,
+    });
     await this.hsSDK.init();
     // await this.signAndSendToBlockchain();
   },
@@ -115,6 +116,7 @@ export default {
         const didDoc = await this.hsSDK.did.generate({ publicKeyMultibase: kp.publicKeyMultibase });
         didDoc.keyAgreement = [];
         // let didDoc = JSON.parse(didDocString);
+        console.log(this.didRaw);
         const { controllers, alsoKnownAs, serviceEndpoint } = this.didRaw;
 
         if (!Array.isArray(controllers)) {
@@ -154,8 +156,6 @@ export default {
             didDoc.verificationMethod.push(didDocument.verificationMethod[0]);
             didDoc.authentication.push(didDocument.authentication[0]);
             didDoc.assertionMethod.push(didDocument.assertionMethod[0]);
-            didDoc.capabilityInvocation.push(didDocument.capabilityInvocation[0]);
-            didDoc.capabilityDelegation.push(didDocument.capabilityDelegation[0]);
           }
         }
 
@@ -165,20 +165,20 @@ export default {
         }
 
         if (serviceEndpoint) {
-          didDoc.service.push({
-            id: `${didDoc.id}#linked-domain`,
-            type: 'LinkedDomains',
-            serviceEndpoint: serviceEndpoint + didDoc.id,
-          });
+          // didDoc.service.push({
+          //   id: `${didDoc.id}#ld-1`,
+          //   type: 'LinkedDomains',
+          //   serviceEndpoint: serviceEndpoint +'/'+ didDoc.id,
+          // });
         }
         const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id;
 
+        console.log(this.hypersign.keys);
         const result = await this.hsSDK.did.register({
           didDocument: didDoc,
           privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
           verificationMethodId,
         });
-
         if (!result) {
           throw new Error('Could not register the did');
         }

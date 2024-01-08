@@ -21,8 +21,8 @@ export const HYPERSIGN_AUTH_PROVIDER = {
   TWITTER: 'twitter',
   FACEBOOK: 'facebook',
 };
-export const HIDNODE_RPC = 'https://rpc.prajna.hypersign.id';
-export const HIDNODE_REST = 'https://api.prajna.hypersign.id';
+export const HIDNODE_RPC = 'https://rpc.prajna.hypersign.id/';
+export const HIDNODE_REST = 'https://api.prajna.hypersign.id/';
 
 // export const HIDNODE_RPC = 'http://127.0.0.1:26657/'
 // export const HIDNODE_REST = "http://127.0.0.1:1317/"
