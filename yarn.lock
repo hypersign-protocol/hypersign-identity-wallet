@@ -7664,8 +7664,9 @@ hpack.js@^2.1.6:
     readable-stream "^2.0.1"
     wbuf "^1.1.0"
 
-hs-ssi-sdk@../hid-ssi-js-sdk:
+"hs-ssi-sdk@github:hypersign-protocol/hid-ssi-js-sdk#testcase/bjj":
   version "7.0.1"
+  resolved "https://codeload.github.com/hypersign-protocol/hid-ssi-js-sdk/tar.gz/d552c9fab0a0c777f3a236ee0fd9019a5d2914d3"
   dependencies:
     "@cfworker/json-schema" "github:hypersign-protocol/json-schema"
     "@cosmjs/proto-signing" "^0.31.0"

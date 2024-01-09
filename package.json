@@ -55,7 +55,7 @@
         "detect-browser": "^4.8.0",
         "file-loader": "^6.2.0",
         "gh-pages": "^4.0.0",
-        "hs-ssi-sdk": "../hid-ssi-js-sdk",
+        "hs-ssi-sdk": "github:hypersign-protocol/hid-ssi-js-sdk#testcase/bjj",
         "html-webpack-plugin": "^5.6.0",
         "jdenticon": "^2.2.0",
         "lodash-es": "^4.17.15",

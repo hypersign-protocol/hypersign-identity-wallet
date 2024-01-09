@@ -181,7 +181,6 @@ export default {
           holderDid: this.hypersign.did,
         });
         const verificationMethodId = `${this.hypersign.did}#key-1`;
-        console.log(vp_unsigned);
         const vp_signed = await this.hsSDK.vp.sign({
           presentation: vp_unsigned,
           holderDidDocSigned: this.hypersign.didDoc,
@@ -192,7 +191,6 @@ export default {
         });
 
         console.log(vp_signed);
-
 
         const body = {
           challenge,

@@ -170,17 +170,17 @@ export default {
 
         const expirationDate = new Date('12/11/2027');
 
-        const vc = await hsSdk.vc.getCredential({
+        const vc = await hsSdk.vc.generate({
           schemaId: this.schemaId,
           subjectDid: this.hypersign.did,
           issuerDid: this.hypersign.did,
           expirationDate,
           fields,
         });
-        const signedVc = await hsSdk.vc.issueCredential({
+        const signedVc = await hsSdk.vc.issue({
           credential: vc,
           issuerDid: this.hypersign.didDoc.id,
-          privateKey: this.hypersign.keys.privateKeyMultibase,
+          privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
           verificationMethodId: `${this.hypersign.didDoc.id}#key-1`,
         });
 

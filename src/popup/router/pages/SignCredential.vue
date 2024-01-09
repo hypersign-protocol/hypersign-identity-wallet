@@ -94,12 +94,12 @@ export default {
 */
     this.credentialRaw = this.hypersign.requestingAppInfo.data;
     await hidWalletInstance.generateWallet(this.mnemonic);
-    this.hsSDK = new HypersignSSISdk(
-      hidWalletInstance.offlineSigner,
-      HIDNODE_RPC,
-      HIDNODE_REST,
-      HIDNODE_NAMESPACE,
-    );
+    this.hsSDK = new HypersignSSISdk({
+      offlineSigner: hidWalletInstance.offlineSigner,
+      nodeRpcEndpoint: HIDNODE_RPC,
+      nodeRestEndpoint: HIDNODE_REST,
+      namespace: HIDNODE_NAMESPACE,
+    });
     await this.hsSDK.init();
     // await this.signAndSendToBlockchain();
   },
@@ -129,7 +129,7 @@ export default {
         throw new Error('expirationDate is missing');
       }
 
-      return await this.hsSDK.vc.getCredential({
+      return await this.hsSDK.vc.generate({
         schemaId,
         // subjectDidDocSigned:this.hypersign.didDoc ,
         subjectDid,
@@ -272,10 +272,10 @@ export default {
           return;
         }
         const vc = await this.prepareCredential();
-        const result = await this.hsSDK.vc.issueCredential({
+        const result = await this.hsSDK.vc.issue({
           credential: vc,
           issuerDid: this.hypersign.did,
-          privateKey: this.hypersign.keys.privateKeyMultibase,
+          privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
           verificationMethodId: `${this.hypersign.didDoc.id}#key-1`,
         });
 
