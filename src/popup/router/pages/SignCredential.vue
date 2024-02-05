@@ -109,34 +109,54 @@ export default {
       this.$router.push('/account');
     },
     async prepareCredential() {
-      // using hs-ssi-sdk to g
-      const schemaOptions = this.credentialRaw;
-      const { fields, subjectDid, schemaId, expirationDate, issuerDid } = this.credentialRaw;
-      // console.log("Credential to sign",  this.credentialRaw);
-      if (!fields) {
-        throw new Error('field is missing');
-      }
+      try {
+        // using hs-ssi-sdk to g
+        const schemaOptions = this.credentialRaw;
+        const { fields, subjectDid, schemaId, expirationDate, issuerDid } = this.credentialRaw;
+        const attr = {};
+        fields.forEach(field => {
+          if (field.type == 'string') {
+            attr[field.name] = String(field.value);
+          }
+          if (field.type == 'number') {
+            attr[field.name] = Number(field.value);
+          }
+          if (field.type == 'boolean') {
+            attr[field.name] =
+              field.value == 'false' ? false : field.value == 'true' ? true : Boolean(field.value);
+          }
+          if (field.type == 'date-time') {
+            attr[field.name] = new Date(field.value).toISOString();
+          }
+        });
+        // console.log("Credential to sign",  this.credentialRaw);
 
-      if (!subjectDid) {
-        throw new Error('subject did is missing');
-      }
+        if (!fields) {
+          throw new Error('field is missing');
+        }
 
-      if (!schemaId) {
-        throw new Error('schemaId is missing');
-      }
+        if (!subjectDid) {
+          throw new Error('subject did is missing');
+        }
 
-      if (!expirationDate) {
-        throw new Error('expirationDate is missing');
-      }
+        if (!schemaId) {
+          throw new Error('schemaId is missing');
+        }
 
-      return await this.hsSDK.vc.generate({
-        schemaId,
-        // subjectDidDocSigned:this.hypersign.didDoc ,
-        subjectDid,
-        issuerDid,
-        expirationDate,
-        fields,
-      });
+        if (!expirationDate) {
+          throw new Error('expirationDate is missing');
+        }
+        return await this.hsSDK.vc.generate({
+          schemaId,
+          // subjectDidDocSigned:this.hypersign.didDoc ,
+          subjectDid,
+          issuerDid,
+          expirationDate,
+          fields: attr,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     },
     async checkCredentialStatus(url) {
       return await axios.get(url);
@@ -165,7 +185,7 @@ export default {
                             "status": 'SUSPENDED',
                             "vcId":'vc:test:.............'
                             "credentialStatusUrl":'',
-    
+
                         }
                         }
                 */
@@ -188,31 +208,33 @@ export default {
         ) {
           credential = await this.checkCredentialStatus(this.credentialRaw.credentialStatusUrl);
           credential = credential.data;
-          const status = credential.credStatus.claim.currentStatus.toUpperCase();
-          // console.log('status',status);
-          if (status === 'REVOKED' || status === 'EXPIRED') {
-            throw new Error(`Credential is already ${status.toLowerCase()}`);
+          const revoked = credential.credentialStatus.credentialStatusDocument.revoked;
+          const suspended = credential.credentialStatus.credentialStatusDocument.suspended;
+          if (this.credentialRaw.status === 'REVOKED' && revoked === true) {
+            throw new Error(`Credential is already ${this.credentialRaw.status.toLowerCase()}`);
           }
-          if (status === 'SUSPENDED' && this.credentialRaw.status === 'SUSPENDED') {
-            throw new Error(`Credential is already ${status.toLowerCase()}`);
+          if (this.credentialRaw.status === 'SUSPENDED' && suspended == true) {
+            throw new Error(`Credential is already ${this.credentialRaw.status.toLowerCase()}`);
           }
 
-          if (status === 'LIVE' && this.credentialRaw.status === 'LIVE') {
-            throw new Error(`Credential is already ${status.toLowerCase()}`);
+          if (this.credentialRaw.status === 'LIVE' && revoked == false && suspended == false) {
+            throw new Error(`Credential is already ${this.credentialRaw.status.toLowerCase()}`);
           }
           // if vc is not found then throw error
           if (!credential || credential === undefined) {
             throw new Error('credential not found in the revocation registry');
           } else {
-            const privateKey = this.hypersign.keys.privateKeyMultibase;
-            const issuerDid = this.hypersign.did;
-            const verificationMethodId = this.hypersign.didDoc.verificationMethod[0].id;
             // update the credential status
+
+            const credentialStatus = await this.hsSDK.vc.resolveCredentialStatus({
+              credentialId: this.credentialRaw.vcId,
+            });
+    
             const result = await this.hsSDK.vc.updateCredentialStatus({
-              credStatus: credential.credStatus,
-              privateKey,
-              issuerDid,
-              verificationMethodId,
+              credentialStatus: credentialStatus,
+              privateKeyMultibase: this.hypersign.keys.privateKeyMultibase,
+              issuerDid: this.hypersign.did,
+              verificationMethodId: `${this.hypersign.didDoc.id}#key-1`,
               status: this.credentialRaw.status,
               statusReason: this.credentialRaw.statusReason,
             });
