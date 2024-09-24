@@ -1,4 +1,50 @@
-body,html,.content{margin:0 !important;padding:0 !important;height:100% !important}.ae-panel{position:fixed;left:50%;top:50%;transform:translate(-50%, -50%);-ms-transform:translate(-50%, -50%);-webkit-transform:translate(-50%, -50%);padding:15px;width:80%;max-width:80% !important}.ae-icon{vertical-align:middle;margin-right:5px;line-height:32px !important;display:inline-block !important;margin-top:-5px}p{font-size:1.2rem;text-align:left}a{color:#f1f1f1;text-decoration:underline;cursor:pointer}.text-center{text-align:center}.ae-main{background:#f1f1f1 !important}
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/sass-loader/dist/cjs.js??clonedRuleSet-3.use[2]!../node_modules/vue-loader/lib/index.js??vue-loader-options!./phishing/App.vue?vue&type=style&index=0&id=7f6f879c&lang=scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+/** Colors for new designs */
+body,
+html,
+.content {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+}
+.ae-panel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  padding: 15px;
+  width: 80%;
+  max-width: 80% !important;
+}
+.ae-icon {
+  vertical-align: middle;
+  margin-right: 5px;
+  line-height: 32px !important;
+  display: inline-block !important;
+  margin-top: -5px;
+}
+p {
+  font-size: 1.2rem;
+  text-align: left;
+}
+a {
+  color: #f1f1f1;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.text-center {
+  text-align: center;
+}
+.ae-main {
+  background: #f1f1f1 !important;
+}
+/*!************************************************************************************************************************!*\
+  !*** css ../node_modules/css-loader/dist/cjs.js!../node_modules/@aeternity/aepp-components-3/dist/aepp.components.css ***!
+  \************************************************************************************************************************/
 
 .ae-address[data-v-55eec12f], .ae-address.v-copied-to-clipboard[data-v-55eec12f]:before {
   font-family: "IBM Plex Mono", monospace;
