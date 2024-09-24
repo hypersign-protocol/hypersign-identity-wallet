@@ -66,6 +66,7 @@
         "rxjs-etc": "^10.4.0",
         "sass": "^1.69.5",
         "sass-loader": "10",
+        "serve": "^14.2.3",
         "style-loader": "^3.3.3",
         "tweetnacl": "^1.0.3",
         "url-parse": "^1.4.7",
