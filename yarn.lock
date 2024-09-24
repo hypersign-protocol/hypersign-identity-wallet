@@ -8885,6 +8885,7 @@ javascript-stringify@^1.6.0:
 
 "jcs@https://github.com/hypersign-protocol/JCS.git":
   version "0.0.1"
+  uid d47e953505648c5f0e778dc024f64c65339558cb
   resolved "https://github.com/hypersign-protocol/JCS.git#d47e953505648c5f0e778dc024f64c65339558cb"
 
 jdenticon@^2.2.0:
